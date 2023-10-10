@@ -9,19 +9,19 @@ class Mng_Runtime: public BaseComponent {
     //! 1 Second Interval
     void render1s_Interval() {
         if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
-            device->addDisplayQueue1(device->appClock.getDisplay(), 1);      //* LINE 1   
-            device->addDisplayQueue1(asyncTimer1.record(), 2);                 //* LINE 2
-            device->addDisplayQueue1(asyncTimer2.record(), 3);                 //* LINE 3
-            device->addDisplayQueue1(device->i2c1.sensors.getTempHumLux(), 5); //* LINE 5
+            device->addDisplayQueue1(device->appClock.getDisplay(), 1);         //* LINE 1   
+            device->addDisplayQueue1(asyncTimer1.record(), 2);                  //* LINE 2
+            device->addDisplayQueue1(asyncTimer2.record(), 3);                  //* LINE 3
+            device->addDisplayQueue1(device->i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
 
         } else if (device->i2c1.dispMode == DISPLAY_2ND) {
             network->handle_1secInterval();
         }
 
-        device->addDisplayQueue2(device->appClock.getDisplay(), 1);      //* LINE 1
-        device->addDisplayQueue2(asyncTimer1.record(), 2);                 //* LINE 2
-        device->addDisplayQueue2(asyncTimer2.record(), 3);                 //* LINE 3
-        device->addDisplayQueue2(device->i2c1.sensors.getTempHumLux(), 5); //* LINE 5
+        device->addDisplayQueue2(device->appClock.getDisplay(), 1);             //* LINE 1
+        device->addDisplayQueue2(asyncTimer1.record(), 2);                      //* LINE 2
+        device->addDisplayQueue2(asyncTimer2.record(), 3);                      //* LINE 3
+        device->addDisplayQueue2(device->i2c1.sensors.getTempHumLux(), 5);      //* LINE 5
     }
 
     //! 5 Seconds Interval
@@ -33,11 +33,11 @@ class Mng_Runtime: public BaseComponent {
         if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
             device->addDisplayQueue1(hostName, 0);     //! Oled Mini LINE 0  
             device->addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
-            device->addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);     //* LINE 6
+            device->addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
         }
         device->addDisplayQueue2(hostName, 0);         //* LINE 0
         device->addDisplayQueue2(sdSize, 4);           //* LINE 4
-        device->addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);     //* LINE 6
+        device->addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);          //* LINE 6
     }
 
     //! 3 Seconds Interval

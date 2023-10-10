@@ -1,34 +1,111 @@
 // #define TTGO_LORA32 true
 
-#define MAX_DISPLAY_QUEUE1 8
-#define MAX_DISPLAY_QUEUE2 20
+// #define MAX_DISPLAY_QUEUE1 8
+// #define MAX_DISPLAY_QUEUE2 20
 
 // #define DEV_KMC_70011 1
 
-class Serv_Device: public BaseComponent {
-    AppQueue<DispItem, MAX_DISPLAY_QUEUE1> dispQueue1;
-    AppQueue<DispItem, MAX_DISPLAY_QUEUE2> dispQueue2;
+class Serv_Device: public BaseComponent, public Serv_Serial {
 
+    std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
+        String output = "IrRead = " + (status ? String(value) : "Locked");
+        AppPrint("[IR]", output);
+        addDisplayQueue1(output, 6);
+    };
+
+    std::function<void(bool, uint8_t)> pirCb = [&](bool status, uint8_t pin) {
+        Serial.print("PirTriggered = "); Serial.print(pin);
+        Serial.print(" | "); Serial.println(status);
+    };
+
+    BNT_Hold releasedState = HOLD_TRANSITION;
+
+    std::function<void(BTN_Action, BNT_Hold, uint32_t)> buttonCb = 
+                        [&](BTN_Action action, BNT_Hold hold, uint32_t elapse) {
+        switch (action) {
+            case ACTION_SINGLE_CLICK: {
+                xSerial.println("Hellow there\n");
+                addDisplayQueues("Single Click", 6);
+                // network.handleSingleClick();
+                if (onHandleSingleClick) (*onHandleSingleClick)();
+                toggleRelay();
+
+                // uint8_t read = digitalRead(14);
+                // digitalWrite(14, !read);
+
+                // servDev.buzzer.toggle();
+                // servDev.storage.testSetupData();
+                // led.toggle();
+
+                // power.goToSleep(27, true);
+
+                // if (power.wakeUpCauseResume()) {
+                //     network.resetNetwork();
+                // }
+
+                break;
+            }   
+            case ACTION_DOUBLE_CLICK: {
+                addDisplayQueues("Double Click", 6);
+                // servDev.i2c1.switchDisplayMode();
+                // network.handleDoubleClick();
+                if (onHandleDoubleClick) (*onHandleDoubleClick)();
+                break;
+            }
+            case ACTION_PRESS_ACTIVE: {
+                //! Long press 20 sec -> Recovery/Factory Reset - turn off
+                if (hold == HOLD_20_SEC) {
+                    addDisplayQueues("[Bnt] 20sec hold", 6);
+                    led.setOFF();
+                    storage.deleteData();
+
+                //! Long press 10 sec -> Reset - fash flashing
+                } else if (hold == HOLD_10_SEC) {
+                    addDisplayQueues("[Bnt] 10sec hold", 6);
+                    led.repeatPulses(400);
+                    releasedState = hold;
+
+                //! Long press 5 sec -> Pairing - double flashing
+                } else if (hold == HOLD_5_SEC) {
+                    addDisplayQueues("[Bnt] 5sec hold", 6);
+                    led.repeatPulses(20);
+                    releasedState = hold;
+                }
+                break;
+            }
+            case ACTION_PRESS_END: {
+                addDisplayQueues("Press Ended " + String(elapse), 6);
+                if (releasedState == HOLD_5_SEC) {
+                    MY_ESP.restart();           //! Restart Device
+                } else if (releasedState == HOLD_10_SEC) {
+                    // network.startAP(true);      //! Start access point
+                    if (onHandleAPRequest) (*onHandleAPRequest)();
+                }
+                break;
+            }
+        }
+    };
+
+    
     public:
-        Serv_Device(): BaseComponent("Dev") {}
+        Serv_Device(): BaseComponent("Dev"), Serv_Serial() {}
 
         WS28xx ws2812;
         MyButton button1;
         PinWritable pinWrite;
         IRSwitch irSwitch;
-        Disp_ST77 largeDisp;
-        SerialControl serial;
+        // SerialControl serial;
         EdgeDetector edgeDetector;
         PinsConf P_CONF;
         ExtraSerial xSerial;
 
-        Serv_I2C i2c1;
-        Serv_I2C i2c2;
-        Mng_Storage storage;
         OutputController led, buzzer;
         PinWritable relay1;
-        Mng_AppClock appClock;
-        
+
+        std::function<void()> *onHandleSingleClick;
+        std::function<void()> *onHandleDoubleClick;
+        std::function<void()> *onHandleAPRequest;
+
         virtual void showLadderId() {}
 
         void configure() {
@@ -126,37 +203,11 @@ class Serv_Device: public BaseComponent {
             ws2812.setup(P_CONF.ws2812);
             // xSerial.setup(P_CONF.swRx, P_CONF.swTx);
 
-            //! setup i2C
-            if (P_CONF.checkWire0()) {
-                i2c1.setup(P_CONF.scl0, P_CONF.sda0, &Wire);    //! ORDER DOES MATTER
-                appClock.setup(&(i2c1.rtc));                    //! ORDER DOES MATTER
-            }
+            setupSerial(&P_CONF);
 
-            #ifdef ESP32
-                // pinMode(14, OUTPUT);
-                pinMode(36, INPUT);
-                pinMode(39, INPUT);
-                i2c2.setup(P_CONF.scl1, P_CONF.sda1, &Wire1);
-            #endif
-
-            storage.setup();
-
-            if (P_CONF.checkHSPIPins() && P_CONF.out3 != 255) {
-                MY_ESP.printSPIPins();
-
-                appTimer0.logElapse("LogTime until Storage");
-
-                #ifdef ESP32
-                    SPI.begin(P_CONF.sck0, P_CONF.miso0, P_CONF.mosi0);
-                #else
-                    SPI.begin();
-                #endif
-                storage.setupSDCard(P_CONF.out0);
-
-                pinMode(P_CONF.out3, OUTPUT);
-                digitalWrite(P_CONF.out3, HIGH);
-                largeDisp.setup2(P_CONF.out1, P_CONF.out2, P_CONF.rst0, P_CONF.mosi0, P_CONF.sck0);
-            }
+            irSwitch.load(P_CONF.irSwitch, &irSwitchCb);
+            edgeDetector.setup(P_CONF.pir1, &pirCb);
+            button1.setup(P_CONF.btn1, &buttonCb);
         }
 
         void toggleRelay() {
@@ -174,61 +225,6 @@ class Serv_Device: public BaseComponent {
             // buzzer.run();
             // edgeDetector.run();
             // xSerial.run();
-        }
-
-        //! DisplayQueue1
-        void addDisplayQueue1(String str, uint8_t line) {
-            if (!i2c1.isLoaded) return;
-            const char* arr = str.c_str();
-            DispItem item = DispItem::make(arr, line);
-            dispQueue1.sendQueue(&item);   
-        }
-
-        //! DisplayQueue2
-        void addDisplayQueue2(String str, uint8_t line) {
-            if (!largeDisp.isLoaded) return;
-            const char* arr = str.c_str();
-            DispItem item = DispItem::make(arr, line);
-            dispQueue2.sendQueue(&item);            
-        }
-
-        //! Add to both DisplayQueue1 and DisplayQueue2
-        void addDisplayQueues(String str, uint8_t line) {
-            addDisplayQueue1(str, line);
-            addDisplayQueue2(str, line);
-        }
-
-        //! store and reset sensors readings
-        void addStoreQueue() {
-            if (!storage.isValidPath()) return;
-            float temp, hum, lux;
-            i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
-            storage.addStoreTempHumLuxQueue(temp, hum, lux, appClock.getTimeNow());
-        }
-
-        //! Handle Qeueues
-        void handleQueues() {
-            DispItem item;
-            //! Handle one at a time
-            if (dispQueue1.getQueue(&item)) {
-                i2c1.disp.printline(String(item.data), item.line);
-            } 
-            //! Finish dispQueue1 first
-            else if (dispQueue2.getQueue(&item)) {
-                largeDisp.printline(String(item.data), item.line);
-            }
-            //! Finish dispQueue2 first
-            else {
-                //! handle valueQueue
-                storage.handleValueQueue([&](uint32_t writeTime) {
-                    addDisplayQueue2("sd write: " + String(writeTime) + "ms", 8);
-                });
-            }
-        }
-
-        void tick() {
-            i2c1.run();
-            handleQueues();         //! handle DisplayQueues
         }
 
         void setFrequency() {

@@ -68,7 +68,7 @@ class Serv_Network: public BaseComponent {
         } 
         
         AppPrint(output.c_str());
-        device->addDisplayQueue2(output, 6);
+        device->addDisplayQueues(output, 6);    //* LINE 6
     }
 
     void scanChannels() {
