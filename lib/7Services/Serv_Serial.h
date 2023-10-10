@@ -13,16 +13,18 @@ class Serv_Serial {
         if (onHandleResetWifi) (*onHandleResetWifi)();
     };
 
+    protected:
+        SerialControl serial;
+
     public:
         Serv_I2C i2c1;
         Serv_I2C i2c2;
-        SerialControl serial;
         Mng_Storage storage;
         Mng_AppClock appClock;
 
         std::function<void()> *onHandleResetWifi;
 
-        void setupSerial(PinsConf* conf) {
+        void setupSerial(PinConfig* conf) {
             //! setup i2C
             if (conf->checkWire0()) {
                 i2c1.setup(conf->scl0, conf->sda0, &Wire);    //! ORDER DOES MATTER
@@ -56,6 +58,69 @@ class Serv_Serial {
             }
 
             serial.onStoreCred = &storeCredCb;
+        }
+
+        //! 1 Second Interval
+        void render1s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2, std::function<void()> handleDisplayMode) {
+            if (i2c1.dispMode == DISPLAY_DEFAULT) {
+                addDisplayQueue1(appClock.getDisplay(), 1);         //* LINE 1   
+                addDisplayQueue1(aTimer1->record(), 2);             //* LINE 2
+                addDisplayQueue1(aTimer2->record(), 3);             //* LINE 3
+                addDisplayQueue1(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+
+            } else if (i2c1.dispMode == DISPLAY_2ND) {
+                handleDisplayMode();
+            }
+
+            addDisplayQueue2(appClock.getDisplay(), 1);             //* LINE 1
+            addDisplayQueue2(aTimer1->record(), 2);                      //* LINE 2
+            addDisplayQueue2(aTimer2->record(), 3);                      //* LINE 3
+            addDisplayQueue2(i2c1.sensors.getTempHumLux(), 5);      //* LINE 5
+        }
+
+        //! 5 Seconds Interval
+        void render5s_Interval(const char* hostName) {
+            char sdSize[22];
+            sprintf(sdSize, "sd = %u MB", storage.sd1.getCardSize());
+
+            if (i2c1.dispMode == DISPLAY_DEFAULT) {
+                addDisplayQueue1(hostName, 0);     //! Oled Mini LINE 0  
+                addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
+                addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
+            }
+            addDisplayQueue2(hostName, 0);         //* LINE 0
+            addDisplayQueue2(sdSize, 4);           //* LINE 4
+            addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);          //* LINE 6
+        }
+
+        //! 3 Seconds Interval
+        void render3s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2) {
+            char output[22];
+            sprintf(output, "dep = %u/%u", aTimer1->stackUsage, aTimer2->stackUsage);
+
+            if (i2c1.dispMode == DISPLAY_DEFAULT) {
+                // showLadderId(); // line0
+                addDisplayQueue1(String(output), 4);   //! Oled Mini LINE 4
+            }
+            addDisplayQueue2(output, 4);               //* LINE 4
+        }
+
+        //! 2 Seconds Interval
+        void render2s_Interval(String localIP) {
+            char heapInfo[22];
+            char networkInfo[64];
+            sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
+
+            uint64_t resetCount = storage.resetCount.value;
+            sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
+
+            //! Oled Mini
+            if (i2c1.dispMode == DISPLAY_DEFAULT) {
+                addDisplayQueue1(networkInfo, 0);      //! Oled Mini LINE 0
+                addDisplayQueue1(heapInfo, 4);   //! Oled Mini LINE 4        
+            }
+            addDisplayQueue2(networkInfo, 0);          //* LINE 0
+            addDisplayQueue2(heapInfo, 4);               //* LINE 4 
         }
 
         //! DisplayQueue1

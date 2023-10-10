@@ -1,12 +1,7 @@
 // #define TTGO_LORA32 true
-
-// #define MAX_DISPLAY_QUEUE1 8
-// #define MAX_DISPLAY_QUEUE2 20
-
 // #define DEV_KMC_70011 1
 
 class Serv_Device: public BaseComponent, public Serv_Serial {
-
     std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
         String output = "IrRead = " + (status ? String(value) : "Locked");
         AppPrint("[IR]", output);
@@ -16,6 +11,21 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
     std::function<void(bool, uint8_t)> pirCb = [&](bool status, uint8_t pin) {
         Serial.print("PirTriggered = "); Serial.print(pin);
         Serial.print(" | "); Serial.println(status);
+    };
+
+    std::function<void(RotaryDirection, uint8_t)> rotaryCb = [&](RotaryDirection state, uint8_t counter) {
+        #ifdef ESP32
+            String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
+            AppPrint("Read ", readings);
+            addDisplayQueues(readings, 5);
+        #endif
+
+        String dir = (state == CLOCKWISE) ? "CW" : "CCW";
+        String output =  "val=" + String(counter) + " Dir=" + dir;
+        AppPrint("[Rot]", output);
+        addDisplayQueues(output, 6);       // display
+        if (onHandleRotary) (*onHandleRotary)(state, counter);
+        // network.handleRotary(state, counter);      // network message
     };
 
     BNT_Hold releasedState = HOLD_TRANSITION;
@@ -48,7 +58,6 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
             case ACTION_DOUBLE_CLICK: {
                 addDisplayQueues("Double Click", 6);
                 // servDev.i2c1.switchDisplayMode();
-                // network.handleDoubleClick();
                 if (onHandleDoubleClick) (*onHandleDoubleClick)();
                 break;
             }
@@ -78,7 +87,6 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
                 if (releasedState == HOLD_5_SEC) {
                     MY_ESP.restart();           //! Restart Device
                 } else if (releasedState == HOLD_10_SEC) {
-                    // network.startAP(true);      //! Start access point
                     if (onHandleAPRequest) (*onHandleAPRequest)();
                 }
                 break;
@@ -86,7 +94,6 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
         }
     };
 
-    
     public:
         Serv_Device(): BaseComponent("Dev"), Serv_Serial() {}
 
@@ -94,124 +101,40 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
         MyButton button1;
         PinWritable pinWrite;
         IRSwitch irSwitch;
-        // SerialControl serial;
         EdgeDetector edgeDetector;
-        PinsConf P_CONF;
         ExtraSerial xSerial;
 
         OutputController led, buzzer;
         PinWritable relay1;
-
+        RotaryEncoder rotary;
+            
         std::function<void()> *onHandleSingleClick;
         std::function<void()> *onHandleDoubleClick;
         std::function<void()> *onHandleAPRequest;
+        std::function<void(RotaryDirection state, uint8_t counter)> *onHandleRotary;
 
         virtual void showLadderId() {}
 
-        void configure() {
-            #ifdef TTGO_LORA32
-                AppPrintSeparator("[DIRECTIVE]", "TTGO_LORA32");
-                // pinMode(16, OUTPUT);
-                // digitalWrite(16, HIGH);
-                // delay(20);
-
-                // pinMode(17, INPUT_PULLUP);
-                // pinMode(2, OUTPUT);
-                // P_CONF.sda0 = 4; P_CONF.scl0 = 15;
-                P_CONF.miso1 = 19; P_CONF.mosi1 = 23; P_CONF.sck1 = 18;  P_CONF.cs1 = 5;
-                P_CONF.di01 = 2; P_CONF.rst1 = 14;
-
-                vspi->begin(P_CONF.sck1, P_CONF.miso1, P_CONF.mosi1, P_CONF.cs1);
-                SPI.begin(P_CONF.sck1, P_CONF.miso1, P_CONF.mosi1, P_CONF.cs1);
-                // lora.setup(P_CONF.cs1, P_CONF.rst1, P_CONF.di01, *vspi);
-                
-                // lora.loadReceiveCb([this](Lora_Packet *packet) {
-                //     Serial.println("LOra received"); 
-                //     packet->print();
-                //     // i2c.disp.printline("Lora: " + String(packet->data0), 5);
-                //     // digitalWrite(2, !digitalRead(2));
-                // });
-
-            #elif defined(DEV_KMC_70011)
-                P_CONF.led1 = 13;
-                P_CONF.btn1 = 0;
-                P_CONF.relay1 = 14;
-
-            #elif ESP32
-                AppPrintSeparator("[DIRECTIVE]", "ESP32");
-                // use for disp0
-                // pinMode(5, OUTPUT);
-                // pinMode(18, OUTPUT);
-                // digitalWrite(5, LOW);
-                // digitalWrite(18, HIGH);
-
-                // P_CONF.ws2812 = 12;
-                // P_CONF.led1 = 22;
-                // P_CONF.sda0 = 32; P_CONF.scl0 = 33;
-                // P_CONF.pir1 = 36;
-                // P_CONF.irSwitch = 26;
-                // P_CONF.btn1 = 23;
-                // P_CONF.buzzer1 = 19;
-
-                P_CONF.ws2812 = 12;
-                P_CONF.led1 = 22;
-                P_CONF.btn1 = 34;
-                P_CONF.buzzer1 = 14;
-                P_CONF.rotaryA = 13; P_CONF.rotaryB = 15;
-                // P_CONF.pir1 = 36;
-                // P_CONF.irSwitch = 26;
-                // P_CONF.swRx = 0; P_CONF.swTx = 2;
-                
-                //! i2C Pins
-                P_CONF.sda0 = 33; P_CONF.scl0 = 32;
-                P_CONF.sda1 = 4; P_CONF.scl1 = 0;
-
-                //! SPI Pins
-                P_CONF.sck0 = 18;       //! SCK
-                P_CONF.mosi0 = 23;      //! MOSI
-                P_CONF.miso0 = 19;      //! MISO
-                P_CONF.rst0 = 2;        //! RST
-                
-                P_CONF.out0 = 5;        // sdCard CS
-                P_CONF.out1 = 27;       // display CS
-                P_CONF.out2 = 26;       // display AO
-                P_CONF.out3 = 25;       // display backlight
-
-            #else
-                xLogSection("[DIRECTIVE] ESP8266");
-
-                // AppPrintSeparator("[DIRECTIVE]", "ESP8266");
-                // D0: 16, D1: 5, D2: 4, D3: 0, D4: 2, D5: 14, D6: 12, D7: 13, D8: 15
-                // P_CONF.sda0 = 4; P_CONF.scl0 = 5;
-                P_CONF.led1 = 2;
-                P_CONF.btn1 = 0;
-                P_CONF.relay1 = 14;
-                // P_CONF.ws2812 = 15;
-                // P_CONF.irSwitch = 12;
-                // P_CONF.pir1 = 14;
-
-                // SPI.pins(14, 12, 13, 15);
-                // SPI.begin();
-                // P_CONF.swRx = 14; P_CONF.swTx = 12;
-            #endif
-        
-            led.setup(P_CONF.led1);
+        void configure(PinConfig* conf) {        
+            led.setup(conf->led1);
             led.repeatPulses(1000);
-            relay1.setup(P_CONF.relay1);
+            relay1.setup(conf->relay1);
 
-            // buzzer.setup(P_CONF.buzzer1);
-            ws2812.setup(P_CONF.ws2812);
-            // xSerial.setup(P_CONF.swRx, P_CONF.swTx);
+            // buzzer.setup(conf->buzzer1);
+            ws2812.setup(conf->ws2812);
+            // xSerial.setup(conf->swRx, conf->swTx);
 
-            setupSerial(&P_CONF);
+            setupSerial(conf);
 
-            irSwitch.load(P_CONF.irSwitch, &irSwitchCb);
-            edgeDetector.setup(P_CONF.pir1, &pirCb);
-            button1.setup(P_CONF.btn1, &buttonCb);
+            irSwitch.load(conf->irSwitch, &irSwitchCb);
+            edgeDetector.setup(conf->pir1, &pirCb);
+            button1.setup(conf->btn1, &buttonCb);
+
+            rotary.setup(conf->rotaryA, conf->rotaryB);
+            rotary.onCallback = &rotaryCb;
         }
 
         void toggleRelay() {
-            xLog("IM HERE 222");
             relay1.toggle();
         }
 
@@ -221,10 +144,14 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
             led.run();
             ws2812.run();
             serial.run();
-            
+
             // buzzer.run();
             // edgeDetector.run();
             // xSerial.run();
+        }
+
+        void runMainTask2() {
+            rotary.run();
         }
 
         void setFrequency() {

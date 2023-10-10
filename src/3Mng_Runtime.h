@@ -1,3 +1,4 @@
+#include "Mng_Config.h"
 #include "4Mng_Network.h"
 
 #ifndef ESP32 
@@ -8,89 +9,30 @@
 AsyncTimer asyncTimer1;
 
 class Mng_Runtime: public BaseComponent {
-    //! 1 Second Interval
-    void render1s_Interval() {
-        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
-            device.addDisplayQueue1(device.appClock.getDisplay(), 1);         //* LINE 1   
-            device.addDisplayQueue1(asyncTimer1.record(), 2);                  //* LINE 2
-            device.addDisplayQueue1(asyncTimer2.record(), 3);                  //* LINE 3
-            device.addDisplayQueue1(device.i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
-
-        } else if (device.i2c1.dispMode == DISPLAY_2ND) {
-            network.handle_1secInterval();
-        }
-
-        device.addDisplayQueue2(device.appClock.getDisplay(), 1);             //* LINE 1
-        device.addDisplayQueue2(asyncTimer1.record(), 2);                      //* LINE 2
-        device.addDisplayQueue2(asyncTimer2.record(), 3);                      //* LINE 3
-        device.addDisplayQueue2(device.i2c1.sensors.getTempHumLux(), 5);      //* LINE 5
-    }
-
-    //! 5 Seconds Interval
-    void render5s_Interval() {
-        char hostName[22], sdSize[22];
-        sprintf(sdSize, "sd = %u MB", device.storage.sd1.getCardSize());
-        strcpy(hostName, network.getHostName());
-
-        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
-            device.addDisplayQueue1(hostName, 0);     //! Oled Mini LINE 0  
-            device.addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
-            device.addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
-        }
-        device.addDisplayQueue2(hostName, 0);         //* LINE 0
-        device.addDisplayQueue2(sdSize, 4);           //* LINE 4
-        device.addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);          //* LINE 6
-    }
-
-    //! 3 Seconds Interval
-    void render3s_Interval() {
-        char output[22];
-        sprintf(output, "dep = %u/%u", asyncTimer1.stackUsage, asyncTimer2.stackUsage);
-
-        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
-            // showLadderId(); // line0
-            device.addDisplayQueue1(String(output), 4);   //! Oled Mini LINE 4
-        }
-        device.addDisplayQueue2(output, 4);               //* LINE 4
-    }
-
-    //! 2 Seconds Interval
-    void render2s_Interval() {
-        char heapInfo[22], networkInfo[64];
-        sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
-
-        uint64_t resetCount = device.storage.resetCount.value;
-        sprintf(networkInfo, "%s ~%u ~%llu", network.wifi.localIp(), 
-                            WiFi.channel(), resetCount);
-
-        //! Oled Mini
-        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
-            device.addDisplayQueue1(networkInfo, 0);      //! Oled Mini LINE 0
-            device.addDisplayQueue1(heapInfo, 4);   //! Oled Mini LINE 4        
-        }
-        device.addDisplayQueue2(networkInfo, 0);          //* LINE 0
-        device.addDisplayQueue2(heapInfo, 4);               //* LINE 4
-    }
-
     //! MAIN JOB
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
             //! RUNTIME (inclusive): 1 second interval
-            render1s_Interval();
+            device.render1s_Interval(&asyncTimer1, &asyncTimer2, [&]() {
+                network.handle_1secInterval();
+            });
 
             if (runTime->isSecondInterval(5)) {
-                render5s_Interval();                    //! RUNTIME: 5 seconds intervals
-            } else if (runTime->isSecondInterval(3)) {
-                render3s_Interval();                    //! RUNTIME: 3 seconds intervals 
-            } else if (runTime->isSecondInterval(2)) {
-                render2s_Interval();                    //! RUNTIME: 2 seconds intervals
+                char hostName[22];
+                strcpy(hostName, network.getHostName());
+                device.render5s_Interval(hostName);
 
-                //! Enable Rotary on 2nd second to prevent automatic trigger at the start
-                rotary.isEnabled = true;    
+            } else if (runTime->isSecondInterval(3)) { 
+                device.render3s_Interval(&asyncTimer1, &asyncTimer2);
+
+            } else if (runTime->isSecondInterval(2)) {
+                device.render2s_Interval(network.wifi.localIp());
+                
+                // //! Enable Rotary on 2nd second to prevent automatic trigger at the start
+                device.rotary.isEnabled = true;
             } else {
                 //! RUNTIME (exclusive): 1 second interval
             }
-
             //! Reset sensors reading every second
             device.addStoreQueue();
             device.i2c1.sensors.reset();
@@ -124,22 +66,6 @@ class Mng_Runtime: public BaseComponent {
         }
     };
 
-    RotaryEncoder rotary;
-    
-    std::function<void(RotaryDirection, uint8_t)> rotaryCb = [&](RotaryDirection state, uint8_t counter) {
-        #ifdef ESP32
-            String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
-            AppPrint("Read ", readings);
-            device.addDisplayQueues(readings, 5);
-        #endif
-
-        String dir = (state == CLOCKWISE) ? "CW" : "CCW";
-        String output =  "val=" + String(counter) + " Dir=" + dir;
-        AppPrint("[Rot]", output);
-        device.addDisplayQueues(output, 6);       // display
-        network.handleRotary(state, counter);      // network message
-    };
-
     std::function<void()> onHandleSingleClick = [&]() {
         network.handleSingleClick();
     };
@@ -154,6 +80,11 @@ class Mng_Runtime: public BaseComponent {
 
     std::function<void()> onHandleResetWifi = [&]() {
         network.resetWifi();        //! Reset Wifi
+    };
+
+    std::function<void(RotaryDirection state, uint8_t counter)> onHandleRotary = 
+            [&](RotaryDirection state, uint8_t counter) {
+        network.handleRotary(state, counter);      // network message
     };
 
     #ifdef ESP32
@@ -180,17 +111,19 @@ class Mng_Runtime: public BaseComponent {
         Serv_Device device;
         Mng_Network network;
         Mng_Power power;
+        Mng_Config config;
 
         void setup() {
             xLog(__func__);
-            device.configure();
-            rotary.setup(device.P_CONF.rotaryA, device.P_CONF.rotaryB);
-            rotary.onCallback = &rotaryCb;
+
+            config.setup();
+            device.configure(&config);
 
             device.onHandleSingleClick = &onHandleSingleClick;
             device.onHandleDoubleClick = &onHandleDoubleClick;
             device.onHandleAPRequest = &onHandleAPRequest;
             device.onHandleResetWifi = &onHandleResetWifi;
+            device.onHandleRotary = &onHandleRotary;
 
             network.setupNetwork(&device);
 
@@ -215,7 +148,7 @@ class Mng_Runtime: public BaseComponent {
         void runJob2() {
             //! JOB2: LIVE TASKS
             network.run();
-            rotary.run();
+            device.runMainTask2();
 
             #ifdef ESP32
                 asyncTimer2.run();

@@ -65,6 +65,7 @@ void AppPrintHeap() {
 #include "TimeoutItem.h"
 TimerItem appTimer0;
 
+#include "PinConfig.h"
 #include "IntCycle.h"
 #include "Button.h"         // need TimeoutItem.h
 #include "PinSequence.h"
