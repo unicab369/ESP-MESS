@@ -54,16 +54,12 @@ class Mng_Runtime: public BaseComponent {
 
     //! 2 Seconds Interval
     void render2s_Interval() {
-        char heapInfo[22], networkInfo[32];
+        char heapInfo[22], networkInfo[64];
         sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
 
-        uint64_t cnt = device->storage.resetCount.value;
-        xLog("IM HERE zzz ", cnt);
-
-        // sprintf(networkInfo, "%s ~%u ~%llu", network->wifi.localIp(), 
-        //             WiFi.channel(), device->storage.resetCount.getValue());
+        uint64_t resetCount = device->storage.resetCount.value;
         sprintf(networkInfo, "%s ~%u ~%llu", network->wifi.localIp(), 
-                            WiFi.channel(), 33);
+                            WiFi.channel(), resetCount);
 
         //! Oled Mini
         if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
@@ -192,12 +188,12 @@ class Mng_Runtime: public BaseComponent {
         }
 
         void runJob2() {
-            // //! JOB2: LIVE TASKS
-            // network->run();
-            // rotary.run();
+            //! JOB2: LIVE TASKS
+            network->run();
+            rotary.run();
 
-            // #ifdef ESP32
-            //     asyncTimer2.run();
-            // #endif
+            #ifdef ESP32
+                asyncTimer2.run();
+            #endif
         }
 };

@@ -1,4 +1,4 @@
-#define LOG_MAX_LENGTH 50
+#define LOG_MAX_LENGTH 64
 
 class BaseComponent {
     char identifier[20];
@@ -13,6 +13,8 @@ class BaseComponent {
         }
 
         void xLog(const char* value, uint64_t number) {
+            //# TODO: There seem to be an issue with xLog when printing a large uint64_t number
+            //! Need to investigate
             xLogf("%s %llu", value, number);
         }
 

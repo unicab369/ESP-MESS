@@ -8,6 +8,20 @@
 
 class Sto_EEPROM {
     protected:
+        void writeValue(int address, uint64_t value) {
+            for (int i = 0; i < 8; i++) {
+                EEPROM.write(address + i, (uint8_t)(value >> (i * 8)));
+            }
+            EEPROM.commit(); // Commit the changes to EEPROM            
+        }
+
+        void readValue(int address, uint64_t* value) {
+            *value = 0;
+            for (int i = 0; i < 8; i++) {
+                *value |= ((uint64_t)EEPROM.read(address + i) << (i * 8));
+            }            
+        }
+
         void writeBytes(int address, const void *value, size_t len) {
             byte* val = (byte*) value;
 
@@ -69,15 +83,16 @@ class EEPROM_Check: public Sto_EEPROM {
 
 class EEPROM_ResetCount: public EEPROM_Check {
     void increaseValue() {
-        readBytes(1, &value, sizeof(value));
-        // value++;
-        writeBytes(1, &value, sizeof(value));
+        //! NOTE: Read the value into a separte variable before writing it back into memory
+        readValue(1, &value);
+        value++;
+        writeValue(1, value);
     }
 
     public:
         uint64_t value = 0; 
 
-        // Reset Code [0] = 0xDD, Reset Count [1-4]
+        // Reset Code [0] = 0xDD, Reset Count [1-8]
         void loadValue() {
             loadCheckAddr(0);
             checkCode() ? increaseValue() : deleteValue();
