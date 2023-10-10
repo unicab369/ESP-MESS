@@ -1,7 +1,10 @@
 #include <0Foundation.h>
-#include "1Mng_Device.h"    // +11.5%
+#include "3Mng_Runtime.h"
 
-Mng_Device device;
+// #include "1Mng_Device.h"    // +11.5%
+
+// Mng_Device device;
+Mng_Runtime runTime;
 
 // #define UNIT_TEST true
 
@@ -11,18 +14,18 @@ Mng_Device device;
 #else
   void setup() {
     Serial.begin(115200);
-    device.setup();
+    runTime.setup();
 
     #ifdef ESP32
       xTaskCreatePinnedToCore([](void *pvParam) {
         for (;;) { 
-          device.runtime.runJob1(); 
+          runTime.runJob1(); 
         }
       }, "loopCore0", 10000, NULL, 1, NULL, 0);
 
       xTaskCreatePinnedToCore([](void *pvParam) {
         for (;;) { 
-          device.runtime.runJob2(); 
+          runTime.runJob2();
         }
       }, "loopCore1", 5000, NULL, 1, NULL, 1);
     #endif
@@ -31,8 +34,8 @@ Mng_Device device;
   void loop() {
     #ifndef ESP32
       // should not be called for ESP32
-      device.runtime.runJob1();
-      device.runtime.runJob2();
+      runTime.runJob1();
+      runTime.runJob2();
     #endif
   }
 #endif

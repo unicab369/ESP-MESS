@@ -1,3 +1,5 @@
+#include "4Mng_Network.h"
+
 #ifndef ESP32 
     #include <Ticker.h>
 #endif 
@@ -8,36 +10,36 @@ AsyncTimer asyncTimer1;
 class Mng_Runtime: public BaseComponent {
     //! 1 Second Interval
     void render1s_Interval() {
-        if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
-            device->addDisplayQueue1(device->appClock.getDisplay(), 1);         //* LINE 1   
-            device->addDisplayQueue1(asyncTimer1.record(), 2);                  //* LINE 2
-            device->addDisplayQueue1(asyncTimer2.record(), 3);                  //* LINE 3
-            device->addDisplayQueue1(device->i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
+            device.addDisplayQueue1(device.appClock.getDisplay(), 1);         //* LINE 1   
+            device.addDisplayQueue1(asyncTimer1.record(), 2);                  //* LINE 2
+            device.addDisplayQueue1(asyncTimer2.record(), 3);                  //* LINE 3
+            device.addDisplayQueue1(device.i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
 
-        } else if (device->i2c1.dispMode == DISPLAY_2ND) {
-            network->handle_1secInterval();
+        } else if (device.i2c1.dispMode == DISPLAY_2ND) {
+            network.handle_1secInterval();
         }
 
-        device->addDisplayQueue2(device->appClock.getDisplay(), 1);             //* LINE 1
-        device->addDisplayQueue2(asyncTimer1.record(), 2);                      //* LINE 2
-        device->addDisplayQueue2(asyncTimer2.record(), 3);                      //* LINE 3
-        device->addDisplayQueue2(device->i2c1.sensors.getTempHumLux(), 5);      //* LINE 5
+        device.addDisplayQueue2(device.appClock.getDisplay(), 1);             //* LINE 1
+        device.addDisplayQueue2(asyncTimer1.record(), 2);                      //* LINE 2
+        device.addDisplayQueue2(asyncTimer2.record(), 3);                      //* LINE 3
+        device.addDisplayQueue2(device.i2c1.sensors.getTempHumLux(), 5);      //* LINE 5
     }
 
     //! 5 Seconds Interval
     void render5s_Interval() {
         char hostName[22], sdSize[22];
-        sprintf(sdSize, "sd = %u MB", device->storage.sd1.getCardSize());
-        strcpy(hostName, network->getHostName());
+        sprintf(sdSize, "sd = %u MB", device.storage.sd1.getCardSize());
+        strcpy(hostName, network.getHostName());
 
-        if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
-            device->addDisplayQueue1(hostName, 0);     //! Oled Mini LINE 0  
-            device->addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
-            device->addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
+        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
+            device.addDisplayQueue1(hostName, 0);     //! Oled Mini LINE 0  
+            device.addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
+            device.addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
         }
-        device->addDisplayQueue2(hostName, 0);         //* LINE 0
-        device->addDisplayQueue2(sdSize, 4);           //* LINE 4
-        device->addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);          //* LINE 6
+        device.addDisplayQueue2(hostName, 0);         //* LINE 0
+        device.addDisplayQueue2(sdSize, 4);           //* LINE 4
+        device.addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);          //* LINE 6
     }
 
     //! 3 Seconds Interval
@@ -45,11 +47,11 @@ class Mng_Runtime: public BaseComponent {
         char output[22];
         sprintf(output, "dep = %u/%u", asyncTimer1.stackUsage, asyncTimer2.stackUsage);
 
-        if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
+        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
             // showLadderId(); // line0
-            device->addDisplayQueue1(String(output), 4);   //! Oled Mini LINE 4
+            device.addDisplayQueue1(String(output), 4);   //! Oled Mini LINE 4
         }
-        device->addDisplayQueue2(output, 4);               //* LINE 4
+        device.addDisplayQueue2(output, 4);               //* LINE 4
     }
 
     //! 2 Seconds Interval
@@ -57,17 +59,17 @@ class Mng_Runtime: public BaseComponent {
         char heapInfo[22], networkInfo[64];
         sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
 
-        uint64_t resetCount = device->storage.resetCount.value;
-        sprintf(networkInfo, "%s ~%u ~%llu", network->wifi.localIp(), 
+        uint64_t resetCount = device.storage.resetCount.value;
+        sprintf(networkInfo, "%s ~%u ~%llu", network.wifi.localIp(), 
                             WiFi.channel(), resetCount);
 
         //! Oled Mini
-        if (device->i2c1.dispMode == DISPLAY_DEFAULT) {
-            device->addDisplayQueue1(networkInfo, 0);      //! Oled Mini LINE 0
-            device->addDisplayQueue1(heapInfo, 4);   //! Oled Mini LINE 4        
+        if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
+            device.addDisplayQueue1(networkInfo, 0);      //! Oled Mini LINE 0
+            device.addDisplayQueue1(heapInfo, 4);   //! Oled Mini LINE 4        
         }
-        device->addDisplayQueue2(networkInfo, 0);          //* LINE 0
-        device->addDisplayQueue2(heapInfo, 4);               //* LINE 4
+        device.addDisplayQueue2(networkInfo, 0);          //* LINE 0
+        device.addDisplayQueue2(heapInfo, 4);               //* LINE 4
     }
 
     //! MAIN JOB
@@ -90,19 +92,19 @@ class Mng_Runtime: public BaseComponent {
             }
 
             //! Reset sensors reading every second
-            device->addStoreQueue();
-            device->i2c1.sensors.reset();
+            device.addStoreQueue();
+            device.i2c1.sensors.reset();
 
             #ifndef ESP32 
-                network->handle_1secInterval_job2();
+                network.handle_1secInterval_job2();
             #endif
             
         } else {
             //! RUNTIME: 25ms intervals
-            device->tick();
+            device.tick();
 
             #ifndef ESP32
-                device->runGroupTasks();
+                device.runGroupTasks();
             #endif
         }
     };
@@ -111,14 +113,14 @@ class Mng_Runtime: public BaseComponent {
     std::function<void(RunTimeModel*)> runtimeCb2 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
             //! RUNTIME: 1 second intervals
-            network->handle_1secInterval_job2();
+            network.handle_1secInterval_job2();
 
             float temp, hum, lux;
-            device->i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
+            device.i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
             // wServer.refreshReadings(temp, hum, lux);
         } else {
             //! RUNTIME: 25ms intervals
-            device->runGroupTasks();
+            device.runGroupTasks();
         }
     };
 
@@ -128,14 +130,30 @@ class Mng_Runtime: public BaseComponent {
         #ifdef ESP32
             String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
             AppPrint("Read ", readings);
-            device->addDisplayQueues(readings, 5);
+            device.addDisplayQueues(readings, 5);
         #endif
 
         String dir = (state == CLOCKWISE) ? "CW" : "CCW";
         String output =  "val=" + String(counter) + " Dir=" + dir;
         AppPrint("[Rot]", output);
-        device->addDisplayQueues(output, 6);       // display
-        network->handleRotary(state, counter);      // network message
+        device.addDisplayQueues(output, 6);       // display
+        network.handleRotary(state, counter);      // network message
+    };
+
+    std::function<void()> onHandleSingleClick = [&]() {
+        network.handleSingleClick();
+    };
+
+    std::function<void()> onHandleDoubleClick = [&]() {
+        network.handleDoubleClick();
+    };
+
+    std::function<void()> onHandleAPRequest = [&]() {
+        network.startAP(true);      //! Start access point
+    };
+
+    std::function<void()> onHandleResetWifi = [&]() {
+        network.resetWifi();        //! Reset Wifi
     };
 
     #ifdef ESP32
@@ -159,15 +177,22 @@ class Mng_Runtime: public BaseComponent {
         Mng_Runtime(): BaseComponent("Runtime") {}
 
         AsyncTimer asyncTimer2;
-        Serv_Device *device;
-        Mng_Network *network;
+        Serv_Device device;
+        Mng_Network network;
+        Mng_Power power;
 
-        void setup(Serv_Device *_servDev, Mng_Network *_network) {
+        void setup() {
             xLog(__func__);
-            device = _servDev;
-            network = _network;
-            rotary.setup(device->P_CONF.rotaryA, device->P_CONF.rotaryB);
+            device.configure();
+            rotary.setup(device.P_CONF.rotaryA, device.P_CONF.rotaryB);
             rotary.onCallback = &rotaryCb;
+
+            device.onHandleSingleClick = &onHandleSingleClick;
+            device.onHandleDoubleClick = &onHandleDoubleClick;
+            device.onHandleAPRequest = &onHandleAPRequest;
+            device.onHandleResetWifi = &onHandleResetWifi;
+
+            network.setupNetwork(&device);
 
             //! setup AsyncTimers
             asyncTimer1.setup(&runtimeCb1);
@@ -189,7 +214,7 @@ class Mng_Runtime: public BaseComponent {
 
         void runJob2() {
             //! JOB2: LIVE TASKS
-            network->run();
+            network.run();
             rotary.run();
 
             #ifdef ESP32
@@ -197,3 +222,16 @@ class Mng_Runtime: public BaseComponent {
             #endif
         }
 };
+
+// Lora Bluetooth, mqtt
+// FS update, sd storage
+// device encryption
+
+// device discovery
+// ESPNow, behavior
+// PIR Multi
+
+// multi channel
+// - Storing channel
+// - Scan channel
+// - broadcast channel
