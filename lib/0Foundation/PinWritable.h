@@ -32,22 +32,27 @@ class PinWritable: public PinReadable {
 
 class PWMWritable: public PinWritable {
     int refValue = 0;
+    bool inverted = false;
     const int ledChannel = 0;
     const int resolution = 8;
     const int freq = 5000;
 
     public:
-        void setup(uint8_t pin) {
+        void setup(uint8_t pin, bool _inverted = false) {
+            inverted = _inverted;
+
             #ifdef ESP32
                 ledcSetup(ledChannel, freq, resolution);
                 ledcAttachPin(pin, ledChannel);
             #else
-                setup(pin);
+                setup(pin, inverted);
             #endif
         }
 
-        void pwmWrite(int value) {
+        void pwmWrite(uint8_t value) {
             // refValue = value;
+            uint8_t writeValue = inverted ? (255-value) : value;
+            
             #ifdef ESP32
                 ledcWrite(ledChannel, value);
             #else

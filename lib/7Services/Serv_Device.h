@@ -39,15 +39,10 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
                 if (onHandleSingleClick) (*onHandleSingleClick)();
                 toggleRelay();
 
-                // uint8_t read = digitalRead(14);
-                // digitalWrite(14, !read);
-
                 // servDev.buzzer.toggle();
-                // servDev.storage.testSetupData();
                 // led.toggle();
 
                 // power.goToSleep(27, true);
-
                 // if (power.wakeUpCauseResume()) {
                 //     network.resetNetwork();
                 // }
@@ -70,13 +65,13 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
                 //! Long press 10 sec -> Reset - fash flashing
                 } else if (hold == HOLD_10_SEC) {
                     addDisplayQueues("[Bnt] 10sec hold", 6);
-                    led.repeatPulses(400);
+                    led.uniformPulse20ms();
                     releasedState = hold;
 
                 //! Long press 5 sec -> Pairing - double flashing
                 } else if (hold == HOLD_5_SEC) {
                     addDisplayQueues("[Bnt] 5sec hold", 6);
-                    led.repeatPulses(20);
+                    led.uniformPulse500ms();
                     releasedState = hold;
                 }
                 break;
@@ -84,9 +79,9 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
             case ACTION_PRESS_END: {
                 addDisplayQueues("Press Ended " + String(elapse), 6);
                 if (releasedState == HOLD_5_SEC) {
-                    MY_ESP.restart();           //! Restart Device
-                } else if (releasedState == HOLD_10_SEC) {
                     if (onHandleAPRequest) (*onHandleAPRequest)();
+                } else if (releasedState == HOLD_10_SEC) {
+                    MY_ESP.restart();           //! Restart Device
                 }
                 break;
             }
@@ -102,7 +97,7 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
         EdgeDetector edgeDetector;
         ExtraSerial xSerial;
 
-        SinglePulse led, buzzer;
+        PulseController led, buzzer;
         PinWritable relay1;
         RotaryEncoder rotary;
             
@@ -115,7 +110,7 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
 
         void configure(PinConfig* conf) {        
             led.setup(conf->led1);
-            led.repeatPulses(1000);
+            led.uniformPluse1000ms();
             relay1.begin(conf->relay1);
 
             // buzzer.setup(conf->buzzer1);
