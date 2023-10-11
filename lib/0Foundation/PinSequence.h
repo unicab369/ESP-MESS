@@ -1,32 +1,3 @@
-class AnalogWritable: public PinWritable {
-    int refValue = 0;
-
-    public:
-        void pin_analogWrite(int value) {
-            // refValue = value;
-            #ifdef ESP32
-                ledcWrite(get_pin(), value);
-            #else
-                analogWrite(get_pin(), value);
-            #endif
-        }
-
-        void fadeToward(int newValue, int change) {
-            if (refValue>newValue) {
-                Serial.print("+refVal="); Serial.print(refValue);
-                Serial.print(" newVal="); Serial.println(newValue);
-                refValue += change;
-                refValue = refValue > newValue ? newValue : refValue;
-            } else if (newValue > refValue) {
-                Serial.print("-refVal="); Serial.print(refValue);
-                Serial.print(" newVal="); Serial.println(newValue);
-                refValue -= change;
-                refValue = refValue < newValue ? newValue : refValue;
-            }
-            // Serial.print("value="); Serial.println(refValue);
-            pin_analogWrite(refValue);
-        }
-};
 
 struct PairValues {
     int *value1;
@@ -74,54 +45,50 @@ class ValueTimeSequence {
         }
 };
 
-class PinSequence: public AnalogWritable {
-    Cycle_Timer cycle;
+class PinSequence: public PWMWritable, public Cycle_Timer {
     ValueTimeSequence seq;
+    uint8_t toggleValue = 0;
 
     std::function<void()> callback = [this]() {
         if (!seq.checkTimeout()) { return; }
-        pin_analogWrite(seq.getCurrentValue());
+        pwmWrite(seq.getCurrentValue());
     };
 
     public:
         void reload(PairValues values, int runTime = 0) {
             seq.load(values);
-            cycle.loadCb(&callback);
-            cycle.start(100, runTime);
+            loadCb(&callback);
+            start(100, runTime);
         }
 
-        void stop() {
-            cycle.stop();
+        void turnON() override {
+            stop();
+            if (!isValid()) { return; }
+            pwmWrite(255);
         }
-        
-        void run() {
-            cycle.run();
-        } 
-};
 
-class OutputController: public PinSequence {
-    int outputs2[2] = { 255, 0 };
-    int duration[2] = { 100, 100 };
-
-    public:
-        void repeatPulses(int pulseLength = 100) {
-            duration[0] = pulseLength;
-            duration[1] = pulseLength;
-            reload(PairValues::make(outputs2, duration, 2));
+        void turnOFF() override {
+            stop();
+            if (!isValid()) { return; }
+            pwmWrite(0);
         }
 
         void toggle() {
             stop();
-            toggle();
+            if (!isValid()) { return; }
+            toggleValue = (toggleValue == 0) ? 255 : 0;
+            pwmWrite(toggleValue);
         }
+};
 
-        void setON() {
-            stop();
-            turnOn();
-        }
+class SinglePulse: public PinSequence {
+    int outputs[2] = { 255, 0 };
+    int durations[2] = { 100, 100 };
 
-        void setOFF() {
-            stop();
-            turnOff();
+    public:
+        void repeatPulses(int pulseLength = 100) {
+            durations[0] = pulseLength;
+            durations[1] = pulseLength;
+            reload(PairValues::make(outputs, durations, 2));
         }
 };

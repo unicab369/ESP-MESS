@@ -1,12 +1,9 @@
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
 
-// #include "1Mng_Device.h"    // +11.5%
-
-// Mng_Device device;
-Mng_Runtime runTime;
-
 // #define UNIT_TEST true
+
+Mng_Runtime runTime;
 
 #ifdef UNIT_TEST
   #include "AppTest/AppTest.h"

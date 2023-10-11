@@ -25,7 +25,6 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
         AppPrint("[Rot]", output);
         addDisplayQueues(output, 6);       // display
         if (onHandleRotary) (*onHandleRotary)(state, counter);
-        // network.handleRotary(state, counter);      // network message
     };
 
     BNT_Hold releasedState = HOLD_TRANSITION;
@@ -65,7 +64,7 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
                 //! Long press 20 sec -> Recovery/Factory Reset - turn off
                 if (hold == HOLD_20_SEC) {
                     addDisplayQueues("[Bnt] 20sec hold", 6);
-                    led.setOFF();
+                    led.turnOFF();
                     storage.deleteData();
 
                 //! Long press 10 sec -> Reset - fash flashing
@@ -99,12 +98,11 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
 
         WS28xx ws2812;
         MyButton button1;
-        PinWritable pinWrite;
         IRSwitch irSwitch;
         EdgeDetector edgeDetector;
         ExtraSerial xSerial;
 
-        OutputController led, buzzer;
+        SinglePulse led, buzzer;
         PinWritable relay1;
         RotaryEncoder rotary;
             
@@ -118,7 +116,7 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
         void configure(PinConfig* conf) {        
             led.setup(conf->led1);
             led.repeatPulses(1000);
-            relay1.setup(conf->relay1);
+            relay1.begin(conf->relay1);
 
             // buzzer.setup(conf->buzzer1);
             ws2812.setup(conf->ws2812);

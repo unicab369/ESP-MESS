@@ -1,5 +1,3 @@
-#include "PinBase.h"
-
 enum BTN_Action {
     ACTION_SINGLE_CLICK,
     ACTION_DOUBLE_CLICK,

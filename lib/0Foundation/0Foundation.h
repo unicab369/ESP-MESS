@@ -67,6 +67,7 @@ TimerItem appTimer0;
 
 #include "PinConfig.h"
 #include "IntCycle.h"
+#include "PinWritable.h"
 #include "Button.h"         // need TimeoutItem.h
 #include "PinSequence.h"
 #include "AsyncTimer.h"

@@ -159,12 +159,24 @@ class Mng_Runtime: public BaseComponent {
 // Lora Bluetooth, mqtt
 // FS update, sd storage
 // device encryption
-
 // device discovery
-// ESPNow, behavior
-// PIR Multi
 
 // multi channel
 // - Storing channel
 // - Scan channel
 // - broadcast channel
+
+// PIR Multi
+// ESPNow, behavior
+
+// Send: 
+// x Single Click
+// x Double Click
+// x IR code
+// x Sensor Reading
+// Pir Signal, Data Requests (readings)
+
+// handler:
+// x toggle pin
+// ws2812 output
+// buzzer

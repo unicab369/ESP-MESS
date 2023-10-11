@@ -44,35 +44,6 @@ class PinReadable {
         }
 };
 
-class PinWritable: public PinReadable {
-    bool inverted = false;
-
-    public:
-        PinWritable(): PinReadable() {}
-
-        // setup - store pin, set pin as OUTPUT
-        bool setup(uint8_t pin, bool _inverted = false) {
-            if (!pin_setup(pin)) { return false; }
-            inverted = _inverted;
-            pinMode(pin, OUTPUT);
-            return true;
-        }
-
-        void turnOn() { pin_write(HIGH); }
-        void turnOff() { pin_write(LOW); }
-
-        // write value to pin
-        void pin_write(bool value) {
-            if (!isValid()) { return; }
-            digitalWrite(get_pin(), inverted ? !value : value);
-        }
-
-        // toggle the current pin state
-        void toggle() {
-            if (!isValid()) { return; }
-            digitalWrite(get_pin(), !pin_read());
-        }
-};
 
 class EdgeDetector: private PinReadable {
     TimeoutItem cooldown_timer;
