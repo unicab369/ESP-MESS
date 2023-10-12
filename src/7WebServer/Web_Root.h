@@ -31,17 +31,16 @@ class Web_Root: public Web_Base {
         makeTableRow("Flash Size", String(MY_ESP.flashSize()) + " kB");
         
         //! sketchUsed takes 1114ms, sketchTotal takes 1059ms
-        makeTableRow("Sketch Size", String(MY_ESP.sketchUsed()) +   
-                        "/" + String(MY_ESP.sketchTotal())  + " kB");
-        // makeTableRow("Heap Size", String(params.heapUsed) + 
-        //                 "/" + String(params.heapTotal) + " kB");
+        // makeTableRow("Sketch Size", String(MY_ESP.sketchUsed()) +   
+        //                 "/" + String(MY_ESP.sketchTotal())  + " kB");
+        // // makeTableRow("Heap Size", String(params.heapUsed) + 
+        // //                 "/" + String(params.heapTotal) + " kB");
 
         makeNewRow();
         makeButton("TOGGLE IO", "/toggleIO", true);
         makeButton("DEVICE CONFIG", devConfig.getPath());
         makeButton("CONTROL CONFIG", ctrlConfig.getPath());
         makeButton("FILES", devFile.getPath());
-        makeButton("RESTART", "/restart", true);
 
         stopTable();
         stopPage();
@@ -84,9 +83,12 @@ class Web_Root: public Web_Base {
         server->send(200, "application/javascript", MAIN_JS2);
     };
 
-    std::function<void()> handleCss = [&]() {
-        xLog("IM HERE xxxxxxx");
-        server->send(200, "text/css", MAIN_CSS);
+    std::function<void()> pureCssButton = [&]() {
+        server->send(200, "text/css", HTTP_BUTTONS_CORE);
+    };
+
+    std::function<void()> pureCssForm = [&]() {
+        server->send(200, "text/css", HTTP_FORMS);
     };
 
     public:
@@ -107,7 +109,8 @@ class Web_Root: public Web_Base {
             webOTA.begin(network, server);
             
             server->on("/root.js", HTTP_GET, handleJs);
-            server->on("/root.css", HTTP_GET, handleCss);
+            server->on("/button.css", HTTP_GET, pureCssButton);
+            server->on("/forms.css", HTTP_GET, pureCssForm);
 
             server->on("/restart", HTTP_POST, handleRestart);
             server->on("/toggleIO", HTTP_POST, handleToggle);

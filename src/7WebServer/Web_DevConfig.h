@@ -10,8 +10,9 @@ class Web_DevConfig: public Web_Base {
         // server->sendContent("<form action='/'>");
 
         makeNewRow();
-        makeTextField("ssid", String(ssid));
-        makeTextField("password", "");
+
+        makeTextField2("ssid", String(ssid));
+        makeTextField2("password", "");
         makeButton("SAVE CRED", "/sav_cred");
         makeButton("DELETE CRED", "/del_cred");
 
@@ -19,10 +20,12 @@ class Web_DevConfig: public Web_Base {
         // makeActionForm("/sav_cred");
 
         makeNewRow();
-        makeTextField("DevName", String(deviceName));
-        makeTextField("mqttServer", String(mqttServer));
+        makeTextField2("DevName", String(deviceName));
+        makeTextField2("mqttServer", String(mqttServer));
         makeButton("SAVE CONF", "/sav_conf", true);
         makeButton("DELETE CONF", "/del_conf", true);
+
+        makeButton("RESTART", "/restart", true);
         makeButton("UPDATE", "/update");
         // server->sendContent("</form>");
 

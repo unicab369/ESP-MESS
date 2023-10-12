@@ -1,9 +1,10 @@
-char HTTP_WEB_START[] =  R"!^!(<!DOCTYPE html>
+char HTTP_WEB_START[] = R"!^!(<!DOCTYPE html>
 <html><head>
 <script src='root.js'></script>
-<link rel='stylesheet' href='root.css'>
+<link rel='stylesheet' href='button.css'>
+<link rel='stylesheet' href='forms.css'>
 </head><body>
-<div style='margin: auto; width: 640px; background-color: CornflowerBlue;'>
+<div style='margin: auto; width: 640px; background-color: MediumSeaGreen;'>
 )!^!";
 
 char HTTP_WEB_END[] = "</div></body></html>";
@@ -162,19 +163,20 @@ class Web_Base: public Loggable {
          appendStr("</tr>");
       }
 
+      String buttonStyle = "class='pure-button FontLarge WidthFull Height100px'";
+
       //! NOTE: button title and href string length is limited
       void makeButton(String title, const char* href, bool isPost = false) {
          makeNewRow();
-         String btnStr; 
+         String btnStr;
 
          if (isPost) {
                String isPostString = isPost ? "true" : "false";
                btnStr = "<td colspan='2'><button type='button' onclick=\"sendPostRequest('" + String(href) + 
-                     "'," + isPostString + ")\" style='display:inline-block; width:100%; height:100px; font-size:40px;'>" + title + "</button></td>";
+                     "'," + isPostString + ")\" " + buttonStyle + ">" + title + "</button></td>";
          } else {
                btnStr = "<td colspan='2'><form action='" + String(href) + "'>" + 
-                  "<button style='display:inline-block; width:100%; height:100px; font-size:40px;'>" 
-                     + title + "</button></form></td>";
+                  "<button " + buttonStyle + ">" + title + "</button></form></td>";
          }
 
          makeRow(btnStr.c_str());
@@ -182,8 +184,7 @@ class Web_Base: public Loggable {
 
       void makeReturnButton(const char* title = "BACK") {
          makeNewRow();
-         String btnStr = "<td colspan='2'><button onclick='goBack()' style='display:inline-block; width:100%; height:100px; font-size:40px;'>" 
-                              + String(title) + "</button></td>";
+         String btnStr = "<td colspan='2'><button onclick='goBack()'" + buttonStyle + ">" + String(title) + "</button></td>";
          makeRow(btnStr.c_str());         
       } 
 
@@ -197,5 +198,22 @@ class Web_Base: public Loggable {
          String str = "<tr><td width='30%'>%s</td><td width='100%'><input type='text' name='" + key + 
                            "' maxlength='20' width='100%' value='" + value + "'></td></tr>";
          appendStr(str.c_str());
+      }
+
+      void startForm() {
+         appendStr("<form class='pure-form pure-form-aligned'><fieldset>");
+      }
+
+      void stopForm() {
+         appendStr("</fieldset></form>");
+      }
+
+      void makeTextField2(String key, String value) {
+         String str = "<div class='pure-control-group'><td width='30%'>\
+         <label for='tf-name' class='Width200px FontLarge'>" + key + "</label></td>\
+         <td width='100%'><input type='text' id='tf-name' class='Width95 FontLarge' placeholder='" + key + "' /></td></div>";
+         appendStr("<tr>");
+         appendStr(str.c_str());
+         appendStr("</tr>");
       }
 };
