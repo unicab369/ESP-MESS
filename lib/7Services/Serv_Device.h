@@ -25,7 +25,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
         AppPrint("[Rot]", output);
         addDisplayQueues(output, 6);       // display
 
-        i2c1.pca96.drivePWM(0, counter);
+        // i2c1.pca96.drivePWM(0, counter);
         if (onHandleRotary) (*onHandleRotary)(state, counter);
     };
 

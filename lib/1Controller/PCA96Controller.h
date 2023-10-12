@@ -12,6 +12,7 @@ uint8_t servonum = 0;
 
 class PCA96Controller {
     Adafruit_PWMServoDriver pwm;
+    bool isLoaded = false;
 
     public:
         void setup(TwoWire* wire) {
@@ -36,6 +37,7 @@ class PCA96Controller {
             */
             pwm.setOscillatorFrequency(27000000);
             pwm.setPWMFreq(SERVO_FREQ);  // Analog servos run at ~50 Hz updates
+            isLoaded = true;
         }
 
         // You can use this function if you'd like to set the pulse length in seconds
@@ -55,6 +57,7 @@ class PCA96Controller {
         }
 
         void drivePWM(uint8_t servoIx, uint16_t pulseLen) {
+            if (!isLoaded) return;
             pwm.setPWM(servoIx, 0, pulseLen);
         }
 

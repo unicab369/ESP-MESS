@@ -160,8 +160,9 @@ class Mng_Runtime: public Loggable {
 // FS update, sd storage
 // device encryption
 
-// Servo
-// Webserver update
+// ESP12
+// Servo                (2)
+//! Webserver update     (1)
 
 // device discovery
 // multi channel
@@ -169,9 +170,9 @@ class Mng_Runtime: public Loggable {
 // - Scan channel
 // - broadcast channel
 
-// PIR Multi
+// PIR Multi            (4)
 
-// ESPNow, behavior
+// ESPNow, behavior     (3)
 // handler:
 // x toggle pin
 // ws2812 output
