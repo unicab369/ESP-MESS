@@ -79,6 +79,16 @@ class Web_Root: public Web_Base {
         // payload[3] = lowByte(value);
     };
     
+    std::function<void()> handleJs = [&]() {
+        xLog("IM HERE yyyyyy");
+        server->send(200, "application/javascript", MAIN_JS2);
+    };
+
+    std::function<void()> handleCss = [&]() {
+        xLog("IM HERE xxxxxxx");
+        server->send(200, "text/css", MAIN_CSS);
+    };
+
     public:
         Web_Root(): Web_Base("Web_Root") {}
 
@@ -96,6 +106,9 @@ class Web_Root: public Web_Base {
             devFile.begin(network, server);
             webOTA.begin(network, server);
             
+            server->on("/root.js", HTTP_GET, handleJs);
+            server->on("/root.css", HTTP_GET, handleCss);
+
             server->on("/restart", HTTP_POST, handleRestart);
             server->on("/toggleIO", HTTP_POST, handleToggle);
             server->on("/setTime", handleSetTime);
