@@ -15,7 +15,7 @@ class Web_Root: public Web_Base {
         makeNewRow();
         makeTableRow("Built Date", String(__DATE__) + " @ " + String(__TIME__));
         // makeTableRow("Run Time", network->device->asyncTimer1.record());
-        makeTableRow("Time Keeping", network->device->appClock.getDateTimeStr());
+        // makeTableRow("Time Keeping", network->device->appClock.getDateTimeStr());
         makeTableRow("Reset Count", network->device->storage.resetCount.value);
         makeTableRow("Reset Reason", String(MY_ESP.getResetReason()));
 

@@ -4,8 +4,9 @@
     uint8_t ledPin = 2;
 #endif
 
-#define TEST_BEHAVIOR True
-#define TEST_PWM True
+#define TEST_PCA96
+// #define TEST_BEHAVIOR True
+// #define TEST_PWM True
 
 Loggable TestLog("Test"); 
 
@@ -21,6 +22,21 @@ Loggable TestLog("Test");
         uint8_t read = digitalRead(ledPin);
         digitalWrite(ledPin, !read);
         delay(1000);
+    }
+
+#elif defined(TEST_PCA96)
+    PCA96Controller pca96z;
+
+    void setup() {
+        Serial.begin(115200);
+        Wire.begin(33, 32);
+
+        pca96z.setup(&Wire);
+        delay(10);
+    }
+
+    void loop() {
+        pca96z.test();
     }
 
 #elif defined(TEST_BEHAVIOR)

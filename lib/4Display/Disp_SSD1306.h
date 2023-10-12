@@ -33,7 +33,7 @@ static const unsigned char PROGMEM logo_bmp[] =
 class Disp_SSD13062 {
     Adafruit_SSD1306 disp;
     TimeoutItem timer;       //* print time logger
-    bool configured = false;
+    bool isLoaded = false;
 
     public:
         Disp_SSD13062() {}
@@ -51,12 +51,12 @@ class Disp_SSD13062 {
             disp.clearDisplay();
             disp.setTextSize(1);
             disp.setTextColor(WHITE, BLACK);        // Draw white text
-            configured = true;
+            isLoaded = true;
         }
 
         void printline(const String str, uint16_t line, uint16_t offset = 0) {
             // takes about 38ms to print each line
-            if (!configured) { return; }
+            if (!isLoaded) { return; }
             uint16_t height = 9;    // 17 for size 2
             uint16_t pos = line*height + offset;
             // timer.reset();
@@ -80,7 +80,7 @@ class Disp_SSD13062 {
         }
 
         void clear() {
-            if (!configured) { return; }
+            if (!isLoaded) { return; }
             disp.clearDisplay();
         }
 

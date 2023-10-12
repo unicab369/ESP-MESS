@@ -93,6 +93,6 @@ class ClockItem {
             TimeElements dt = getTime();
             snprintf_P(dateStr, sizeof(dateStr), PSTR("%02u-%02u-%02u"), 
                         dt.Month, dt.Day, dt.Year+1970);
-            return dateStr;  
+            return dateStr;
         }
 };

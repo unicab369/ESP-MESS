@@ -13,7 +13,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
         Serial.print(" | "); Serial.println(status);
     };
 
-    std::function<void(RotaryDirection, uint8_t)> rotaryCb = [&](RotaryDirection state, uint8_t counter) {
+    std::function<void(RotaryDirection, uint16_t)> rotaryCb = [&](RotaryDirection state, uint16_t counter) {
         #ifdef ESP32
             String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
             AppPrint("Read ", readings);
@@ -24,6 +24,8 @@ class Serv_Device: public Loggable, public Serv_Serial {
         String output =  "val=" + String(counter) + " Dir=" + dir;
         AppPrint("[Rot]", output);
         addDisplayQueues(output, 6);       // display
+
+        i2c1.pca96.drivePWM(0, counter);
         if (onHandleRotary) (*onHandleRotary)(state, counter);
     };
 

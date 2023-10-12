@@ -28,7 +28,7 @@ class Serv_Serial {
             //! setup i2C
             if (conf->checkWire0()) {
                 i2c1.setup(conf->scl0, conf->sda0, &Wire);    //! ORDER DOES MATTER
-                appClock.setup(&(i2c1.rtc));                    //! ORDER DOES MATTER
+                // appClock.setup(&(i2c1.rtc));                    //! ORDER DOES MATTER
             }
 
             #ifdef ESP32

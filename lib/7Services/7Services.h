@@ -1,8 +1,3 @@
-#include "1Controller.h"
-#include "3Sensor.h"
-#include "2Storage.h"
-#include "4Display.h"
-
 enum SourceCmd: uint8_t {
     // CMD_SENSORS = 0x10,
     CMD_POST = 0xF0,

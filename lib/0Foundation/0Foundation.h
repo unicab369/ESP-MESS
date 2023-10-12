@@ -78,6 +78,7 @@ void AppPrintHeap() {
 #include "TimeoutItem.h"
 TimerItem appTimer0;
 
+#include "Structs.h"
 #include "PinConfig.h"
 #include "IntCycle.h"
 #include "PinWritable.h"
@@ -91,4 +92,8 @@ TimerItem appTimer0;
 #include "Behavior.h"
 #include "BaseComponent.h"
 
+#include "1Controller.h"
+#include "3Sensor.h"
+#include "2Storage.h"
+#include "4Display.h"
 #include <7Services.h>
