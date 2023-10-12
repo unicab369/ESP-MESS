@@ -66,7 +66,6 @@ class StorageConfig: public StoragePairValues<108, 21, 130, 21> {
 
 
 #define MAX_BEHAVIOR_ITEMS 10
-BehaviorItem APP_BEHAVIORS[MAX_BEHAVIOR_ITEMS];
 
 class StorageBehavior2: public Loggable {
     EEPROM_Data rawData[MAX_BEHAVIOR_ITEMS];
@@ -74,7 +73,7 @@ class StorageBehavior2: public Loggable {
 
     void reload() {
         for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
-            uint16_t addr = i*(500+sizeof(BehaviorItem));
+            uint16_t addr = 500+i*sizeof(BehaviorItem);
             rawData[i].loadAddress(addr);
             rawData[i].loadData(&behaviors[i], sizeof(BehaviorItem));
         }
@@ -108,34 +107,6 @@ class StorageBehavior2: public Loggable {
         }
 };
 
-class StorageBehavior {
-    EEPROM_FixData<500, sizeof(APP_BEHAVIORS)> behaviorsData;
-
-    public:
-        void reloadData() {
-            behaviorsData.loadFixedData(&APP_BEHAVIORS);
-            AppPrint("\n[Behav] Size", sizeof(APP_BEHAVIORS));
-        }
-
-        void storeData() {
-            behaviorsData.storeFixedData(&APP_BEHAVIORS);
-        }
-
-        void deleteData() {
-            behaviorsData.deleteData();
-        }
-
-        void load(uint8_t index, BehaviorItem item) {
-            APP_BEHAVIORS[index] = item;
-        }
-
-        void handle(Cue_Trigger cue) {
-            for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
-                (APP_BEHAVIORS[i].handle(cue));
-            }
-        }
-};
-
 #define MAX_VALUE_QUEUE 10
 
 struct StoringValue {
@@ -159,7 +130,7 @@ class Mng_Storage {
         EEPROM_ResetCount resetCount;
         StorageCred stoCred;
         StorageConfig stoConfig;
-        StorageBehavior stoBehavior;
+        StorageBehavior2 stoBehavior;
         Sto_LittleFS littleFS;
         Sto_SD sd1;
 

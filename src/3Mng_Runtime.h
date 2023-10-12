@@ -159,15 +159,16 @@ class Mng_Runtime: public Loggable {
 // Lora Bluetooth, mqtt
 // FS update, sd storage
 // device encryption
-// device discovery
 
+
+
+// device discovery
 // multi channel
 // - Storing channel
 // - Scan channel
 // - broadcast channel
 
 // PIR Multi
-
 
 // ESPNow, behavior
 // handler:

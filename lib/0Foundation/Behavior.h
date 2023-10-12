@@ -66,7 +66,6 @@ class BehaviorItem {
 
         template <typename T>
         void configure(Cue_Trigger setCue, T control) {
-            AppPrint(__func__);
             memcpy(data, &control, sizeof(T));
             cue = setCue;
             
