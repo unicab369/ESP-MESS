@@ -1,8 +1,8 @@
 class Serv_Behaviors {
-    StorageBehavior2* stoBehavior;
+    Sto_Behavior* stoBehavior;
 
     public:
-        void setup(StorageBehavior2* input) {
+        void setup(Sto_Behavior* input) {
             stoBehavior = input;
         }
 

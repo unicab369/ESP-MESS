@@ -41,7 +41,7 @@ Loggable TestLog("Test");
 
 #elif defined(TEST_BEHAVIOR)
     Mng_Storage storage;
-    StorageBehavior2 stoBehav;
+    StorageBehavior stoBehav;
 
     void setup() {
         Serial.begin(115200);

@@ -15,7 +15,7 @@ struct RTC_Data {
 };
 
 template <int addr1, size_t len1, int addr2, size_t len2>
-class StoragePairValues {
+class Sto_PairValues {
    EEPROM_FixData<addr1, len1> value1Data;
    EEPROM_FixData<addr2, len2> value2Data;
 
@@ -45,20 +45,20 @@ class StoragePairValues {
 };
 
 // template format: startAddr of ssid, ssid length, startAddr of passw, passw length
-class StorageCred: public StoragePairValues<9, 33, 43, 64> {
+class Sto_Cred: public Sto_PairValues<9, 33, 43, 64> {
    public:
       const char* ssid()    { return value1; }
       const char* passw()   { return value2; }
 
       void reloadData() override {
-         StoragePairValues::reloadData();
+         Sto_PairValues::reloadData();
          AppPrint("[StoCred] SSID", ssid());
          AppPrint("[StoCred] PASSW", passw());
       }
 };      
 
 // template format: startAddr of devName, devName length, startAddr of mqttIp, mqttIp length
-class StorageConfig: public StoragePairValues<108, 21, 130, 21> {
+class Sto_Config: public Sto_PairValues<108, 21, 130, 21> {
    public:
       const char* devName()    { return value1; }
       const char* mqttIp()     { return value2; }
@@ -67,7 +67,7 @@ class StorageConfig: public StoragePairValues<108, 21, 130, 21> {
 
 #define MAX_BEHAVIOR_ITEMS 10
 
-class StorageBehavior2: public Loggable {
+class Sto_Behavior: public Loggable {
    EEPROM_Data rawData[MAX_BEHAVIOR_ITEMS];
    BehaviorItem* behaviors;
    bool isLoaded = false; 
@@ -85,7 +85,7 @@ class StorageBehavior2: public Loggable {
    }
 
    public:
-      StorageBehavior2(): Loggable("Sto_Behav") {}
+      Sto_Behavior(): Loggable("Sto_Behav") {}
 
       void setup() {
          behaviors = new BehaviorItem[MAX_BEHAVIOR_ITEMS];
@@ -141,9 +141,9 @@ class Mng_Storage {
    public:
       Sto_RTC rtc_storage;
       EEPROM_ResetCount resetCount;
-      StorageCred stoCred;
-      StorageConfig stoConfig;
-      StorageBehavior2 stoBehavior;
+      Sto_Cred stoCred;
+      Sto_Config stoConfig;
+      Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
       Sto_SD sd1;
 

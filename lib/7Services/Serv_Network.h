@@ -113,7 +113,7 @@ class Serv_Network: public Loggable {
         void resetWifi() {
             xLog(__func__);
             state = NETWORK_START;
-            StorageCred cred = device->storage.stoCred;
+            Sto_Cred cred = device->storage.stoCred;
             retryCnt = 13;
             
             #ifdef ESP32
