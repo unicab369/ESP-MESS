@@ -19,24 +19,32 @@ class Controlable {};
 
 class ControlOutput: public Controlable {
     public:
+        uint8_t pin;
+        uint8_t value;
+
         void load(uint8_t setPin, uint8_t setValue) {
             pin = setPin;
             value = setValue;
         }
 
-        uint8_t pin;
-        uint8_t value;
+        void load(uint8_t *data) {
+            memcpy(this, data, sizeof(*this));
+        }
 };
 
 class ControlWS2812: public Controlable {
     public:
+        uint8_t pin;
+        uint32_t value;
+
         void load(uint8_t setPin, uint32_t setValue) {
             pin = setPin;
             value = setValue;
         }
 
-        uint8_t pin;
-        uint32_t value;
+        void load(uint8_t *data) {
+            memcpy(this, data, sizeof(*this));
+        }
 };
 
 class ControlReport: public Controlable {
@@ -65,10 +73,11 @@ class BehaviorItem {
         }
 
         template <typename T>
-        void configure(Cue_Trigger setCue, T control) {
+        void configure(uint8_t _refId, Cue_Trigger setCue, T control) {
             memcpy(data, &control, sizeof(T));
             cue = setCue;
-            
+            refId = _refId;
+
             if (std::is_same<T, ControlOutput>::value) {
                 actionCmd = ACTION_OUTPUT;
             } else if (std::is_same<T, ControlWS2812>::value) {
@@ -78,29 +87,33 @@ class BehaviorItem {
             }
         }
 
-        void handle(Cue_Trigger checkCue) {
-            if (cue != checkCue || isValid() == false) return;
+        void handle(uint8_t _refId, Cue_Trigger checkCue) {
+            if (refId != _refId || cue != checkCue || !isValid()) return;
             AppPrint("\n[Behav]", __func__);
 
-            // (*callback)(&_control);
             switch (actionCmd) {
                 case ACTION_OUTPUT: {
                     ControlOutput control;
-                    memcpy(&control, data, sizeof(control));
+                    control.load(data);
+
+                    // memcpy(&control, data, sizeof(control));
                     AppPrint("ControlOutput Pin", String(control.pin));
                     AppPrint("ControlOutput value", String(control.value));
                     break;
                 }
                 case ACTION_WS2812: {
                     ControlWS2812 control;
-                    memcpy(&control, data, sizeof(control));
+                    control.load(data);
+
+                    // memcpy(&control, data, sizeof(control));
                     AppPrint("ControlWS2812 pin", String(control.pin));
                     AppPrint("ControlWS2812 value", String(control.value));
                     break;
                 }
                 case ACTION_SEND: {
                     ControlSend control;
-                    memcpy(&control, data, sizeof(control));
+
+                    // memcpy(&control, data, sizeof(control));
                     AppPrint("ControlWS2812 pin", String(control.myStr));
                     break;
                 }

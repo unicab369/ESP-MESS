@@ -129,6 +129,10 @@ class Serv_Device: public Loggable, public Serv_Serial {
             rotary.onCallback = &rotaryCb;
         }
 
+        void handleReceivePacket(ReceivePacket2* packet) {
+            // storage.stoBehavior.handleCue(item->cue);
+        }
+
         void toggleRelay() {
             relay1.toggle();
         }

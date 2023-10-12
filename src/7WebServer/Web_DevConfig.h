@@ -11,8 +11,8 @@ class Web_DevConfig: public Web_Base {
 
         makeNewRow();
 
-        makeTextField2("ssid", String(ssid));
-        makeTextField2("password", "");
+        makeTextField("ssid", String(ssid));
+        makeTextField("password", "");
         makeButton("SAVE CRED", "/sav_cred");
         makeButton("DELETE CRED", "/del_cred");
 
@@ -20,8 +20,8 @@ class Web_DevConfig: public Web_Base {
         // makeActionForm("/sav_cred");
 
         makeNewRow();
-        makeTextField2("DevName", String(deviceName));
-        makeTextField2("mqttServer", String(mqttServer));
+        makeTextField("DevName", String(deviceName));
+        makeTextField("mqttServer", String(mqttServer));
         makeButton("SAVE CONF", "/sav_conf", true);
         makeButton("DELETE CONF", "/del_conf", true);
 

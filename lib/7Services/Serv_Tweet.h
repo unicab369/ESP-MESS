@@ -73,6 +73,7 @@ class Serv_Tweet {
 
         void handleMessage(ReceivePacket2* packet) {
             DataContent& content = packet->dataPacket.content;
+            device->handleReceivePacket(packet);
 
             switch (packet->dataPacket.info.sourceCmd) {
                 case CMD_TRIGGER: {

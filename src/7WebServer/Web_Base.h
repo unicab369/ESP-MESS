@@ -195,20 +195,6 @@ class Web_Base: public Loggable {
       }
 
       void makeTextField(String key, String value) {
-         String str = "<tr><td width='30%'>%s</td><td width='100%'><input type='text' name='" + key + 
-                           "' maxlength='20' width='100%' value='" + value + "'></td></tr>";
-         appendStr(str.c_str());
-      }
-
-      void startForm() {
-         appendStr("<form class='pure-form pure-form-aligned'><fieldset>");
-      }
-
-      void stopForm() {
-         appendStr("</fieldset></form>");
-      }
-
-      void makeTextField2(String key, String value) {
          String str = "<div class='pure-control-group'><td width='30%'>\
          <label for='tf-name' class='Width200px FontLarge'>" + key + "</label></td>\
          <td width='100%'><input type='text' id='tf-name' class='Width95 FontLarge' placeholder='" + key + "' /></td></div>";

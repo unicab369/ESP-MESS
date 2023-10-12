@@ -70,6 +70,7 @@ class StorageConfig: public StoragePairValues<108, 21, 130, 21> {
 class StorageBehavior2: public Loggable {
     EEPROM_Data rawData[MAX_BEHAVIOR_ITEMS];
     BehaviorItem* behaviors;
+    bool isLoaded = false; 
 
     void reload() {
         for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
@@ -85,6 +86,7 @@ class StorageBehavior2: public Loggable {
         void setup() {
             behaviors = new BehaviorItem[MAX_BEHAVIOR_ITEMS];
             reload();
+            isLoaded = true;
         }
 
         void deleteData() {
@@ -104,6 +106,13 @@ class StorageBehavior2: public Loggable {
 
         BehaviorItem* getData(uint8_t index) {
             return &behaviors[index];
+        }
+
+        void handleCue(uint8_t refId, Cue_Trigger cue) {
+            if (!isLoaded) return;
+            for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
+                behaviors[i].handle(refId, cue);
+            }
         }
 };
 
