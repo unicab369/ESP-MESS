@@ -6,7 +6,7 @@ class Mod_RTC: public I2CInterface, public Loggable {
     char dateTimeStr[22];
     char dateStr[11];
 
-    // addr 0x68
+    //! addr 0x68
     public:
         Mod_RTC(): I2CInterface(), Loggable("RTC") {}
 

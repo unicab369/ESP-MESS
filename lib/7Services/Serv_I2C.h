@@ -29,7 +29,7 @@ class Serv_I2C: public Loggable {
         DisplayMode dispMode = DISPLAY_DEFAULT;
         Mng_Sensor sensors;
         Mod_RTC rtc;
-        // PCA96Controller pca96;
+        PCA96Controller pca96;
 
         bool isLoaded = false;
     
@@ -41,7 +41,7 @@ class Serv_I2C: public Loggable {
             wire->begin(sda, scl);
             sensors.setup(wire);
             rtc.setup(wire);
-            // pca96.setup(wire);
+            pca96.setup(wire);
             disp.setup(wire);
             disp.printline("Hello World!", 0);
             isLoaded = true;
@@ -53,9 +53,15 @@ class Serv_I2C: public Loggable {
             disp.clear();
         }
 
+        uint16_t value = 0;
+
         //! Run
         void run() {
             sensors.checkStatus();
             // pca96.test();
+
+            // pca96.drivePWM(0, value);
+            // value+=10;
+            // value = value>4000 ? 0 : value;
         }
 };

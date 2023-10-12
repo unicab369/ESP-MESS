@@ -23,7 +23,7 @@ class Mod2_BH17: public SensorBase, public Lux_Interface {
     }
 
     public:
-        // addr 0x23
+        //! addr 0x23
         Mod2_BH17(): SensorBase(0x23), Lux_Interface() {}
 
         uint16_t setup(TwoWire *wire) override {

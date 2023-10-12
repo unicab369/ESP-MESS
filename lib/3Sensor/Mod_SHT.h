@@ -20,7 +20,7 @@ class Mod2_SHT3: public SensorBase, public TempHum_Interface {
     }
 
     public:
-        // addr 0x44
+        //! addr 0x44
         Mod2_SHT3(): SensorBase(0x44), TempHum_Interface() {}
 
         uint16_t setup(TwoWire *wire) override {

@@ -6,6 +6,7 @@ class Mod_VL53LOX {
     bool configured = false;
 
     public:
+        //! Addr 0x29
         void setup(TwoWire *wire = &Wire) {
             if (!lox.begin(0x29, wire)) { 
                 Serial.println("[Mod_VL53LOX]: Error");

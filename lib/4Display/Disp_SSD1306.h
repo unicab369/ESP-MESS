@@ -38,6 +38,7 @@ class Disp_SSD13062 {
     public:
         Disp_SSD13062() {}
 
+        //! Addr 0x3C : 0x3D
         void setup(TwoWire *wire) {
             // Display required some time on power up to work
             // Wire.beginTransmission(addr);

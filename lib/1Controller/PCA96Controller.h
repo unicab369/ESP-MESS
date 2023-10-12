@@ -15,6 +15,7 @@ class PCA96Controller {
     bool isLoaded = false;
 
     public:
+        //! Addr 0x40
         void setup(TwoWire* wire) {
             pwm = Adafruit_PWMServoDriver(PCA9685_I2C_ADDRESS, *wire);
 
@@ -62,6 +63,7 @@ class PCA96Controller {
         }
 
         void test() {
+            if (!isLoaded) return;
             // Drive each servo one at a time using setPWM()
             Serial.println(servonum);
             for (uint16_t pulselen = SERVOMIN; pulselen < SERVOMAX; pulselen++) {
