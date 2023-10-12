@@ -20,7 +20,7 @@ char WebServer_timeString[50];
 long WebServer_resetCnt = 0;
 char WebServer_devName[32] = "NULL";
 
-class Web_Server: public BaseComponent {
+class Web_Server: public Loggable {
     void WebServer_Response() {
         Serial.print("\n[WebServer] ");
         webServer.sendHeader("Access-Control-Allow-Origin","*");
@@ -36,7 +36,7 @@ class Web_Server: public BaseComponent {
     int value = 0;
 
     public:
-        Web_Server(): BaseComponent("Base") {}
+        Web_Server(): Loggable("Base") {}
 
         Web_Root webRoot;
         Serv_Network *network;

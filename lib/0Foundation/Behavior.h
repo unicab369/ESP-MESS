@@ -50,14 +50,20 @@ class ControlSend: public Controlable {
 };
 
 class BehaviorItem {
-    Cue_Trigger cue;
-    Cmd_Behavior actionCmd = ACTION_NONE;
-    uint8_t id[6];
-    uint8_t data[24];
-
-    bool isValid() { return actionCmd != ACTION_NONE; }
-
     public:
+        BehaviorItem() {}
+
+        Cue_Trigger cue;
+        Cmd_Behavior actionCmd = ACTION_NONE;
+        uint8_t refId;
+        uint8_t data[32];
+
+        bool isValid() { return actionCmd != ACTION_NONE; }
+
+        void toCharArr(char* charArr) const {
+            memcpy(charArr, this, sizeof(BehaviorItem));
+        }
+
         template <typename T>
         void configure(Cue_Trigger setCue, T control) {
             AppPrint(__func__);

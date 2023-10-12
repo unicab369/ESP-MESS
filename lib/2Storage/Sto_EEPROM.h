@@ -6,7 +6,10 @@
 // [mqttServer] 176- 200
 // [mqttTopic] 201-270
 
-class Sto_EEPROM {
+class Sto_EEPROM: public Loggable {
+    public:
+        Sto_EEPROM(): Loggable("EEPROM") {}
+
     protected:
         void writeValue(int address, uint64_t value) {
             for (int i = 0; i < 8; i++) {
@@ -23,21 +26,35 @@ class Sto_EEPROM {
         }
 
         void writeBytes(int address, const void *value, size_t len) {
+            xLogLine();
+            xLogf("-&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
-
+        
             for (int i=0; i<len; i++) {
                 EEPROM.write(address+i, val[i]);
             }
-
             EEPROM.commit();
+
+            // xLogLine();
+            // xLog("ReadBack");
+            // byte data[len];
+            // readBytes(address, data, len);
+            // AppPrintHex(data, len);
         }
 
         void readBytes(int address, void *value, size_t len) {
+            xLogLine();
+            xLogf("-&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
 
             for (int i=0; i<len; i++) {
                 val[i] = EEPROM.read(address+i);
             }
+
+            // byte checkData[len];
+            // memcpy(checkData, val, len);
+            // xLog("ReadBack2");
+            // AppPrintHex(checkData, len);
         }
 
         void storeData(int address, const char *buf, size_t len) {
@@ -61,7 +78,6 @@ class Sto_EEPROM {
 class EEPROM_Check: public Sto_EEPROM {
     protected:
         int checkAddr;
-        uint64_t valueAddr() { return checkAddr + 1; }
 
         void writeCode() {
             writeByte(checkAddr, 0xDD);
@@ -76,7 +92,11 @@ class EEPROM_Check: public Sto_EEPROM {
         }
 
     public:
-        void loadCheckAddr(int addr) {
+        uint16_t valueAddr() { return checkAddr + 1; }
+
+        //! loadAddress begins with check byte
+        //! contents of the data follow the check byte
+        void loadAddress(int addr) {
             checkAddr = addr;
         }
 };
@@ -94,7 +114,7 @@ class EEPROM_ResetCount: public EEPROM_Check {
 
         // Reset Code [0] = 0xDD, Reset Count [1-8]
         void loadValue() {
-            loadCheckAddr(0);
+            loadAddress(0);
             checkCode() ? increaseValue() : deleteValue();
         }
 
@@ -117,8 +137,8 @@ class EEPROM_Data: public EEPROM_Check {
 
         void storeData(const void* data, size_t len) {
             // Serial.print("[EEPROM] "); AppPrint(__func__, "addr " + String(valueAddr()));
-            writeBytes(valueAddr(), data, len);
             writeCode();
+            writeBytes(valueAddr(), data, len);
         }
 
         void deleteData() {
@@ -130,7 +150,7 @@ template<int startAddr, size_t len>
 class EEPROM_FixData: public EEPROM_Data {
     public:
         EEPROM_FixData() {
-            loadCheckAddr(startAddr);
+            loadAddress(startAddr);
         }
 
         void loadFixedData(void *data) {

@@ -1,6 +1,6 @@
 #include "RTClib.h"
 
-class Mod_RTC: public I2CInterface, public BaseComponent {
+class Mod_RTC: public I2CInterface, public Loggable {
     RTC_DS1307 rtc;
     bool didLoad = false;
     char dateTimeStr[22];
@@ -8,7 +8,7 @@ class Mod_RTC: public I2CInterface, public BaseComponent {
 
     // addr 0x68
     public:
-        Mod_RTC(): I2CInterface(), BaseComponent("RTC") {}
+        Mod_RTC(): I2CInterface(), Loggable("RTC") {}
 
         DateTime getTimeNow() { return getTime(); }
         bool isRunning() { return rtc.isrunning(); }

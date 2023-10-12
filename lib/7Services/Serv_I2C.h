@@ -21,9 +21,9 @@ struct DispItem {
     }
 };
 
-class Serv_I2C: public BaseComponent {
+class Serv_I2C: public Loggable {
     public:
-        Serv_I2C(): BaseComponent("I2C") {}
+        Serv_I2C(): Loggable("I2C") {}
 
         Disp_SSD13062 disp;
         DisplayMode dispMode = DISPLAY_DEFAULT;

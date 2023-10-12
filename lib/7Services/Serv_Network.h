@@ -7,7 +7,7 @@ enum Network_State {
     NETWORK_UDP_DONE,
 };
 
-class Serv_Network: public BaseComponent {
+class Serv_Network: public Loggable {
     // ReceivePacketCb tweetHandler = [&](ReceivePacket* packet) {
     //     tweet.handleMessage(packet);
     // };
@@ -86,7 +86,7 @@ class Serv_Network: public BaseComponent {
     }
 
     public:
-        Serv_Network(): BaseComponent("Net") {}
+        Serv_Network(): Loggable("Net") {}
 
         Net_Wifi wifi;
         Net_UDP udp;

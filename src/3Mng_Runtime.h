@@ -8,7 +8,7 @@
 //! timerCallback is static sto asyncTimer1 cannot be an instance of Mng_Runtime
 AsyncTimer asyncTimer1;
 
-class Mng_Runtime: public BaseComponent {
+class Mng_Runtime: public Loggable {
     //! MAIN JOB
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
@@ -105,7 +105,7 @@ class Mng_Runtime: public BaseComponent {
     #endif
 
     public:
-        Mng_Runtime(): BaseComponent("Runtime") {}
+        Mng_Runtime(): Loggable("Runtime") {}
 
         AsyncTimer asyncTimer2;
         Serv_Device device;
@@ -167,15 +167,9 @@ class Mng_Runtime: public BaseComponent {
 // - broadcast channel
 
 // PIR Multi
+
+
 // ESPNow, behavior
-
-// Send: 
-// x Single Click
-// x Double Click
-// x IR code
-// x Sensor Reading
-// Pir Signal, Data Requests (readings)
-
 // handler:
 // x toggle pin
 // ws2812 output

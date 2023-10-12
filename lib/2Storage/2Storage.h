@@ -44,6 +44,7 @@ class StoragePairValues {
         }
 };
 
+// template format: startAddr of ssid, ssid length, startAddr of passw, passw length
 class StorageCred: public StoragePairValues<9, 33, 43, 64> {
     public:
         const char* ssid()    { return value1; }
@@ -56,6 +57,7 @@ class StorageCred: public StoragePairValues<9, 33, 43, 64> {
         }
 };      
 
+// template format: startAddr of devName, devName length, startAddr of mqttIp, mqttIp length
 class StorageConfig: public StoragePairValues<108, 21, 130, 21> {
     public:
         const char* devName()    { return value1; }
@@ -65,6 +67,46 @@ class StorageConfig: public StoragePairValues<108, 21, 130, 21> {
 
 #define MAX_BEHAVIOR_ITEMS 10
 BehaviorItem APP_BEHAVIORS[MAX_BEHAVIOR_ITEMS];
+
+class StorageBehavior2: public Loggable {
+    EEPROM_Data rawData[MAX_BEHAVIOR_ITEMS];
+    BehaviorItem* behaviors;
+
+    void reload() {
+        for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
+            uint16_t addr = i*(500+sizeof(BehaviorItem));
+            rawData[i].loadAddress(addr);
+            rawData[i].loadData(&behaviors[i], sizeof(BehaviorItem));
+        }
+    }
+
+    public:
+        StorageBehavior2(): Loggable("Sto_Behav") {}
+
+        void setup() {
+            behaviors = new BehaviorItem[MAX_BEHAVIOR_ITEMS];
+            reload();
+        }
+
+        void deleteData() {
+            for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
+                uint16_t addr = i*(500+sizeof(BehaviorItem));
+                rawData[i].deleteData();
+            }
+            reload();          
+        }
+
+        void updateData(BehaviorItem* newItem, uint8_t index) {
+            if (index-1>MAX_BEHAVIOR_ITEMS) return;
+            rawData[index].storeData(newItem, sizeof(BehaviorItem));
+            bool check2 = rawData[index].loadData(&behaviors[index], sizeof(BehaviorItem));
+            // xLogf("RetrievedData2 cue = 0x%02X; cmd = 0x%02X", behaviors[index].cue, behaviors[index].actionCmd);
+        }
+
+        BehaviorItem* getData(uint8_t index) {
+            return &behaviors[index];
+        }
+};
 
 class StorageBehavior {
     EEPROM_FixData<500, sizeof(APP_BEHAVIORS)> behaviorsData;
@@ -133,11 +175,11 @@ class Mng_Storage {
             AppPrintSeparator("[ResetCount]", val);
             stoCred.reloadData();
             stoConfig.reloadData();
-            stoBehavior.reloadData();
+            // stoBehavior.reloadData();
 
-            stoBehavior.handle(TRIGGER_SINGLECLICK);
-            stoBehavior.handle(TRIGGER_DOUBLECLICK);
-            AppPrint("[Sto] behaviorSize", sizeof(APP_BEHAVIORS));
+            // stoBehavior.handle(TRIGGER_SINGLECLICK);
+            // stoBehavior.handle(TRIGGER_DOUBLECLICK);
+            // AppPrint("[Sto] behaviorSize", sizeof(APP_BEHAVIORS));
 
             // littleFS.begin();
             // Serial.println("\n\n***LittleFS test");
@@ -182,25 +224,6 @@ class Mng_Storage {
         void testSetupData() {
             stoCred.storeData("ffffffffff22222222223333333333", "gggggggggg3333333333444444444455555555556666666666");
             stoConfig.storeData("hhhhhhhhhhjjjjjjjjjj", "kkkkkkkkkkmmmmmmmmmm");
-
-            ControlOutput action1;
-            action1.load(11, 22);
-            BehaviorItem behav1;
-            // behav1.configure<ControlOutput>(TRIGGER_SINGLECLICK, action1);
-            // stoBehavior.load(0, behav1);
-
-            // ControlWS2812 action2;
-            // action2.load(33, 223344);
-            // BehaviorItem behav2;
-            // behav2.configure<ControlWS2812>(TRIGGER_DOUBLECLICK, action2);
-            // stoBehavior.load(1, behav2);
-
-            // ControlSend action3;
-            // BehaviorItem behav3;
-            // behav3.configure<ControlSend> (TRIGGER_SINGLECLICK, action3);
-            // stoBehavior.load(2, behav3);
-
-            // stoBehavior.storeData();
         }
 
         void deleteData() {

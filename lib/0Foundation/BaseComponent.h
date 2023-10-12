@@ -1,10 +1,10 @@
 #define LOG_MAX_LENGTH 64
 
-class BaseComponent {
+class Loggable {
     char identifier[20];
     
     public:
-        BaseComponent(const char* id) {
+        Loggable(const char* id) {
             memcpy(identifier, id, sizeof(identifier));
         }
 
@@ -18,6 +18,10 @@ class BaseComponent {
             xLogf("%s %llu", value, number);
         }
 
+        void xLogLine() {
+            Serial.println();
+        }
+        
         void xLogf(const char *format, ...) {
             char buf1[LOG_MAX_LENGTH]; 
             va_list args;

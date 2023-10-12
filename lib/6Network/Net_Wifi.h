@@ -10,7 +10,7 @@
     #include <WiFiClient.h>
 #endif
 
-class Net_Wifi: public BaseComponent {
+class Net_Wifi: public Loggable {
     char hostName[21];
 
     void setHostName() {
@@ -37,7 +37,7 @@ class Net_Wifi: public BaseComponent {
     }
     
     public:
-        Net_Wifi(): BaseComponent("Wifi") {} 
+        Net_Wifi(): Loggable("Wifi") {} 
 
         bool isConnected() { return WiFi.status() == WL_CONNECTED; }
 

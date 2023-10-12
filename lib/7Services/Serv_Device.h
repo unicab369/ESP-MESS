@@ -1,7 +1,7 @@
 // #define TTGO_LORA32 true
 // #define DEV_KMC_70011 1
 
-class Serv_Device: public BaseComponent, public Serv_Serial {
+class Serv_Device: public Loggable, public Serv_Serial {
     std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
         String output = "IrRead = " + (status ? String(value) : "Locked");
         AppPrint("[IR]", output);
@@ -89,7 +89,7 @@ class Serv_Device: public BaseComponent, public Serv_Serial {
     };
 
     public:
-        Serv_Device(): BaseComponent("Dev"), Serv_Serial() {}
+        Serv_Device(): Loggable("Dev"), Serv_Serial() {}
 
         WS28xx ws2812;
         MyButton button1;

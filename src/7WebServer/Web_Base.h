@@ -31,7 +31,7 @@ function sendPostRequest(path, isPost) {\
 
 #define HTML_BUFFER_SIZE 1024
 
-class Web_Base: public BaseComponent {
+class Web_Base: public Loggable {
     private:
         char* buffer = new char[HTML_BUFFER_SIZE];
         int bufferSize = HTML_BUFFER_SIZE;
@@ -66,7 +66,7 @@ class Web_Base: public BaseComponent {
         };
 
     public:
-        Web_Base(const char* name): BaseComponent(name) {}
+        Web_Base(const char* name): Loggable(name) {}
 
         const char* getPath() { return (const char*)dirPath; }
 
