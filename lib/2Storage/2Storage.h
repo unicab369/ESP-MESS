@@ -173,10 +173,6 @@ class Mng_Storage {
          stoConfig.reloadData();
          // stoBehavior.reloadData();
 
-         // stoBehavior.handle(TRIGGER_SINGLECLICK);
-         // stoBehavior.handle(TRIGGER_DOUBLECLICK);
-         // AppPrint("[Sto] behaviorSize", sizeof(APP_BEHAVIORS));
-
          // littleFS.begin();
          // Serial.println("\n\n***LittleFS test");
          // littleFS.test();
