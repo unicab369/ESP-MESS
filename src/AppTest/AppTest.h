@@ -42,24 +42,34 @@ Loggable TestLog("Test");
 #elif defined(TEST_BEHAVIOR)
     Mng_Storage storage;
     Sto_Behavior stoBehav;
-
+    Sto_Peer stoPeer;
+    
     void setup() {
         Serial.begin(115200);
         storage.setup();
-        stoBehav.setup();
+        stoBehav.reload();
+        stoPeer.reload();
 
         BehaviorItem behav_In;
         BehaviorItem* behav_Out;
 
         ControlOutput action1(11, 22);
-        behav_In.store(0, TRIGGER_SINGLECLICK, action1);
+        behav_In.store(0x00, TRIGGER_SINGLECLICK, action1);
         stoBehav.updateData(0, &behav_In);                  //! store behavior
-        stoBehav.handleCue(0, TRIGGER_SINGLECLICK);
+        stoBehav.handleCue(0x01, TRIGGER_SINGLECLICK);
 
         ControlWS2812 action2(33, 44);
-        behav_In.store(0, TRIGGER_DOUBLECLICK, action2);
+        behav_In.store(0x00, TRIGGER_DOUBLECLICK, action2);
         stoBehav.updateData(1, &behav_In);                  //! store behavior
-        stoBehav.handleCue(0, TRIGGER_DOUBLECLICK);
+        stoBehav.handleCue(0x00, TRIGGER_DOUBLECLICK);
+
+        // uint8_t macValues[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
+        // PeerItem peer_In(macValues, 12345, 3);
+        // PeerItem* peer_Out;
+
+        // stoPeer.updateData(3, &peer_In);
+        // peer_Out = stoPeer.findPeer(macValues);
+        // // peer_Out->printRaw();
     }
 
     void loop() {

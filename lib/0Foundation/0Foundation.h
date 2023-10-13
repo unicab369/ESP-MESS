@@ -75,6 +75,8 @@ void AppPrintHeap() {
     AppPrint("\n[FreeHeap]", freeHeap);
 }
 
+#define INVALID_UINT8 255
+
 #include "TimeoutItem.h"
 TimerItem appTimer0;
 
