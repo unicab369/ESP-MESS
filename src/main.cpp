@@ -1,7 +1,7 @@
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
 
-// #define UNIT_TEST true
+#define UNIT_TEST true
 
 Mng_Runtime runTime;
 

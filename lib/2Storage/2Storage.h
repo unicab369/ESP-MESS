@@ -101,7 +101,7 @@ class Sto_Behavior: public Loggable {
          reload();          
       }
 
-      void updateData(BehaviorItem* newItem, uint8_t index) {
+      void updateData(uint8_t index, BehaviorItem* newItem) {
          if (index-1>MAX_BEHAVIOR_ITEMS) return;
          rawData[index].storeData(newItem, sizeof(BehaviorItem));
          bool check2 = rawData[index].loadData(&behaviors[index], sizeof(BehaviorItem));
@@ -114,8 +114,20 @@ class Sto_Behavior: public Loggable {
 
       void handleCue(uint8_t refId, Cue_Trigger cue) {
          if (!isLoaded) return;
+
          for (int i=0; i<MAX_BEHAVIOR_ITEMS; i++) {
-               behaviors[i].handle(refId, cue);
+            BehaviorItem *behav = &behaviors[i];
+            if (behav->cue != cue) continue;
+            
+            ControlOutput out1(0, 0);
+            ControlWS2812 out2(0, 0);
+
+            if (out1.extract(behav)) {
+               xLogf("IM HERE1 pin = %u, value = %u", out1.pin, out1.value);
+            } else if (out2.extract(behav)) {
+               xLogf("IM HERE2 pin = %u, value = %u", out2.pin, out2.value);
+            }
+               // behaviors[i].handle(refId, cue);
          }
       }
 };

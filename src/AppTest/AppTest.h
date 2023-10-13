@@ -4,8 +4,8 @@
     uint8_t ledPin = 2;
 #endif
 
-#define TEST_PCA96
-// #define TEST_BEHAVIOR True
+// #define TEST_PCA96
+#define TEST_BEHAVIOR True
 // #define TEST_PWM True
 
 Loggable TestLog("Test"); 
@@ -41,38 +41,25 @@ Loggable TestLog("Test");
 
 #elif defined(TEST_BEHAVIOR)
     Mng_Storage storage;
-    StorageBehavior stoBehav;
+    Sto_Behavior stoBehav;
 
     void setup() {
         Serial.begin(115200);
         storage.setup();
         stoBehav.setup();
 
-        ControlOutput action1;
-        action1.load(11, 22);
-        BehaviorItem behav1;
-        behav1.configure<ControlOutput>(TRIGGER_SINGLECLICK, action1);
-        stoBehav.updateData(&behav1, 0);
-        
-        BehaviorItem *behav1_test = stoBehav.getData(0);
-        TestLog.xLogf("CHECK1 cue = 0x%02X; cmd = 0x%02X", behav1_test->cue, behav1_test->actionCmd);
+        BehaviorItem behav_In;
+        BehaviorItem* behav_Out;
 
-        ControlWS2812 action2;
-        action2.load(33, 223344);
-        BehaviorItem behav2;
-        behav2.configure<ControlWS2812>(TRIGGER_DOUBLECLICK, action2);
-        stoBehav.updateData(&behav2, 1);
+        ControlOutput action1(11, 22);
+        behav_In.store(0, TRIGGER_SINGLECLICK, action1);
+        stoBehav.updateData(0, &behav_In);                  //! store behavior
+        stoBehav.handleCue(0, TRIGGER_SINGLECLICK);
 
-        BehaviorItem *behav2_test = stoBehav.getData(1);
-        TestLog.xLogf("CHECK2 cue = 0x%02X; cmd = 0x%02X", behav2_test->cue, behav2_test->actionCmd);
-
-        ControlSend action3;
-        BehaviorItem behav3;
-        behav3.configure<ControlSend> (TRIGGER_SINGLECLICK, action3);
-        stoBehav.updateData(&behav3, 2);
-
-        BehaviorItem *behav3_test = stoBehav.getData(2);
-        TestLog.xLogf("CHECK3 cue = 0x%02X; cmd = 0x%02X", behav3_test->cue, behav3_test->actionCmd);
+        ControlWS2812 action2(33, 44);
+        behav_In.store(0, TRIGGER_DOUBLECLICK, action2);
+        stoBehav.updateData(1, &behav_In);                  //! store behavior
+        stoBehav.handleCue(0, TRIGGER_DOUBLECLICK);
     }
 
     void loop() {
