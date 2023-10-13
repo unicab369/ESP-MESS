@@ -27,7 +27,7 @@ class Sto_EEPROM: public Loggable {
 
         void writeBytes(int address, const void *value, size_t len) {
             xLogLine();
-            xLogf("-&&& %s @addr = %u", __func__, address);
+            xLogf("&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
         
             for (int i=0; i<len; i++) {
@@ -44,7 +44,7 @@ class Sto_EEPROM: public Loggable {
 
         void readBytes(int address, void *value, size_t len) {
             xLogLine();
-            xLogf("-&&& %s @addr = %u", __func__, address);
+            xLogf("&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
 
             for (int i=0; i<len; i++) {

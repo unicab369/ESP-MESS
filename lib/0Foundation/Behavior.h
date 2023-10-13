@@ -17,27 +17,27 @@ enum Cue_Trigger: uint8_t {
 
 struct BehaviorItem {
    Cue_Trigger cue;
-   uint8_t refId;
+   uint8_t peerId;
    uint8_t data[32]; 
    
    void toCharArr(char* charArr) const {
       memcpy(charArr, this, sizeof(BehaviorItem));
    }
 
+   bool check(uint8_t peerIdIdVal, Cue_Trigger cueVal) {
+      return peerId == peerIdIdVal && cue == cueVal;
+   }
+   
    template <typename T>
-   void store(uint8_t refIdVal, Cue_Trigger cueVal, T control) {
-      memcpy(data, &control, sizeof(T));
-      refId = refIdVal;
+   void load(uint8_t peerIdIdVal, Cue_Trigger cueVal, T* control) {
+      memcpy(data, control, sizeof(T));
+      peerId = peerIdIdVal;
       cue = cueVal;
    }
 
    template <typename T>
    void produce(T *control) {
       memcpy(control, data, sizeof(T));
-   }
-
-   bool check(uint8_t refIdVal, Cue_Trigger cueVal) {
-      return refId == refIdVal && cue == cueVal;
    }
 };
 

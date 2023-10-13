@@ -2,17 +2,20 @@
 // #define DEV_KMC_70011 1
 
 class Serv_Device: public Loggable, public Serv_Serial {
+    //! iR Switch Callback
     std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
         String output = "IrRead = " + (status ? String(value) : "Locked");
         AppPrint("[IR]", output);
         addDisplayQueue1(output, 6);
     };
 
+    //! Pir Callback
     std::function<void(bool, uint8_t)> pirCb = [&](bool status, uint8_t pin) {
         Serial.print("PirTriggered = "); Serial.print(pin);
         Serial.print(" | "); Serial.println(status);
     };
 
+    //! RotaryEncoder Callback
     std::function<void(RotaryDirection, uint16_t)> rotaryCb = [&](RotaryDirection state, uint16_t counter) {
         #ifdef ESP32
             String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
@@ -31,6 +34,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
 
     BNT_Hold releasedState = HOLD_TRANSITION;
 
+    //! ButtonPress Callback
     std::function<void(BTN_Action, BNT_Hold, uint32_t)> buttonCb = 
                         [&](BTN_Action action, BNT_Hold hold, uint32_t elapse) {
         switch (action) {
@@ -102,6 +106,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
         PulseController led, buzzer;
         PinWritable relay1;
         RotaryEncoder rotary;
+        Serv_Behavior servBehav;
             
         std::function<void()> *onHandleSingleClick;
         std::function<void()> *onHandleDoubleClick;
@@ -110,7 +115,9 @@ class Serv_Device: public Loggable, public Serv_Serial {
 
         virtual void showLadderId() {}
 
-        void configure(PinConfig* conf) {        
+        void configure(PinConfig* conf) {
+            servBehav.setup();
+            
             led.setup(conf->led1);
             led.uniformPluse1000ms();
             relay1.begin(conf->relay1);
@@ -129,7 +136,37 @@ class Serv_Device: public Loggable, public Serv_Serial {
             rotary.onCallback = &rotaryCb;
         }
 
-        void handleReceivePacket(ReceivePacket2* packet) {
+        //! Tweet CommandTrigger
+        void handleCommandTrigger(ReceivePacket2* packet) {
+            CommandItem item = packet->dataPacket.content.commandItem;
+
+            switch (item.cue) {
+                case TRIGGER_STARTUP: {
+                    addDisplayQueues("Recv Startup", 6);
+                    break;
+                }
+                case TRIGGER_SINGLECLICK: {
+                    addDisplayQueues("Recv Single: " + String(item.value), 6);
+                    // device->led.toggle();
+                    break;
+                }
+                case TRIGGER_DOUBLECLICK: {
+                    addDisplayQueues("Recv Double: " + String(item.value), 6);
+                    // device->led.repeatPulses(1000);
+                    break;  
+                }
+                case TRIGGER_PIR: {
+                    addDisplayQueues("Recv Pir: " + String(item.value), 6);
+                    break;
+                }
+                case TRIGGER_IR: {
+                    addDisplayQueues("Recv Ir: " + String(item.value), 6);
+                    break;
+                }
+                default: {
+                    addDisplayQueues("Recv Unknown", 6);
+                }
+            }
             // storage.stoBehavior.handleCue(item->cue);
         }
 

@@ -242,7 +242,7 @@ typedef std::function<void(ReceivePacket2*)> ReceivePacketCb2;
 #include "Serv_ESP.h"
 #include "Serv_Power.h"
 #include "Serv_Serial.h"
+#include "Serv_Behaviors.h"     //! Before Serv_Device
 #include "Serv_Device.h"
 #include "Serv_Tweet.h"
 #include "Serv_Network.h"
-#include "Serv_Behaviors.h"
