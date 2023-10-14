@@ -99,13 +99,13 @@ class Mng_Storage {
 
       void setup() {
          EEPROM.begin(EEPROM_SIZE);
-         resetCount.loadValue();
+         // resetCount.loadValue();
          
-         char val[32];
-         sprintf(val, "%llu", resetCount.value);
-         AppPrintSeparator("[ResetCount]", val);
-         stoCred.reloadData();
-         stoConfig.reloadData();
+         // char val[32];
+         // sprintf(val, "%llu", resetCount.value);
+         // AppPrintSeparator("[ResetCount]", val);
+         // stoCred.reloadData();
+         // stoConfig.reloadData();
          // stoBehavior.reloadData();
 
          // littleFS.begin();

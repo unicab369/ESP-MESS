@@ -106,7 +106,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
         PulseController led, buzzer;
         PinWritable relay1;
         RotaryEncoder rotary;
-        Serv_Behavior servBehav;
+        // Serv_Behavior servBehav;
             
         std::function<void()> *onHandleSingleClick;
         std::function<void()> *onHandleDoubleClick;
@@ -116,7 +116,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
         virtual void showLadderId() {}
 
         void configure(PinConfig* conf) {
-            servBehav.setup();
+            // servBehav.setup();
             
             led.setup(conf->led1);
             led.uniformPluse1000ms();

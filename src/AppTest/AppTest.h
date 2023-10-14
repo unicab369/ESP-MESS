@@ -42,26 +42,59 @@ Loggable TestLog("Test");
 #elif defined(TEST_BEHAVIOR)
     Mng_Storage storage;
     Serv_Behavior servBehav;
-    
+    Mng_Config config;
+    MyButton button1;
+
+    //! ButtonPress Callback
+    std::function<void(BTN_Action, BNT_Hold, uint32_t)> buttonCb = 
+                        [&](BTN_Action action, BNT_Hold hold, uint32_t elapse) {
+        switch (action) {
+            case ACTION_SINGLE_CLICK: {
+                uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x08};
+                ControlOutput action1(11, 22);    
+                // servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
+                servBehav.stoPeer.addPeer(peer1Mac);
+
+                break;
+            }   
+            case ACTION_DOUBLE_CLICK: {
+                servBehav.deleteData();
+                break;
+            }
+            case ACTION_PRESS_ACTIVE: {
+                break;
+            }
+            case ACTION_PRESS_END: {
+                break;
+            }
+        }
+    };
+
     void setup() {
         Serial.begin(115200);
         storage.setup();
         servBehav.setup();
         // servBehav.deleteData();
 
-        uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x88};
-        ControlOutput action1(11, 22);    
-        servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
+        servBehav.stoPeer.printAllPeers();
+
+        // uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x07};
+        // ControlOutput action1(11, 22);    
+        // // servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
+        // servBehav.stoPeer.addPeer(peer1Mac);
 
         // ControlWS2812 action2(33, 44);
         // servBehav.storeAction<TRIGGER_DOUBLECLICK>(1, &action2, &peer1);
 
-        servBehav.test();
+        config.setup();
+        button1.setup(config.btn1, &buttonCb);
+        // servBehav.test();
     }
 
     void loop() {
-
+        button1.run();
     }
+
 #elif defined(TEST_PWM)
     PulseController led;
 

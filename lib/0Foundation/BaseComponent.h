@@ -9,7 +9,7 @@ class Loggable {
         }
 
         void xLog(const char* value, const char* separator = ":") {
-            Serial.printf("[%s]%s %s\n", identifier, separator, value);
+            Serial.printf("\n[%s]%s %s", identifier, separator, value);
         }
 
         void xLog(const char* value, uint64_t number) {
@@ -45,8 +45,7 @@ class Loggable {
         }
 
         void xLogSection(const char* value) {
-            Serial.print("#################### "); 
-            xLog(value);
+            xLogf("%s %s", "###########", value);
         }
 
         void xLogSectionf(const char *format, ...) {

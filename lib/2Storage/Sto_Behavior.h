@@ -15,10 +15,14 @@ class Sto_Array: public Loggable {
    public:
       void reload() {
          for (int i=0; i<count; i++) {
+            xLog("***Reload index = %u", i);
             uint16_t addr = getEEPROM_Address(i);
             rawData[i].loadAddress(addr);
             rawData[i].loadData(&array[i], sizeof(T));
          }
+
+         xLogSection("Print All Data\n");
+         AppPrintHex(array, 48);
          isLoaded = true;
       }
 
@@ -31,22 +35,26 @@ class Sto_Array: public Loggable {
       }
 
       void updateData(uint8_t index, T* newItem) {
-         if (index-1>count) return;
+         if (index>count) return;
          rawData[index].storeData(newItem, sizeof(T));
          bool check2 = rawData[index].loadData(&array[index], sizeof(T));
       }
 
-      T* firstMatch(std::function<bool(T*, uint8_t index)> cb) {
-         if (!isLoaded) return NULL;
+      // T* firstMatch(std::function<bool(T*, uint8_t index)> cb) {
+      //    if (!isLoaded) return NULL;
+      //    T* output = NULL;
 
-         for (int i=0; i<count; i++) {
-            T* target = &array[i];
-            bool match = cb(target, i);
-            if (match) return target;
-         }
+      //    for (int i=0; i<count; i++) {
+      //       T* target = &array[i];
+      //       bool match = cb(target, i);
+      //       if (match) {
+      //          output = target;
+      //          break;
+      //       }
+      //    }
 
-         return NULL;        
-      }
+      //    return output;        
+      // }
 
       void forEach(std::function<void(T*, uint8_t index)> cb) {
          if (!isLoaded) return;
@@ -95,36 +103,60 @@ struct PeerItem {
    }
 };
 
-#define MAX_PEER_COUNT 5
+#define MAX_PEER_COUNT 3
 
 class Sto_Peer: public Sto_Array<1000, PeerItem, MAX_PEER_COUNT> {
    public:
       Sto_Peer(): Sto_Array("Sto_Peer") {}
       
+      void printAllPeers() {
+         xLogSection("***********");
+         forEach([&](PeerItem* item, uint8_t index) {
+            xLogLine();
+            item->printRaw();
+         });
+      }
+
       void addPeer(uint8_t* peerMac) {
          uint8_t lastAvailIndex = INVALID_UINT8;
+         PeerItem* match = NULL;
 
-         PeerItem *match = firstMatch([&](PeerItem* item, uint8_t index) {
-            bool foundMatch = item->hasSameMac(peerMac);
+         for (int i=0; i<MAX_PEER_COUNT; i++) {
+            PeerItem* target = &array[i];
+            // bool foundMatch = target->hasSameMac(peerMac);
 
-            //! get last Available index
-            if (!item->isValid() && !foundMatch) lastAvailIndex = index;
+            Serial.println("\n***ITEM "); target->printRaw(); Serial.println();
+            Serial.printf("***PEER_MAC=%02X:%02X:%02X:%02X:%02X:%02X", 
+                                 peerMac[0], peerMac[1], peerMac[2], 
+                                 peerMac[3], peerMac[4], peerMac[5]);
+            Serial.println();
+
+            bool foundMatch = memcmp(peerMac, target->mac, sizeof(target->mac)) == 0;
+            Serial.printf("Compare = %u", foundMatch); Serial.println();
+
             if (foundMatch) {
-               xLogLine(); xLogf("FirstMatchFound = %u", index);
+               xLog("IM HERE YYYYYYYYY");
+               match = target; break;
+            } else if (!target->isValid()) {
+               lastAvailIndex = i;
             }
-            return foundMatch; 
-         });
+         }
 
-         // if (match != NULL) {
-         //    xLogLine(); xLogf("**FOUND MATCH");
-         //    xLogLine(); xLogf("foundIndex = %u", match->peerId);
+         if (match != nullptr) {
+            xLogLine(); xLogf("**FOUND MATCH");
+            xLogLine(); xLogf("foundIndex = %u", match->peerId);
 
-         // } else if (lastAvailIndex != INVALID_UINT8) {
-         //    //! match == NULL
-         //    xLogLine(); xLogf("\n**ADD NEW PEER");
-         //    newPeer.assignPeerId(lastAvailIndex);
-         //    updateData(lastAvailIndex, &newPeer);
-         // }
+         } else if (lastAvailIndex != INVALID_UINT8) {
+            //! match == NULL
+            xLogLine(); xLogf("\n**ADD NEW PEER at Index = %u", lastAvailIndex);
+            PeerItem newPeer(peerMac);
+            newPeer.assignPeerId(lastAvailIndex);
+            updateData(lastAvailIndex, &newPeer);
+         } else {
+            xLogLine(); xLogf("\n**NO AVAILABLE SPOT");
+         }
+
+         printAllPeers();
       }
 
       // uint8_t findPeer(uint8_t* targetMac) {

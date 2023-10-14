@@ -1,15 +1,16 @@
 class Serv_Behavior {
     Sto_Behavior stoBehav;
-    Sto_Peer stoPeer;
 
     public:
+        Sto_Peer stoPeer;
+
         void setup() {
-            stoBehav.reload();
+            // stoBehav.reload();
             stoPeer.reload();
         }
 
         void deleteData() {
-            stoBehav.deleteData();
+            // stoBehav.deleteData();
             stoPeer.deleteData();
         }
 

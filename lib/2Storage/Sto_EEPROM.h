@@ -31,6 +31,11 @@ class Sto_EEPROM: public Loggable {
                 EEPROM.write(address+i, value);
             }
             EEPROM.commit();
+
+            // xLogLine(); xLog("ReadBack");
+            // byte data[len];
+            // readBytes(address, data, len);
+            // AppPrintHex(data, len);
         }
 
         void writeBytes(uint16_t address, const void *value, size_t len) {
@@ -109,7 +114,6 @@ class EEPROM_Check: public Sto_EEPROM {
 
 class EEPROM_ResetCount: public EEPROM_Check {
     void increaseValue() {
-        //! NOTE: Read the value into a separte variable before writing it back into memory
         readValue(1, &value);
         value++;
         writeValue(1, value);
@@ -134,22 +138,25 @@ class EEPROM_ResetCount: public EEPROM_Check {
 
 class EEPROM_Data: public EEPROM_Check {
     public:
-        bool loadData(void* data, size_t len) {
+        template <class T>
+        bool loadData(T* data, size_t len) {
             // Serial.print("[EEPROM] "); AppPrint(__func__, "addr " + String(valueAddr()));
             if (!checkCode()) return false;
+            xLog("LOAD DATA");
             readBytes(valueAddr(), data, len);
             return true;
         }
 
-        void storeData(const void* data, size_t len) {
+        template <class T>
+        void storeData(T* data, size_t len) {
             // Serial.print("[EEPROM] "); AppPrint(__func__, "addr " + String(valueAddr()));
             writeCode();
             writeBytes(valueAddr(), data, len);
         }
 
         void deleteData(uint16_t address, size_t len) {
-            clearCode();
-            deleteBytes(address, 0, len);
+            writeCode();
+            deleteBytes(valueAddr(), 0, len);
         }
 };
 
