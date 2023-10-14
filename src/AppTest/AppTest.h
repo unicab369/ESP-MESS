@@ -72,9 +72,20 @@ Loggable TestLog("Test");
         }
     };
 
-    std::function<void(const char* ssid, const char *passw)> 
-            storeCredCb = [&](const char* ssid, const char *passw) {
-        storage.stoCred.updateData(ssid, passw);
+    std::function<void(char*)> storeCredCb = [&](char* inputStr) {
+        storage.handleConsoleStr(inputStr);
+        
+        // WiFiCred* cred = (WiFiCred*)val;
+        // DevConf* conf = (DevConf*)val;
+
+        // if (cred != nullptr) {
+        //     TestLog.xLogf("ssid = %s, passw = %s", cred->ssid, cred->password);
+        //     storage.stoCred.updateData(cred->ssid, cred->password);
+        // } 
+        // else if (conf != nullptr) {
+        //     TestLog.xLogf("name = %s, mqtt = %s", conf->name, conf->mqttIP);
+        //     storage.stoConf.updateData(conf->name, conf->mqttIP);            
+        // }
     };
 
     void setup() {
@@ -95,7 +106,7 @@ Loggable TestLog("Test");
 
         config.setup();
         button1.setup(config.btn1, &buttonCb);
-        serial.onStoreCred = &storeCredCb;
+        serial.onParseString = &storeCredCb;
         // servBehav.test();
     }
 

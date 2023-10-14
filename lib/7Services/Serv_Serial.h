@@ -58,7 +58,7 @@ class Serv_Serial {
                 largeDisp.setup2(conf->out1, conf->out2, conf->rst0, conf->mosi0, conf->sck0);
             }
 
-            serial.onStoreCred = &storeCredCb;
+            // serial.onParseString = &storeCredCb;
         }
 
         //! 1 Second Interval

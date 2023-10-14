@@ -112,7 +112,6 @@ class EEPROM_Value: public Sto_EEPROM {
         EEPROM_Value(): Sto_EEPROM(id) {}
         
         bool loadData(uint16_t addr) {
-            xLogf("size = %zu", sizeof(T));
             startAddr = addr;
             if (!checkCode()) return false;
             readBytes(contentAddr(), &value, sizeof(T));
@@ -122,7 +121,6 @@ class EEPROM_Value: public Sto_EEPROM {
         void storeData() {
             writeCode();
             writeBytes(contentAddr(), &value, sizeof(T));
-            loadData(startAddr);
         }
 
         void deleteData() {

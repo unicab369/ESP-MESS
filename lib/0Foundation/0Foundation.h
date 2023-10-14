@@ -2,6 +2,7 @@
 #include <functional>
 #include <Wire.h>
 #include <SPI.h>
+#include "Loggable.h"
 
 void AppPrint(const char* key, const char* value = NULL, const char* value2 = NULL) {
     Serial.print(key); 
@@ -87,14 +88,13 @@ TimerItem appTimer0;
 #include "PinSequence.h"
 #include "AsyncTimer.h"
 #include "ClockItem.h"
-#include "SerialControl.h"
 #include "ExtraSerial.h"
 #include "AppQueue.h"
 #include "Behavior.h"
-#include "BaseComponent.h"
 
 #include "1Controller.h"
 #include "3Sensor.h"
 #include "2Storage.h"
+#include "SerialControl.h"
 #include "4Display.h"
 #include <7Services.h>

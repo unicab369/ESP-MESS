@@ -33,17 +33,47 @@ class Sto_Stat: public EEPROM_Value<DeviceStats, sto_stat_id> {
          loadData(address);
          value.increseResetCnt();
          storeData();
+         xLogSectionf("resetCount = %llu", value.resetCnt);
       }
 };
 
-struct WiFiCred {
-   char ssid[33] = "";
-   char password[64] = "";
+class PairChar {
+   public:
+      bool checkVal(const char* key, char* input, char* val1, char* val2) {
+         char *ref = strtok(input, " ");
 
-   void loadValues(const char* ssidVal, const char* passwVal) {
-      memcpy(ssid, ssidVal, sizeof(ssid));
-      memcpy(password, passwVal, sizeof(password));
-   }
+         if (strcmp(ref, key) == 0) {
+            ref = strtok(NULL, " ");
+            strcpy(val1, ref);
+
+            ref = strtok(NULL, " ");
+            ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
+            strcpy(val2, ref);
+
+            return true;
+         }
+
+         return false;
+      }
+
+   protected:
+      void loadVals(char* val1, const char* newVal1,
+                     char* val2, const char* newVal2) {
+         strcpy(val1, newVal1);
+         strcpy(val2, newVal2);
+         // ssid[sizeof(ssid)] = '\0';          // Ensure null-termination
+         // password[sizeof(password)] = '\0';  // Ensure null-termination
+      }
+};
+
+class WiFiCred: public PairChar {
+   public:
+      char ssid[33] = "";
+      char password[64] = "";
+
+      void loadValues(const char* val1, const char* val2) {
+         loadVals(ssid, val1, password, val2);
+      }
 };
 
 constexpr const char sto_cred_id[] = "Sto_Cred";
@@ -52,24 +82,43 @@ class Sto_Cred: public EEPROM_Value<WiFiCred, sto_cred_id> {
    public:
       void reloadData() {
          loadData(address);
-         AppPrint("\n[StoCred] SSID", value.ssid);
-         AppPrint("\n[StoCred] PASSW", value.password);         
+         xLogf("SSID = %s", value.ssid);
+         xLogf("PASSW = %s", value.password);      
       }
 
       void updateData(const char* ssidVal, const char* passwVal) {
          value.loadValues(ssidVal, passwVal);
          storeData();
+         reloadData();
       }
-}; 
+};
 
-// // template format: startAddr of devName, devName length, startAddr of mqttIp, mqttIp length
-// class Sto_Config: public Sto_PairValues<108, 21, 130, 21> {
-//    public:
-//       const char* devName()    { return value1; }
-//       const char* mqttIp()     { return value2; }
-// };
+class DevConf: public PairChar {
+   public:
+      char name[21] = "";
+      char mqttIP[21] = "";
 
+      void loadValues(const char* val1, const char* val2) {
+         loadVals(name, val1, mqttIP, val2);
+      }
+};
 
+constexpr const char sto_conf_id[] = "Sto_Config";
+template <uint16_t address>
+class Sto_Config: public EEPROM_Value<DevConf, sto_conf_id> {
+   public:
+      void reloadData() {
+         loadData(address);
+         xLogf("name = %s", value.name);
+         xLogf("mqttIP = %s", value.mqttIP);    
+      }
+
+      void updateData(const char* nameVal, const char* mqttIPVal) {
+         value.loadValues(nameVal, mqttIPVal);
+         storeData();
+         reloadData();
+      }
+};
 
 #define MAX_VALUE_QUEUE 10
 
@@ -91,8 +140,10 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat<0> stoStat;
-      Sto_Cred<32> stoCred;
+      Sto_Stat<0> stoStat;    //! length 17 [end 17]
+      Sto_Cred<50> stoCred;   //! length 98 [end 130]
+      Sto_Config<200> stoConf;
+
       // Sto_Config stoConfig;
       Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
@@ -107,14 +158,26 @@ class Mng_Storage: public Loggable {
          EEPROM.begin(EEPROM_SIZE);
          stoStat.reloadData();
          stoCred.reloadData();
-         // stoConfig.reloadData();
+         stoConf.reloadData();
          // stoBehavior.reloadData();
-
-         xLogSectionf("resetCount = %llu", stoStat.value.resetCnt);
 
          // littleFS.begin();
          // Serial.println("\n\n***LittleFS test");
          // littleFS.test();
+      }
+
+      void handleConsoleStr(char* inputStr) {
+         WiFiCred cred;
+         DevConf conf;
+
+         if (cred.checkVal("cred", inputStr, cred.ssid, cred.password)) {
+            xLogf("ssid = %s, passw = %s", cred.ssid, cred.password);
+            stoCred.updateData(cred.ssid, cred.password);
+         }
+         else if (conf.checkVal("conf", inputStr, conf.name, conf.mqttIP)) {
+            xLogf("name = %s, mqtt = %s", conf.name, conf.mqttIP);
+            stoConf.updateData(conf.name, conf.mqttIP); 
+         }
       }
 
       void setupSDCard(uint8_t sdCS) {
@@ -156,7 +219,7 @@ class Mng_Storage: public Loggable {
          AppPrint("[Sto]", __func__);
          stoStat.deleteData();
          stoCred.deleteData();
-         // stoConfig.deleteData();
+         stoConf.deleteData();
          stoBehavior.deleteData();
       }
 
