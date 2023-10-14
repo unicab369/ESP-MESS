@@ -8,7 +8,7 @@
 
 class Sto_EEPROM: public Loggable {
     public:
-        Sto_EEPROM(): Loggable("EEPROM") {}
+        Sto_EEPROM(const char* id): Loggable(id) {}
 
     protected:
         void writeValue(uint16_t address, uint64_t value) {
@@ -87,7 +87,7 @@ class Sto_EEPROM: public Loggable {
 };
 
 
-template <class T>
+template <class T, const char* id>
 class EEPROM_Value: public Sto_EEPROM {
     protected:
         void writeCode() {
@@ -107,18 +107,21 @@ class EEPROM_Value: public Sto_EEPROM {
         uint16_t contentAddr() { return startAddr + 1; }
 
     public:
-        T data;
-
+        T value;
+        
+        EEPROM_Value(): Sto_EEPROM(id) {}
+        
         bool loadData(uint16_t addr) {
+            xLogf("size = %zu", sizeof(T));
             startAddr = addr;
             if (!checkCode()) return false;
-            readBytes(contentAddr(), &data, sizeof(T));
+            readBytes(contentAddr(), &value, sizeof(T));
             return true;
         }
 
         void storeData() {
             writeCode();
-            writeBytes(contentAddr(), &data, sizeof(T));
+            writeBytes(contentAddr(), &value, sizeof(T));
             loadData(startAddr);
         }
 
@@ -127,27 +130,3 @@ class EEPROM_Value: public Sto_EEPROM {
             deleteBytes(contentAddr(), 0, sizeof(T));
         }
 };
-
-// class EEPROM_ResetCount: public EEPROM_Check {
-//     void increaseValue() {
-//         readValue(1, &value);
-//         value++;
-//         writeValue(1, value);
-//     }
-
-//     public:
-//         uint64_t value = 0; 
-
-//         // Reset Code [0] = 0xDD, Reset Count [1-8]
-//         void loadValue() {
-//             loadAddress(0);
-//             checkCode() ? increaseValue() : deleteValue();
-//         }
-
-//         void deleteValue() {
-//             AppPrint(__func__);
-//             writeCode();
-//             value = 0;
-//             writeBytes(1, &value, sizeof(value));
-//         }
-// };

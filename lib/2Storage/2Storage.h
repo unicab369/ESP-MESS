@@ -16,12 +16,24 @@ struct RTC_Data {
 };
 
 struct DeviceStats {
-   uint64_t resetCnt = 0;
    uint8_t status = 0;
+   uint16_t builtCode = 0;
+   uint64_t resetCnt = 0;
+
+   void increseResetCnt() {
+      resetCnt++;
+   }
 };
 
-class Sto_Stat: public EEPROM_Value<DeviceStats> {
-
+constexpr const char sto_stat_id[] = "Sto_Stat";
+template <uint16_t address>
+class Sto_Stat: public EEPROM_Value<DeviceStats, sto_stat_id> {
+   public:
+      void reloadData() {
+         loadData(address);
+         value.increseResetCnt();
+         storeData();
+      }
 };
 
 struct WiFiCred {
@@ -34,16 +46,18 @@ struct WiFiCred {
    }
 };
 
-class Sto_Cred: public EEPROM_Value<WiFiCred> {
+constexpr const char sto_cred_id[] = "Sto_Cred";
+template <uint16_t address>
+class Sto_Cred: public EEPROM_Value<WiFiCred, sto_cred_id> {
    public:
       void reloadData() {
-         loadData(9);
-         AppPrint("\n[StoCred] SSID", data.ssid);
-         AppPrint("\n[StoCred] PASSW", data.password);         
+         loadData(address);
+         AppPrint("\n[StoCred] SSID", value.ssid);
+         AppPrint("\n[StoCred] PASSW", value.password);         
       }
 
       void updateData(const char* ssidVal, const char* passwVal) {
-         data.loadValues(ssidVal, passwVal);
+         value.loadValues(ssidVal, passwVal);
          storeData();
       }
 }; 
@@ -63,7 +77,7 @@ struct StoringValue {
    char value[32];
 };
 
-class Mng_Storage {
+class Mng_Storage: public Loggable {
    RTC_Data rtc_data;
    AppQueue<StoringValue, MAX_VALUE_QUEUE> valueQueue;
 
@@ -77,8 +91,8 @@ class Mng_Storage {
 
    public:
       Sto_RTC rtc_storage;
-      // EEPROM_ResetCount resetCount;
-      Sto_Cred stoCred;
+      Sto_Stat<0> stoStat;
+      Sto_Cred<32> stoCred;
       // Sto_Config stoConfig;
       Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
@@ -87,16 +101,16 @@ class Mng_Storage {
       char sensorDataPath[32] = "";
       bool isValidPath()  { return String(sensorDataPath).isEmpty() == false && sd1.isReady(); }
 
+      Mng_Storage(): Loggable("Mng_Sto") {}
+
       void setup() {
          EEPROM.begin(EEPROM_SIZE);
-         // resetCount.loadValue();
-         
-         // char val[32];
-         // sprintf(val, "%llu", resetCount.value);
-         // AppPrintSeparator("[ResetCount]", val);
+         stoStat.reloadData();
          stoCred.reloadData();
          // stoConfig.reloadData();
          // stoBehavior.reloadData();
+
+         xLogSectionf("resetCount = %llu", stoStat.value.resetCnt);
 
          // littleFS.begin();
          // Serial.println("\n\n***LittleFS test");
@@ -140,7 +154,7 @@ class Mng_Storage {
 
       void deleteData() {
          AppPrint("[Sto]", __func__);
-         // resetCount.deleteValue();
+         stoStat.deleteData();
          stoCred.deleteData();
          // stoConfig.deleteData();
          stoBehavior.deleteData();

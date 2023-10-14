@@ -56,8 +56,7 @@ class Loggable {
             vsnprintf(buf1, sizeof(buf1), format, args);
             va_end(args);
 
-            Serial.print("#################### "); 
-            xLog(buf1);
+            xLogSection(buf1);
         }
 
         void xLogStatus(const char* value, bool check) {

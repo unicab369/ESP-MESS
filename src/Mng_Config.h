@@ -3,11 +3,13 @@
 // #define DEV_KMC_70011 1
 
 
-class Mng_Config: public PinConfig {
+class Mng_Config: public PinConfig, public Loggable {
     public:
+        Mng_Config(): Loggable("Mng_Conf") {}
+
         void setup() {
             #ifdef TTGO_LORA32
-                AppPrintSeparator("[DIRECTIVE]", "TTGO_LORA32");
+                xLogSection("DIRECTIVE = TTGO_LORA32");
                 // pinMode(16, OUTPUT);
                 // digitalWrite(16, HIGH);
                 // delay(20);
@@ -30,12 +32,14 @@ class Mng_Config: public PinConfig {
                 // });
 
             #elif defined(DEV_KMC_70011)
+                xLogSection("DIRECTIVE = DEV_KMC_70011");
                 led1 = 13;
                 btn1 = 0;
                 relay1 = 14;
 
             #elif ESP32
-                AppPrintSeparator("[DIRECTIVE]", "ESP32");
+                xLogSection("DIRECTIVE = ESP32");
+                // xLogSec("[DIRECTIVE]", "ESP32");
                 // use for disp0
                 // pinMode(5, OUTPUT);
                 // pinMode(18, OUTPUT);
@@ -75,9 +79,8 @@ class Mng_Config: public PinConfig {
                 out3 = 25;       // display backlight
 
             #else
-                xLogSection("[DIRECTIVE] ESP8266");
-
-                // AppPrintSeparator("[DIRECTIVE]", "ESP8266");
+                xLogSection("DIRECTIVE = ESP8266");
+                
                 // D0: 16, D1: 5, D2: 4, D3: 0, D4: 2, D5: 14, D6: 12, D7: 13, D8: 15
                 // sda0 = 4; scl0 = 5;
                 led1 = 2;
