@@ -47,12 +47,11 @@ Loggable TestLog("Test");
         Serial.begin(115200);
         storage.setup();
         servBehav.setup();
+        // servBehav.deleteData();
 
-        uint8_t peer1Mac[6] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x66};
-        PeerItem peer1(peer1Mac);
-
+        uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x88};
         ControlOutput action1(11, 22);    
-        servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, &peer1);
+        servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
 
         // ControlWS2812 action2(33, 44);
         // servBehav.storeAction<TRIGGER_DOUBLECLICK>(1, &action2, &peer1);

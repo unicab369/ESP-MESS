@@ -11,23 +11,30 @@ class Sto_EEPROM: public Loggable {
         Sto_EEPROM(): Loggable("EEPROM") {}
 
     protected:
-        void writeValue(int address, uint64_t value) {
+        void writeValue(uint16_t address, uint64_t value) {
             for (int i = 0; i < 8; i++) {
                 EEPROM.write(address + i, (uint8_t)(value >> (i * 8)));
             }
             EEPROM.commit(); // Commit the changes to EEPROM            
         }
 
-        void readValue(int address, uint64_t* value) {
+        void readValue(uint16_t address, uint64_t* value) {
             *value = 0;
             for (int i = 0; i < 8; i++) {
                 *value |= ((uint64_t)EEPROM.read(address + i) << (i * 8));
             }            
         }
 
-        void writeBytes(int address, const void *value, size_t len) {
-            xLogLine();
-            xLogf("&&& %s @addr = %u", __func__, address);
+        void deleteBytes(uint16_t address, uint8_t value, size_t len) {
+            xLogLine(); xLogf("&&& %s @addr = %u", __func__, address);
+            for (int i=0; i<len; i++) {
+                EEPROM.write(address+i, value);
+            }
+            EEPROM.commit();
+        }
+
+        void writeBytes(uint16_t address, const void *value, size_t len) {
+            xLogLine(); xLogf("&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
         
             for (int i=0; i<len; i++) {
@@ -42,9 +49,8 @@ class Sto_EEPROM: public Loggable {
             // AppPrintHex(data, len);
         }
 
-        void readBytes(int address, void *value, size_t len) {
-            xLogLine();
-            xLogf("&&& %s @addr = %u", __func__, address);
+        void readBytes(uint16_t address, void *value, size_t len) {
+            xLogLine(); xLogf("&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
 
             for (int i=0; i<len; i++) {
@@ -57,7 +63,7 @@ class Sto_EEPROM: public Loggable {
             // AppPrintHex(checkData, len);
         }
 
-        void storeData(int address, const char *buf, size_t len) {
+        void storeData(uint16_t address, const char *buf, size_t len) {
             for (int i=0; i<len; i++) {
                 EEPROM.write(address+i, buf[i]);
             }
@@ -65,12 +71,12 @@ class Sto_EEPROM: public Loggable {
             EEPROM.commit();        
         }
 
-        void writeByte(int address, uint8_t value) {
+        void writeByte(uint16_t address, uint8_t value) {
             EEPROM.write(address, value);
             EEPROM.commit(); 
         }
 
-        uint8_t readByte(int address) {
+        uint8_t readByte(uint16_t address) {
             return EEPROM.read(address);
         }
 };
@@ -141,8 +147,9 @@ class EEPROM_Data: public EEPROM_Check {
             writeBytes(valueAddr(), data, len);
         }
 
-        void deleteData() {
+        void deleteData(uint16_t address, size_t len) {
             clearCode();
+            deleteBytes(address, 0, len);
         }
 };
 

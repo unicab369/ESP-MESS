@@ -40,8 +40,8 @@ class Sto_PairValues {
       }
 
       void deleteData() {
-         value1Data.deleteData();
-         value2Data.deleteData();
+         value1Data.deleteData(addr1, len1);
+         value2Data.deleteData(addr2, len2);
       }
 };
 
