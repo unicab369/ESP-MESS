@@ -40,10 +40,12 @@ Loggable TestLog("Test");
     }
 
 #elif defined(TEST_BEHAVIOR)
+    MyButton button1;
+    SerialControl serial;
+
     Mng_Storage storage;
     Serv_Behavior servBehav;
     Mng_Config config;
-    MyButton button1;
 
     //! ButtonPress Callback
     std::function<void(BTN_Action, BNT_Hold, uint32_t)> buttonCb = 
@@ -52,8 +54,8 @@ Loggable TestLog("Test");
             case ACTION_SINGLE_CLICK: {
                 uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x08};
                 ControlOutput action1(11, 22);    
-                // servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
-                servBehav.stoPeer.addPeer(peer1Mac);
+                servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
+                // servBehav.stoPeer.addPeer(peer1Mac);
 
                 break;
             }   
@@ -70,13 +72,18 @@ Loggable TestLog("Test");
         }
     };
 
+    std::function<void(const char* ssid, const char *passw)> 
+            storeCredCb = [&](const char* ssid, const char *passw) {
+        storage.stoCred.updateData(ssid, passw);
+    };
+
     void setup() {
         Serial.begin(115200);
         storage.setup();
-        servBehav.setup();
+        // servBehav.setup();
         // servBehav.deleteData();
 
-        servBehav.stoPeer.printAllPeers();
+        // servBehav.stoPeer.printAllPeers();
 
         // uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x07};
         // ControlOutput action1(11, 22);    
@@ -88,11 +95,13 @@ Loggable TestLog("Test");
 
         config.setup();
         button1.setup(config.btn1, &buttonCb);
+        serial.onStoreCred = &storeCredCb;
         // servBehav.test();
     }
 
     void loop() {
         button1.run();
+        serial.run();
     }
 
 #elif defined(TEST_PWM)

@@ -7,7 +7,6 @@ void AppPrint(const char* key, const char* value = NULL, const char* value2 = NU
     Serial.print(key); 
     if (value) { Serial.print(": "); Serial.print(value); }
     if (value2) { Serial.print(" "); Serial.print(value2); }
-    Serial.println();
 }
 
 void AppPrintSeparator(const char* key, const char* value, const char* value2 = NULL) {

@@ -15,55 +15,45 @@ struct RTC_Data {
    unsigned long bootCount = 0;
 };
 
-template <int addr1, size_t len1, int addr2, size_t len2>
-class Sto_PairValues {
-   EEPROM_FixData<addr1, len1> value1Data;
-   EEPROM_FixData<addr2, len2> value2Data;
-
-   protected:
-      char value1[len1], value2[len2];
-
-   public:
-      virtual void reloadData() {
-         AppPrint("[StoPair]", __func__);
-         value1Data.loadFixedData(value1);
-         value2Data.loadFixedData(value2);
-      }
-
-      void storeData(const void* data1, const void* data2) {
-         AppPrint("\n[StoPair]", __func__);
-         value1Data.storeFixedData(data1);
-         value2Data.storeFixedData(data2);
-
-         //! reload stored data
-         reloadData();
-      }
-
-      void deleteData() {
-         value1Data.deleteData(addr1, len1);
-         value2Data.deleteData(addr2, len2);
-      }
+struct DeviceStats {
+   uint64_t resetCnt = 0;
+   uint8_t status = 0;
 };
 
-// template format: startAddr of ssid, ssid length, startAddr of passw, passw length
-class Sto_Cred: public Sto_PairValues<9, 33, 43, 64> {
-   public:
-      const char* ssid()    { return value1; }
-      const char* passw()   { return value2; }
+class Sto_Stat: public EEPROM_Value<DeviceStats> {
 
-      void reloadData() override {
-         Sto_PairValues::reloadData();
-         AppPrint("[StoCred] SSID", ssid());
-         AppPrint("[StoCred] PASSW", passw());
-      }
-};      
-
-// template format: startAddr of devName, devName length, startAddr of mqttIp, mqttIp length
-class Sto_Config: public Sto_PairValues<108, 21, 130, 21> {
-   public:
-      const char* devName()    { return value1; }
-      const char* mqttIp()     { return value2; }
 };
+
+struct WiFiCred {
+   char ssid[33] = "";
+   char password[64] = "";
+
+   void loadValues(const char* ssidVal, const char* passwVal) {
+      memcpy(ssid, ssidVal, sizeof(ssid));
+      memcpy(password, passwVal, sizeof(password));
+   }
+};
+
+class Sto_Cred: public EEPROM_Value<WiFiCred> {
+   public:
+      void reloadData() {
+         loadData(9);
+         AppPrint("\n[StoCred] SSID", data.ssid);
+         AppPrint("\n[StoCred] PASSW", data.password);         
+      }
+
+      void updateData(const char* ssidVal, const char* passwVal) {
+         data.loadValues(ssidVal, passwVal);
+         storeData();
+      }
+}; 
+
+// // template format: startAddr of devName, devName length, startAddr of mqttIp, mqttIp length
+// class Sto_Config: public Sto_PairValues<108, 21, 130, 21> {
+//    public:
+//       const char* devName()    { return value1; }
+//       const char* mqttIp()     { return value2; }
+// };
 
 
 
@@ -87,9 +77,9 @@ class Mng_Storage {
 
    public:
       Sto_RTC rtc_storage;
-      EEPROM_ResetCount resetCount;
+      // EEPROM_ResetCount resetCount;
       Sto_Cred stoCred;
-      Sto_Config stoConfig;
+      // Sto_Config stoConfig;
       Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
       Sto_SD sd1;
@@ -104,7 +94,7 @@ class Mng_Storage {
          // char val[32];
          // sprintf(val, "%llu", resetCount.value);
          // AppPrintSeparator("[ResetCount]", val);
-         // stoCred.reloadData();
+         stoCred.reloadData();
          // stoConfig.reloadData();
          // stoBehavior.reloadData();
 
@@ -148,16 +138,11 @@ class Mng_Storage {
          onComplete(millis()-timeRef);
       }
 
-      void testSetupData() {
-         stoCred.storeData("ffffffffff22222222223333333333", "gggggggggg3333333333444444444455555555556666666666");
-         stoConfig.storeData("hhhhhhhhhhjjjjjjjjjj", "kkkkkkkkkkmmmmmmmmmm");
-      }
-
       void deleteData() {
          AppPrint("[Sto]", __func__);
-         resetCount.deleteValue();
+         // resetCount.deleteValue();
          stoCred.deleteData();
-         stoConfig.deleteData();
+         // stoConfig.deleteData();
          stoBehavior.deleteData();
       }
 

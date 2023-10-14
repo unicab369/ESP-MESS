@@ -26,7 +26,7 @@ class Sto_EEPROM: public Loggable {
         }
 
         void deleteBytes(uint16_t address, uint8_t value, size_t len) {
-            xLogLine(); xLogf("&&& %s @addr = %u", __func__, address);
+            xLogf("&&& %s @addr = %u", __func__, address);
             for (int i=0; i<len; i++) {
                 EEPROM.write(address+i, value);
             }
@@ -39,7 +39,7 @@ class Sto_EEPROM: public Loggable {
         }
 
         void writeBytes(uint16_t address, const void *value, size_t len) {
-            xLogLine(); xLogf("&&& %s @addr = %u", __func__, address);
+            xLogf("&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
         
             for (int i=0; i<len; i++) {
@@ -55,7 +55,7 @@ class Sto_EEPROM: public Loggable {
         }
 
         void readBytes(uint16_t address, void *value, size_t len) {
-            xLogLine(); xLogf("&&& %s @addr = %u", __func__, address);
+            xLogf("&&& %s @addr = %u len = %zu", __func__, address, len);
             byte* val = (byte*) value;
 
             for (int i=0; i<len; i++) {
@@ -86,92 +86,68 @@ class Sto_EEPROM: public Loggable {
         }
 };
 
-class EEPROM_Check: public Sto_EEPROM {
-    protected:
-        int checkAddr;
 
+template <class T>
+class EEPROM_Value: public Sto_EEPROM {
+    protected:
         void writeCode() {
-            writeByte(checkAddr, 0xDD);
+            writeByte(startAddr, 0xDD);
         }   
 
         bool checkCode() {
-            return readByte(checkAddr) == 0xDD;
+            return readByte(startAddr) == 0xDD;
         }
 
         void clearCode() {
-            writeByte(checkAddr, 0x00);
+            writeByte(startAddr, 0x00);
         }
+
+        //! startAddr contains checkByte, content follows startAddr
+        uint16_t startAddr = 0;
+        uint16_t contentAddr() { return startAddr + 1; }
 
     public:
-        uint16_t valueAddr() { return checkAddr + 1; }
+        T data;
 
-        //! loadAddress begins with check byte
-        //! contents of the data follow the check byte
-        void loadAddress(int addr) {
-            checkAddr = addr;
-        }
-};
-
-class EEPROM_ResetCount: public EEPROM_Check {
-    void increaseValue() {
-        readValue(1, &value);
-        value++;
-        writeValue(1, value);
-    }
-
-    public:
-        uint64_t value = 0; 
-
-        // Reset Code [0] = 0xDD, Reset Count [1-8]
-        void loadValue() {
-            loadAddress(0);
-            checkCode() ? increaseValue() : deleteValue();
-        }
-
-        void deleteValue() {
-            AppPrint(__func__);
-            writeCode();
-            value = 0;
-            writeBytes(1, &value, sizeof(value));
-        }
-};
-
-class EEPROM_Data: public EEPROM_Check {
-    public:
-        template <class T>
-        bool loadData(T* data, size_t len) {
-            // Serial.print("[EEPROM] "); AppPrint(__func__, "addr " + String(valueAddr()));
+        bool loadData(uint16_t addr) {
+            startAddr = addr;
             if (!checkCode()) return false;
-            xLog("LOAD DATA");
-            readBytes(valueAddr(), data, len);
+            readBytes(contentAddr(), &data, sizeof(T));
             return true;
         }
 
-        template <class T>
-        void storeData(T* data, size_t len) {
-            // Serial.print("[EEPROM] "); AppPrint(__func__, "addr " + String(valueAddr()));
+        void storeData() {
             writeCode();
-            writeBytes(valueAddr(), data, len);
+            writeBytes(contentAddr(), &data, sizeof(T));
+            loadData(startAddr);
         }
 
-        void deleteData(uint16_t address, size_t len) {
+        void deleteData() {
             writeCode();
-            deleteBytes(valueAddr(), 0, len);
+            deleteBytes(contentAddr(), 0, sizeof(T));
         }
 };
 
-template<int startAddr, size_t len>
-class EEPROM_FixData: public EEPROM_Data {
-    public:
-        EEPROM_FixData() {
-            loadAddress(startAddr);
-        }
+// class EEPROM_ResetCount: public EEPROM_Check {
+//     void increaseValue() {
+//         readValue(1, &value);
+//         value++;
+//         writeValue(1, value);
+//     }
 
-        void loadFixedData(void *data) {
-            loadData(data, len);
-        }
+//     public:
+//         uint64_t value = 0; 
 
-        void storeFixedData(const void *data) {
-            storeData(data, len);
-        }
-};
+//         // Reset Code [0] = 0xDD, Reset Count [1-8]
+//         void loadValue() {
+//             loadAddress(0);
+//             checkCode() ? increaseValue() : deleteValue();
+//         }
+
+//         void deleteValue() {
+//             AppPrint(__func__);
+//             writeCode();
+//             value = 0;
+//             writeBytes(1, &value, sizeof(value));
+//         }
+// };

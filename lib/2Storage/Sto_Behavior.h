@@ -1,6 +1,6 @@
 template <int address, class T, uint8_t count>
 class Sto_Array: public Loggable {
-   EEPROM_Data rawData[count];
+   EEPROM_Value<T> rawData[count];
 
    uint16_t getEEPROM_Address(uint8_t index) {
       return address+index*sizeof(T);
@@ -17,8 +17,7 @@ class Sto_Array: public Loggable {
          for (int i=0; i<count; i++) {
             xLog("***Reload index = %u", i);
             uint16_t addr = getEEPROM_Address(i);
-            rawData[i].loadAddress(addr);
-            rawData[i].loadData(&array[i], sizeof(T));
+            rawData[i].loadData(addr);
          }
 
          xLogSection("Print All Data\n");
@@ -28,16 +27,16 @@ class Sto_Array: public Loggable {
 
       void deleteData() {
          for (int i=0; i<count; i++) {
-            uint16_t addr = getEEPROM_Address(i);
-            rawData[i].deleteData(addr, sizeof(T));
+            rawData[i].deleteData();
          }
          reload();   
       }
 
       void updateData(uint8_t index, T* newItem) {
          if (index>count) return;
-         rawData[index].storeData(newItem, sizeof(T));
-         bool check2 = rawData[index].loadData(&array[index], sizeof(T));
+         rawData[index].storeData();
+         uint16_t addr = getEEPROM_Address(index);
+         bool check2 = rawData[index].loadData(addr);
       }
 
       // T* firstMatch(std::function<bool(T*, uint8_t index)> cb) {
