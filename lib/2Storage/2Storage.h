@@ -25,10 +25,11 @@ struct DeviceStats {
    }
 };
 
-constexpr const char sto_stat_id[] = "Sto_Stat";
 template <uint16_t address>
-class Sto_Stat: public EEPROM_Value<DeviceStats, sto_stat_id> {
+class Sto_Stat: public EEPROM_Value<DeviceStats>, public Loggable {
    public:
+      Sto_Stat(): Loggable("Sto_Stat") {}
+
       void reloadData() {
          loadData(address);
          value.increseResetCnt();
@@ -67,33 +68,25 @@ class PairChar {
          strcpy(value1, newVal->value1);
          strcpy(value2, newVal->value2);
       }
-
-
-      // void loadVals(char* val1, const char* newVal1,
-      //                char* val2, const char* newVal2) {
-      //    strcpy(val1, newVal1);
-      //    strcpy(val2, newVal2);
-      //    // ssid[sizeof(ssid)] = '\0';          // Ensure null-termination
-      //    // password[sizeof(password)] = '\0';  // Ensure null-termination
-      // }
 };
 
 class WiFiCred: public PairChar<33, 64> {
    public:
       const char* ssid() { return value1; }
       const char* password() { return value2; }
-      // char ssid[33] = "";
-      // char password[64] = "";
-
-      // void loadValues(const char* val1, const char* val2) {
-      //    loadVals(ssid, val1, password, val2);
-      // }
 };
 
-constexpr const char sto_cred_id[] = "Sto_Cred";
-template <uint16_t address>
-class Sto_Cred: public EEPROM_Value<WiFiCred, sto_cred_id> {
+class DevConf: public PairChar<21,21> {
    public:
+      const char* name() { return value1; }
+      const char* mqttIP() { return value2; }
+};
+
+template <uint16_t address>
+class Sto_Cred: public EEPROM_Value<WiFiCred>, public Loggable {
+   public:
+      Sto_Cred(): Loggable("Sto_Cred") {}
+
       void reloadData() {
          loadData(address);
          xLogf("SSID = %s", value.ssid());
@@ -102,29 +95,16 @@ class Sto_Cred: public EEPROM_Value<WiFiCred, sto_cred_id> {
 
       void updateData(WiFiCred* newVal) {
          value.loadVals(newVal);
-         // value.loadValues(ssidVal, passwVal);
          storeData();
          reloadData();
       }
 };
 
-class DevConf: public PairChar<21,21> {
-   public:
-      const char* name() { return value1; }
-      const char* mqttIP() { return value2; }
-
-      // char name[21] = "";
-      // char mqttIP[21] = "";
-
-      // void loadValues(const char* val1, const char* val2) {
-      //    loadVals(name, val1, mqttIP, val2);
-      // }
-};
-
-constexpr const char sto_conf_id[] = "Sto_Config";
 template <uint16_t address>
-class Sto_Config: public EEPROM_Value<DevConf, sto_conf_id> {
+class Sto_Config: public EEPROM_Value<DevConf>, public Loggable {
    public:
+      Sto_Config(): Loggable("Sto_Config") {}
+
       void reloadData() {
          loadData(address);
          xLogf("name = %s", value.name());
@@ -133,7 +113,6 @@ class Sto_Config: public EEPROM_Value<DevConf, sto_conf_id> {
 
       void updateData(DevConf* newVal) {
          value.loadVals(newVal);
-         // value.loadValues(nameVal, mqttIPVal);
          storeData();
          reloadData();
       }

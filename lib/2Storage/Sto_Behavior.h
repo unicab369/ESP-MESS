@@ -1,7 +1,6 @@
-constexpr const char sto_arr_id[] = "Sto_Arr";
 template <int address, class T, uint8_t count>
 class Sto_Array: public Loggable {
-   EEPROM_Value<T, sto_arr_id> rawData[count];
+   EEPROM_Value<T> rawData[count];
 
    uint16_t getEEPROM_Address(uint8_t index) {
       return address+index*sizeof(T);

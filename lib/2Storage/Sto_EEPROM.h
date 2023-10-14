@@ -6,11 +6,10 @@
 // [mqttServer] 176- 200
 // [mqttTopic] 201-270
 
-class Sto_EEPROM: public Loggable {
-    public:
-        Sto_EEPROM(const char* id): Loggable(id) {}
-
+class Sto_EEPROM {
     protected:
+        Loggable logger = Loggable("EEPROM");
+
         void writeValue(uint16_t address, uint64_t value) {
             for (int i = 0; i < 8; i++) {
                 EEPROM.write(address + i, (uint8_t)(value >> (i * 8)));
@@ -26,7 +25,7 @@ class Sto_EEPROM: public Loggable {
         }
 
         void deleteBytes(uint16_t address, uint8_t value, size_t len) {
-            xLogf("&&& %s @addr = %u", __func__, address);
+            logger.xLogf("&&& %s @addr = %u", __func__, address);
             for (int i=0; i<len; i++) {
                 EEPROM.write(address+i, value);
             }
@@ -39,7 +38,7 @@ class Sto_EEPROM: public Loggable {
         }
 
         void writeBytes(uint16_t address, const void *value, size_t len) {
-            xLogf("&&& %s @addr = %u", __func__, address);
+            logger.xLogf("&&& %s @addr = %u", __func__, address);
             byte* val = (byte*) value;
         
             for (int i=0; i<len; i++) {
@@ -55,7 +54,7 @@ class Sto_EEPROM: public Loggable {
         }
 
         void readBytes(uint16_t address, void *value, size_t len) {
-            xLogf("&&& %s @addr = %u len = %zu", __func__, address, len);
+            logger.xLogf("&&& %s @addr = %u len = %zu", __func__, address, len);
             byte* val = (byte*) value;
 
             for (int i=0; i<len; i++) {
@@ -87,7 +86,7 @@ class Sto_EEPROM: public Loggable {
 };
 
 
-template <class T, const char* id>
+template <class T>
 class EEPROM_Value: public Sto_EEPROM {
     protected:
         void writeCode() {
@@ -108,8 +107,6 @@ class EEPROM_Value: public Sto_EEPROM {
 
     public:
         T value;
-        
-        EEPROM_Value(): Sto_EEPROM(id) {}
         
         bool loadData(uint16_t addr) {
             startAddr = addr;
