@@ -21,7 +21,7 @@ class Loggable {
         void xLogLine() {
             Serial.println();
         }
-        
+
         void xLogf(const char *format, ...) {
             char buf1[LOG_MAX_LENGTH]; 
             va_list args;
@@ -31,17 +31,6 @@ class Loggable {
             va_end(args);
 
             xLog(buf1);
-        }
-
-        void xLogfe(const char *format, ...) {
-            char buf1[LOG_MAX_LENGTH]; 
-            va_list args;
-
-            va_start(args, format);
-            vsnprintf(buf1, sizeof(buf1), format, args);
-            va_end(args);
-
-            xLog(buf1, "");
         }
 
         void xLogSection(const char* value) {

@@ -74,18 +74,6 @@ Loggable TestLog("Test");
 
     std::function<void(char*)> storeCredCb = [&](char* inputStr) {
         storage.handleConsoleStr(inputStr);
-        
-        // WiFiCred* cred = (WiFiCred*)val;
-        // DevConf* conf = (DevConf*)val;
-
-        // if (cred != nullptr) {
-        //     TestLog.xLogf("ssid = %s, passw = %s", cred->ssid, cred->password);
-        //     storage.stoCred.updateData(cred->ssid, cred->password);
-        // } 
-        // else if (conf != nullptr) {
-        //     TestLog.xLogf("name = %s, mqtt = %s", conf->name, conf->mqttIP);
-        //     storage.stoConf.updateData(conf->name, conf->mqttIP);            
-        // }
     };
 
     void setup() {

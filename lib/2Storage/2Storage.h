@@ -37,18 +37,25 @@ class Sto_Stat: public EEPROM_Value<DeviceStats, sto_stat_id> {
       }
 };
 
+template <uint8_t len1, uint8_t len2>
 class PairChar {
    public:
-      bool checkVal(const char* key, char* input, char* val1, char* val2) {
-         char *ref = strtok(input, " ");
+      char value1[len1];
+      char value2[len2];
+
+      bool getValues(const char* key, char* input) {
+         //! strtok detroys the original string, copy it before perform operation
+         char inputStr[124];
+         memcpy(inputStr, input, sizeof(inputStr));
+         char *ref = strtok(inputStr, " ");
 
          if (strcmp(ref, key) == 0) {
             ref = strtok(NULL, " ");
-            strcpy(val1, ref);
+            strcpy(value1, ref);
 
             ref = strtok(NULL, " ");
             ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
-            strcpy(val2, ref);
+            strcpy(value2, ref);
 
             return true;
          }
@@ -56,24 +63,31 @@ class PairChar {
          return false;
       }
 
-   protected:
-      void loadVals(char* val1, const char* newVal1,
-                     char* val2, const char* newVal2) {
-         strcpy(val1, newVal1);
-         strcpy(val2, newVal2);
-         // ssid[sizeof(ssid)] = '\0';          // Ensure null-termination
-         // password[sizeof(password)] = '\0';  // Ensure null-termination
+      void loadVals(PairChar* newVal) {
+         strcpy(value1, newVal->value1);
+         strcpy(value2, newVal->value2);
       }
+
+
+      // void loadVals(char* val1, const char* newVal1,
+      //                char* val2, const char* newVal2) {
+      //    strcpy(val1, newVal1);
+      //    strcpy(val2, newVal2);
+      //    // ssid[sizeof(ssid)] = '\0';          // Ensure null-termination
+      //    // password[sizeof(password)] = '\0';  // Ensure null-termination
+      // }
 };
 
-class WiFiCred: public PairChar {
+class WiFiCred: public PairChar<33, 64> {
    public:
-      char ssid[33] = "";
-      char password[64] = "";
+      const char* ssid() { return value1; }
+      const char* password() { return value2; }
+      // char ssid[33] = "";
+      // char password[64] = "";
 
-      void loadValues(const char* val1, const char* val2) {
-         loadVals(ssid, val1, password, val2);
-      }
+      // void loadValues(const char* val1, const char* val2) {
+      //    loadVals(ssid, val1, password, val2);
+      // }
 };
 
 constexpr const char sto_cred_id[] = "Sto_Cred";
@@ -82,25 +96,29 @@ class Sto_Cred: public EEPROM_Value<WiFiCred, sto_cred_id> {
    public:
       void reloadData() {
          loadData(address);
-         xLogf("SSID = %s", value.ssid);
-         xLogf("PASSW = %s", value.password);      
+         xLogf("SSID = %s", value.ssid());
+         xLogf("PASSW = %s", value.password());      
       }
 
-      void updateData(const char* ssidVal, const char* passwVal) {
-         value.loadValues(ssidVal, passwVal);
+      void updateData(WiFiCred* newVal) {
+         value.loadVals(newVal);
+         // value.loadValues(ssidVal, passwVal);
          storeData();
          reloadData();
       }
 };
 
-class DevConf: public PairChar {
+class DevConf: public PairChar<21,21> {
    public:
-      char name[21] = "";
-      char mqttIP[21] = "";
+      const char* name() { return value1; }
+      const char* mqttIP() { return value2; }
 
-      void loadValues(const char* val1, const char* val2) {
-         loadVals(name, val1, mqttIP, val2);
-      }
+      // char name[21] = "";
+      // char mqttIP[21] = "";
+
+      // void loadValues(const char* val1, const char* val2) {
+      //    loadVals(name, val1, mqttIP, val2);
+      // }
 };
 
 constexpr const char sto_conf_id[] = "Sto_Config";
@@ -109,12 +127,13 @@ class Sto_Config: public EEPROM_Value<DevConf, sto_conf_id> {
    public:
       void reloadData() {
          loadData(address);
-         xLogf("name = %s", value.name);
-         xLogf("mqttIP = %s", value.mqttIP);    
+         xLogf("name = %s", value.name());
+         xLogf("mqttIP = %s", value.mqttIP());    
       }
 
-      void updateData(const char* nameVal, const char* mqttIPVal) {
-         value.loadValues(nameVal, mqttIPVal);
+      void updateData(DevConf* newVal) {
+         value.loadVals(newVal);
+         // value.loadValues(nameVal, mqttIPVal);
          storeData();
          reloadData();
       }
@@ -170,13 +189,15 @@ class Mng_Storage: public Loggable {
          WiFiCred cred;
          DevConf conf;
 
-         if (cred.checkVal("cred", inputStr, cred.ssid, cred.password)) {
-            xLogf("ssid = %s, passw = %s", cred.ssid, cred.password);
-            stoCred.updateData(cred.ssid, cred.password);
+         if (cred.getValues("cred", inputStr)) {
+            Serial.println();
+            xLogf("ssid = %s, passw = %s", cred.ssid(), cred.password());
+            stoCred.updateData(&cred);
          }
-         else if (conf.checkVal("conf", inputStr, conf.name, conf.mqttIP)) {
-            xLogf("name = %s, mqtt = %s", conf.name, conf.mqttIP);
-            stoConf.updateData(conf.name, conf.mqttIP); 
+         else if (conf.getValues("conf", inputStr)) {
+            Serial.println();
+            xLogf("name = %s, mqtt = %s", conf.name(), conf.mqttIP());
+            stoConf.updateData(&conf); 
          }
       }
 

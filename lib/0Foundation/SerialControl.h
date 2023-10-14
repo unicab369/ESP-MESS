@@ -2,7 +2,7 @@
 
 class SerialControl: public Loggable {
    uint8_t position = 0;
-   char inputString[100] = "";
+   char inputString[124] = "";
 
    public:
       std::function<void(char*)> *onParseString;
@@ -18,7 +18,6 @@ class SerialControl: public Loggable {
          if (c == '\n' || c == '\r') {
             (*onParseString)(inputString);
 
-            // parseString();
             //! clear the character one by one, just printing an emptyString wont do it
             for (int i = 0; i < 100; i++) {
                Serial.print(' ');
