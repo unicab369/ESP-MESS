@@ -106,29 +106,11 @@ class EEPROM_Value: public Sto_EEPROM {
         uint16_t contentAddr() { return startAddr + 1; }
         T value;
 
-        //! interface
-        virtual bool makeExtraction(char *input) { return false; }
-        virtual void print() {}
-
     public:
-        //! interface
-        bool extractor(char *input) {
-            bool check = makeExtraction(input);
-            if (check) {
-                Serial.println("IM HERE UUUUUU");
-                storeData();
-                reloadData();
-            }
-
-            return check;
-        }
-        
-
         bool loadData(uint16_t addr) {
             startAddr = addr;
             if (!checkCode()) return false;
             readBytes(contentAddr(), &value, sizeof(T));
-            print();
             return true;
         }
 
@@ -149,5 +131,35 @@ class EEPROM_Value: public Sto_EEPROM {
         void deleteData() {
             writeCode();
             deleteBytes(contentAddr(), 0, sizeof(T));
+        }
+};
+
+class ExtractorInterface {
+    public:
+        virtual void printValues() {}
+        virtual bool makeExtraction(const char* key, char* input) {}
+};
+
+template <class T>
+class EEPROM_Extractor: public EEPROM_Value<T> {
+    public:
+        void load(uint16_t address) {
+            EEPROM_Value<T>::loadData(address);
+            ExtractorInterface* extractor = &(this->value);
+            extractor->printValues();
+        }
+
+        bool extract(const char* key, char* input) {
+            ExtractorInterface* extractor = &(this->value);
+
+            bool check = extractor->makeExtraction(key, input);
+            if (check) {
+                EEPROM_Value<T>::storeData();
+                EEPROM_Value<T>::reloadData();
+                extractor->printValues();
+                return true;
+            }
+
+            return false;
         }
 };

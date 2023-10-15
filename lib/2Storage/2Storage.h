@@ -66,50 +66,38 @@ class PairChar: public Loggable {
       }
 };
 
-class WiFiCred: public PairChar<33, 64> {
+class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
    public:
-      WiFiCred(): PairChar("WiFiCred") {}
+      WiFiCred(): PairChar("WiFiCred"), ExtractorInterface() {}
 
       const char* ssid() { return value1; }
       const char* password() { return value2; }
 
-      void print() {
+      bool makeExtraction(const char* key, char* input) override {
+         return extractValues(key, input);
+      }
+
+      void printValues() override {
          xLogf("SSID = %s", ssid());
          xLogf("PASSW = %s", password());   
       }
 };
 
-class DevConf: public PairChar<21,21> {
+class DevConf: public PairChar<21,21>, public ExtractorInterface {
    public:
-      DevConf(): PairChar("DevConf") {}
+      DevConf(): PairChar("DevConf"), ExtractorInterface() {}
 
       const char* name() { return value1; }
       const char* mqttIP() { return value2; }
 
-      void print() {
+      bool makeExtraction(const char* key, char* input) override {
+         return extractValues(key, input);
+      }
+
+      void printValues() override {
          xLogf("name = %s", name());
          xLogf("mqttIP = %s", mqttIP());    
       }
-};
-
-class Sto_Cred: public EEPROM_Value<WiFiCred> {
-   bool makeExtraction(char *input) override {
-      return value.extractValues("cred", input);
-   }
-
-   void print() override {
-      value.print();
-   }
-};
-
-class Sto_Config: public EEPROM_Value<DevConf> {
-   bool makeExtraction(char *input) override {
-      return value.extractValues("conf", input);
-   }
-
-   void print() override {
-      value.print();
-   }
 };
 
 #define MAX_VALUE_QUEUE 10
@@ -132,9 +120,9 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat stoStat;    //! length 17 [end 17]
-      Sto_Cred stoCred;    //! length 98 [end 130]
-      Sto_Config stoConf;
+      Sto_Stat stoStat;                      //! length 17 [end 17]
+      EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [end 130]
+      EEPROM_Extractor<DevConf> stoConf;
 
       // Sto_Config stoConfig;
       Sto_Behavior stoBehavior;
@@ -148,9 +136,10 @@ class Mng_Storage: public Loggable {
 
       void setup() {
          EEPROM.begin(EEPROM_SIZE);
-         stoStat.loadData(0);
-         stoCred.loadData(32);
-         stoConf.loadData(136);
+         stoStat.load(0);
+         stoCred.load(32);
+         stoConf.load(136);
+
          // stoBehavior.reloadData();
 
          // littleFS.begin();
@@ -159,10 +148,10 @@ class Mng_Storage: public Loggable {
       }
 
       void handleConsoleStr(char* inputStr) {
-         if (stoCred.extractor(inputStr)) {
+         if (stoCred.extract("cred", inputStr)) {
             xLog("IM HERE AAAAAAAAAAAAA");
          }
-         else if(stoConf.extractor(inputStr)) {
+         else if(stoConf.extract("conf", inputStr)) {
             xLog("IM HERE BBBBBBBBBBBBB");
          }
       }
