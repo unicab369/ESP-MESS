@@ -25,12 +25,11 @@ struct DeviceStats {
    }
 };
 
-template <uint16_t address>
 class Sto_Stat: public EEPROM_Value<DeviceStats>, public Loggable {
    public:
       Sto_Stat(): Loggable("Sto_Stat") {}
 
-      void reloadData() {
+      void load(uint16_t address) {
          loadData(address);
          value.increseResetCnt();
          storeData();
@@ -39,12 +38,14 @@ class Sto_Stat: public EEPROM_Value<DeviceStats>, public Loggable {
 };
 
 template <uint8_t len1, uint8_t len2>
-class PairChar {
+class PairChar: public Loggable {
    public:
+      PairChar(const char* id): Loggable(id) {}
+
       char value1[len1];
       char value2[len2];
 
-      bool getValues(const char* key, char* input) {
+      bool extractValues(const char* key, char* input) {
          //! strtok detroys the original string, copy it before perform operation
          char inputStr[124];
          memcpy(inputStr, input, sizeof(inputStr));
@@ -63,59 +64,52 @@ class PairChar {
 
          return false;
       }
-
-      void loadVals(PairChar* newVal) {
-         strcpy(value1, newVal->value1);
-         strcpy(value2, newVal->value2);
-      }
 };
 
 class WiFiCred: public PairChar<33, 64> {
    public:
+      WiFiCred(): PairChar("WiFiCred") {}
+
       const char* ssid() { return value1; }
       const char* password() { return value2; }
+
+      void print() {
+         xLogf("SSID = %s", ssid());
+         xLogf("PASSW = %s", password());   
+      }
 };
 
 class DevConf: public PairChar<21,21> {
    public:
+      DevConf(): PairChar("DevConf") {}
+
       const char* name() { return value1; }
       const char* mqttIP() { return value2; }
-};
 
-template <uint16_t address>
-class Sto_Cred: public EEPROM_Value<WiFiCred>, public Loggable {
-   public:
-      Sto_Cred(): Loggable("Sto_Cred") {}
-
-      void reloadData() {
-         loadData(address);
-         xLogf("SSID = %s", value.ssid());
-         xLogf("PASSW = %s", value.password());      
-      }
-
-      void updateData(WiFiCred* newVal) {
-         value.loadVals(newVal);
-         storeData();
-         reloadData();
+      void print() {
+         xLogf("name = %s", name());
+         xLogf("mqttIP = %s", mqttIP());    
       }
 };
 
-template <uint16_t address>
-class Sto_Config: public EEPROM_Value<DevConf>, public Loggable {
-   public:
-      Sto_Config(): Loggable("Sto_Config") {}
+class Sto_Cred: public EEPROM_Value<WiFiCred> {
+   bool makeExtraction(char *input) override {
+      return value.extractValues("cred", input);
+   }
 
-      void reloadData() {
-         loadData(address);
-         xLogf("name = %s", value.name());
-         xLogf("mqttIP = %s", value.mqttIP());    
-      }
+   void print() override {
+      value.print();
+   }
+};
 
-      void updateData(DevConf* newVal) {
-         value.loadVals(newVal);
-         storeData();
-         reloadData();
-      }
+class Sto_Config: public EEPROM_Value<DevConf> {
+   bool makeExtraction(char *input) override {
+      return value.extractValues("conf", input);
+   }
+
+   void print() override {
+      value.print();
+   }
 };
 
 #define MAX_VALUE_QUEUE 10
@@ -138,9 +132,9 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat<0> stoStat;    //! length 17 [end 17]
-      Sto_Cred<50> stoCred;   //! length 98 [end 130]
-      Sto_Config<200> stoConf;
+      Sto_Stat stoStat;    //! length 17 [end 17]
+      Sto_Cred stoCred;    //! length 98 [end 130]
+      Sto_Config stoConf;
 
       // Sto_Config stoConfig;
       Sto_Behavior stoBehavior;
@@ -154,9 +148,9 @@ class Mng_Storage: public Loggable {
 
       void setup() {
          EEPROM.begin(EEPROM_SIZE);
-         stoStat.reloadData();
-         stoCred.reloadData();
-         stoConf.reloadData();
+         stoStat.loadData(0);
+         stoCred.loadData(32);
+         stoConf.loadData(136);
          // stoBehavior.reloadData();
 
          // littleFS.begin();
@@ -165,18 +159,11 @@ class Mng_Storage: public Loggable {
       }
 
       void handleConsoleStr(char* inputStr) {
-         WiFiCred cred;
-         DevConf conf;
-
-         if (cred.getValues("cred", inputStr)) {
-            Serial.println();
-            xLogf("ssid = %s, passw = %s", cred.ssid(), cred.password());
-            stoCred.updateData(&cred);
+         if (stoCred.extractor(inputStr)) {
+            xLog("IM HERE AAAAAAAAAAAAA");
          }
-         else if (conf.getValues("conf", inputStr)) {
-            Serial.println();
-            xLogf("name = %s, mqtt = %s", conf.name(), conf.mqttIP());
-            stoConf.updateData(&conf); 
+         else if(stoConf.extractor(inputStr)) {
+            xLog("IM HERE BBBBBBBBBBBBB");
          }
       }
 

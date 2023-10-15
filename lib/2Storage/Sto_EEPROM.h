@@ -104,15 +104,41 @@ class EEPROM_Value: public Sto_EEPROM {
         //! startAddr contains checkByte, content follows startAddr
         uint16_t startAddr = 0;
         uint16_t contentAddr() { return startAddr + 1; }
+        T value;
+
+        //! interface
+        virtual bool makeExtraction(char *input) { return false; }
+        virtual void print() {}
 
     public:
-        T value;
+        //! interface
+        bool extractor(char *input) {
+            bool check = makeExtraction(input);
+            if (check) {
+                Serial.println("IM HERE UUUUUU");
+                storeData();
+                reloadData();
+            }
+
+            return check;
+        }
         
+
         bool loadData(uint16_t addr) {
             startAddr = addr;
             if (!checkCode()) return false;
             readBytes(contentAddr(), &value, sizeof(T));
+            print();
             return true;
+        }
+
+        void reloadData() {
+            loadData(startAddr);
+        }
+
+        void updateData(T* newValue) {
+            writeCode();
+            writeBytes(contentAddr(), newValue, sizeof(T));
         }
 
         void storeData() {
