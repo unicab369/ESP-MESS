@@ -1,13 +1,9 @@
-template <int arrAddress, class T, uint8_t count>
+template <class T, uint8_t count>
 class Sto_Array: public Loggable {
-   uint16_t getEEPROM_Address(uint8_t index) {
-      //! offset by 2 = 1 for the checkByte + 1 for array element offset
-      return arrAddress+index*(sizeof(T)+2);
-   }
-
    protected:
       EEPROM_Value<T> rawData[count];
       bool isLoaded = false; 
+      uint16_t arrAddress;
 
       Sto_Array(const char* id): Loggable(id) {}
       
@@ -16,20 +12,27 @@ class Sto_Array: public Loggable {
          return rawData[index].getValue();
       }
 
-      void reload() {
-         // xLogSectionf("%s count = %u", __func__, count);
-
+      void load(uint16_t arrAddr) {
+         xLogSectionf("%s count = %u", __func__, count);
+         arrAddress = arrAddr;
+      
          for (int i=0; i<count; i++) {
-            uint16_t addr = getEEPROM_Address(i);
+            //! offset by 2 = 1 for the checkByte + 1 for array element offset
+            uint16_t addr = arrAddress + i*(sizeof(T)+2);
             rawData[i].loadData(addr);
          }
 
          // xLogSection("Print All Data\n");
          // AppPrintHex(rawData, 124);
-         // isLoaded = true;
+         isLoaded = true;
+      }
+
+      void reload() {
+         load(arrAddress);
       }
 
       void deleteData() {
+         if (!isLoaded) return;
          for (int i=0; i<count; i++) {
             rawData[i].deleteData();
          }
@@ -37,7 +40,7 @@ class Sto_Array: public Loggable {
       }
 
       void updateData(uint8_t index, T* newItem) {
-         if (index>=count) return;
+         if (index>=count || !isLoaded) return;
          rawData[index].updateData(newItem);
          reload();
       }
@@ -103,7 +106,7 @@ struct PeerItem {
 
 #define MAX_PEER_COUNT 5
 
-class Sto_Peer: public Sto_Array<1000, PeerItem, MAX_PEER_COUNT> {
+class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
    public:
       Sto_Peer(): Sto_Array("Sto_Peer") {}
       
@@ -163,7 +166,7 @@ class Sto_Peer: public Sto_Array<1000, PeerItem, MAX_PEER_COUNT> {
 
 #define MAX_BEHAVIOR_ITEMS 10
 
-class Sto_Behavior: public Sto_Array<500, BehaviorItem, MAX_BEHAVIOR_ITEMS> {
+class Sto_Behavior: public Sto_Array<BehaviorItem, MAX_BEHAVIOR_ITEMS> {
    public:
       Sto_Behavior(): Sto_Array("Sto_Behav") {}
       

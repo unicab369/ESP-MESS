@@ -121,9 +121,9 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat stoStat;                      //! length 17 [end 17]
-      EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [end 130]
-      EEPROM_Extractor<DevConf> stoConf;
+      Sto_Stat stoStat;                      //! length 17 [0 - 17]
+      EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [32 - 130/136]
+      EEPROM_Extractor<DevConf> stoConf;     //! length 42 [136 - 178/184]
 
       Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
