@@ -31,7 +31,7 @@ class Sto_EEPROM {
             }
             EEPROM.commit();
 
-            // xLogLine(); xLog("ReadBack");
+            // logger.xLogLine("Check Raw");
             // byte data[len];
             // readBytes(address, data, len);
             // AppPrintHex(data, len);
@@ -46,11 +46,9 @@ class Sto_EEPROM {
             }
             EEPROM.commit();
 
-            // xLogLine();
-            // xLog("ReadBack");
-            // byte data[len];
-            // readBytes(address, data, len);
-            // AppPrintHex(data, len);
+            //! for testing
+            byte data[len];
+            readBytes(address, data, len);
         }
 
         void readBytes(uint16_t address, void *value, size_t len) {
@@ -61,10 +59,8 @@ class Sto_EEPROM {
                 val[i] = EEPROM.read(address+i);
             }
 
-            // byte checkData[len];
-            // memcpy(checkData, val, len);
-            // xLog("ReadBack2");
-            // AppPrintHex(checkData, len);
+            logger.xLog("Check Raw");
+            AppPrintHex(val, len);
         }
 
         void storeData(uint16_t address, const char *buf, size_t len) {
@@ -107,6 +103,8 @@ class EEPROM_Value: public Sto_EEPROM {
         T value;
 
     public:
+        T* getValue() { return &value; }
+
         bool loadData(uint16_t addr) {
             startAddr = addr;
             if (!checkCode()) return false;

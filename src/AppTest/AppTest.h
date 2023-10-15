@@ -52,11 +52,9 @@ Loggable TestLog("Test");
                         [&](BTN_Action action, BNT_Hold hold, uint32_t elapse) {
         switch (action) {
             case ACTION_SINGLE_CLICK: {
-                uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x08};
+                uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x07};
                 ControlOutput action1(11, 22);    
                 servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
-                // servBehav.stoPeer.addPeer(peer1Mac);
-
                 break;
             }   
             case ACTION_DOUBLE_CLICK: {
@@ -79,10 +77,10 @@ Loggable TestLog("Test");
     void setup() {
         Serial.begin(115200);
         storage.setup();
-        // servBehav.setup();
+        servBehav.setup();
         // servBehav.deleteData();
 
-        // servBehav.stoPeer.printAllPeers();
+        servBehav.stoPeer.printAllPeers();
 
         // uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x07};
         // ControlOutput action1(11, 22);    

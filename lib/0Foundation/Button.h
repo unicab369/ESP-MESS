@@ -23,7 +23,7 @@ enum BNT_Hold {
     HOLD_TRANSITION
 };
 
-class MyButton: private PinReadable {
+class MyButton: private PinReadable, public Loggable {
     BNT_State state = BUTTON_END;
     TimeoutItem debounce_timer;
     TimeoutItem click_timer;
@@ -56,7 +56,7 @@ class MyButton: private PinReadable {
     }
 
     public:
-        MyButton(): PinReadable() {}
+        MyButton(): Loggable("Bnt") {}
 
         void setup(uint8_t pin, std::function<void(BTN_Action, BNT_Hold, uint32_t)> *cb, uint32_t debounceTicks = 50, 
                             uint32_t clickTicks = 200, uint32_t longPressTicks = 2000) {
@@ -87,8 +87,8 @@ class MyButton: private PinReadable {
                 if (!read) {
                     //! Single Click
                     if (click_timer.check()) {
+                        xLogLine("SingleClick");
                         Handle_ButtonEnd(ACTION_SINGLE_CLICK, 0);
-                        AppPrint("\n[Btn]", "SingleClick");
                     }
                 } else {
                     reset_timers(BUTTON_PULSE_HI2);
@@ -109,12 +109,14 @@ class MyButton: private PinReadable {
                 } else {
                     //! Double Click
                     if (click_timer.check()) {
+                        xLogLine("DoubleClick");
                         Handle_ButtonEnd(ACTION_DOUBLE_CLICK, 0);
-                        AppPrint("\n[Btn]", "DoubleClick");
                     }
                 }
             } 
             else if (state == BUTTON_HOLD_BEGIN) {
+                uint32_t elapse = press_timer.elapsed();
+
                 if (read) {
                     if (press_timer.check()) {
 
@@ -128,13 +130,12 @@ class MyButton: private PinReadable {
                         }
                         
                         // DO NOT call Handle_ButtonEnd
-                        (*callback)(ACTION_PRESS_ACTIVE, _holdOutput, press_timer.elapsed());
+                        (*callback)(ACTION_PRESS_ACTIVE, _holdOutput, elapse);
                     }
                 } else {
                     //! Press Ended
-                    uint32_t elapse = press_timer.elapsed();
-                    Handle_ButtonEnd(ACTION_PRESS_END, press_timer.elapsed());
-                    AppPrint("\n[Btn] PressEnded", elapse);
+                    xLogLinef("PressEnded elapse = %llu", elapse);
+                    Handle_ButtonEnd(ACTION_PRESS_END, elapse);
                 }
             } 
         }
