@@ -118,7 +118,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
          });
       }
 
-      void addPeer(uint8_t* peerMac) {
+      uint8_t addPeer(uint8_t* peerMac) {
          xLogf("%s %02X:%02X:%02X:%02X:%02X:%02X", __func__,
                      peerMac[0], peerMac[1], peerMac[2], 
                      peerMac[3], peerMac[4], peerMac[5]);
@@ -138,6 +138,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
 
          if (match != nullptr) {
             xLogf("foundIndex = %u", match->peerId);
+            return match->peerId;
 
          } else if (lastAvailIndex != INVALID_UINT8) {
             xLogf("**ADD NEW PEER at Index = %u", lastAvailIndex);
@@ -146,11 +147,11 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
             newPeer.builtTime = 0x1122334455667788;
             updateData(lastAvailIndex, &newPeer);
          } else {
-            
             xLogf("**NO AVAILABLE SPOT");
          }
 
          printAllPeers();
+         return lastAvailIndex;
       }
 
       // uint8_t findPeer(uint8_t* targetMac) {
@@ -164,12 +165,19 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
       // }
 };
 
-#define MAX_BEHAVIOR_ITEMS 10
+#define MAX_BEHAVIOR_ITEMS 6
 
 class Sto_Behavior: public Sto_Array<BehaviorItem, MAX_BEHAVIOR_ITEMS> {
    public:
       Sto_Behavior(): Sto_Array("Sto_Behav") {}
       
+      void printAll() {
+         xLogSection(__func__);
+         forEach([&](BehaviorItem* item, uint8_t index) {
+            item->printRaw();
+         });
+      }
+
       void handleCue(uint8_t peerId, Cue_Trigger cue) {
          forEach([&](BehaviorItem* item, uint8_t index) {
             // xLogf("At Index = %u", index);

@@ -88,9 +88,9 @@ Loggable TestLog("Test");
       Serial.begin(115200);
       storage.setup();
       servBehav.setup();
-      // servBehav.deleteData();
 
-      servBehav.stoPeer.printAllPeers();
+      // servBehav.stoPeer.printAllPeers();
+      servBehav.stoBehav.printAll();      
 
       // uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x07};
       // ControlOutput action1(11, 22);    
@@ -106,7 +106,6 @@ Loggable TestLog("Test");
 
       rotary.setup(conf.rotaryA, conf.rotaryB);
       rotary.onCallback = &rotaryCb;
-      // servBehav.test();
    }
 
    void loop() {

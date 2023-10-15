@@ -39,6 +39,11 @@ struct BehaviorItem {
    void produce(T *control) {
       memcpy(control, data, sizeof(T));
    }
+
+   void printRaw() {
+      Serial.printf("cue = %u, peerId = %u", cue, peerId);
+      AppPrintHex(data, sizeof(data));
+   }
 };
 
 class ControlOutput {

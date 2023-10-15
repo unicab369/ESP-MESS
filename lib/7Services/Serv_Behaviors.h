@@ -1,27 +1,27 @@
 class Serv_Behavior {
-	Sto_Behavior stoBehav;
-
 	public:
 		Sto_Peer stoPeer;
+		Sto_Behavior stoBehav;
 
 		void setup() {
-         stoPeer.load(192);        //! length 17*Count(20) [192 - 532/536]
-			// stoBehav.reload();
+         // stoPeer.load(192);   	//! length 17*Count(20) [192 - 532/536]
+			stoBehav.load(536);		//! length
 		}
 
 		void deleteData() {
 			stoPeer.deleteData();
-			// stoBehav.deleteData();
+			stoBehav.deleteData();
 		}
 
 		template <Cue_Trigger trigger, class T>
 		void storeAction(uint8_t behavIndex, T* action, uint8_t* peerMac) {
-			// BehaviorItem behav_In;
-			// behav_In.load(peer->peerId, trigger, action);
-			// stoBehav.updateData(behavIndex, &behav_In);     //! store behavior
-			// stoPeer.updateData(peer->peerId, peer);          //! store peer
+			// uint8_t id = stoPeer.addPeer(peerMac);
 
-			stoPeer.addPeer(peerMac);
+
+			BehaviorItem behav_In;
+			behav_In.load(0x99, trigger, action);
+			// behav_In.load(peer->peerId, trigger, action);
+			stoBehav.updateData(behavIndex, &behav_In);     //! store behavior
 		}
 
 		void handleCommandItem(uint8_t* source, CommandItem *item) {
