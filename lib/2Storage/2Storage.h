@@ -25,23 +25,22 @@ struct DeviceStats {
    }
 };
 
-class Sto_Stat: public EEPROM_Value<DeviceStats>, public Loggable {
+//! This object get stored in EEPROM
+//! please keep size minimal, dont inherit Loggable
+class Sto_Stat: public EEPROM_Value<DeviceStats>{
    public:
-      Sto_Stat(): Loggable("Sto_Stat") {}
+      uint16_t resetCnt() { return value.resetCnt; }
 
       void load(uint16_t address) {
          loadData(address);
          value.increseResetCnt();
          storeData();
-         xLogSectionf("resetCount = %llu", value.resetCnt);
       }
 };
 
 template <uint8_t len1, uint8_t len2>
-class PairChar: public Loggable {
+class PairChar {
    public:
-      PairChar(const char* id): Loggable(id) {}
-
       char value1[len1];
       char value2[len2];
 
@@ -66,10 +65,10 @@ class PairChar: public Loggable {
       }
 };
 
+//! This object get stored in EEPROM
+//! please keep size minimal, dont inherit Loggable
 class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
    public:
-      WiFiCred(): PairChar("WiFiCred"), ExtractorInterface() {}
-
       const char* ssid() { return value1; }
       const char* password() { return value2; }
 
@@ -78,15 +77,16 @@ class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
       }
 
       void printValues() override {
-         xLogf("SSID = %s", ssid());
-         xLogf("PASSW = %s", password());   
+         Loggable logger = Loggable("WiFiCred");
+         logger.xLogf("SSID = %s", ssid());
+         logger.xLogf("PASSW = %s", password());   
       }
 };
 
+//! This object get stored in EEPROM
+//! please keep size minimal, dont inherit Loggable
 class DevConf: public PairChar<21,21>, public ExtractorInterface {
    public:
-      DevConf(): PairChar("DevConf"), ExtractorInterface() {}
-
       const char* name() { return value1; }
       const char* mqttIP() { return value2; }
 
@@ -95,8 +95,9 @@ class DevConf: public PairChar<21,21>, public ExtractorInterface {
       }
 
       void printValues() override {
-         xLogf("name = %s", name());
-         xLogf("mqttIP = %s", mqttIP());    
+         Loggable logger = Loggable("DevConf");
+         logger.xLogf("name = %s", name());
+         logger.xLogf("mqttIP = %s", mqttIP());    
       }
 };
 
@@ -124,7 +125,6 @@ class Mng_Storage: public Loggable {
       EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [end 130]
       EEPROM_Extractor<DevConf> stoConf;
 
-      // Sto_Config stoConfig;
       Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
       Sto_SD sd1;
@@ -137,8 +137,11 @@ class Mng_Storage: public Loggable {
       void setup() {
          EEPROM.begin(EEPROM_SIZE);
          stoStat.load(0);
+         xLogSectionf("resetCount = %llu", stoStat.resetCnt());
+
          stoCred.load(32);
          stoConf.load(136);
+
 
          // stoBehavior.reloadData();
 
