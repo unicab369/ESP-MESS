@@ -136,11 +136,11 @@ class Mng_Storage: public Loggable {
 
       void setup() {
          EEPROM.begin(EEPROM_SIZE);
-         stoStat.load(0);
-         xLogSectionf("resetCount = %llu", stoStat.resetCnt());
+         // stoStat.load(0);
+         // xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
-         stoCred.load(32);
-         stoConf.load(136);
+         // stoCred.load(32);
+         // stoConf.load(136);
 
 
          // stoBehavior.reloadData();
