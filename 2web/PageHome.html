@@ -6,6 +6,9 @@
    <script src="script.js"></script>
    <link rel="stylesheet" type="text/css" href="styles.css">
    <link rel="stylesheet" type="text/css" href="buttons.css">
+   <link rel="stylesheet" type="text/css" href="base.css">
+   <link rel="stylesheet" type="text/css" href="forms-r.css">
+
    <style>
       .container {
          border: 1px solid #000;
@@ -31,6 +34,7 @@
             <tr>
                <th style="width: 30%;">Header 1</th><th></th>
             </tr>
+
             <tr><td>Built Date</td><td>111111</td></tr>
             <tr><td>Run Time</td><td>Data 4</td></tr>
             <tr><td>Time Keeping</td><td>Data 4</td></tr>
@@ -50,16 +54,32 @@
 
             <tr style="height: 20px;"><td></td></tr>
             <tr><td colspan="2">
-               <button class="pure-button" style="width: 100%;">TOGGLE IO</button>
+               <fieldset>
+                  <div class="WidthFull" style="display: flex;">
+                     <label style="flex: 0.4;">IP Address</label>
+                     <input style="flex: 0.6;" type="text" id="aligned-name" placeholder="10.0.0.2" />
+                     <button style="margin-left: 10px;">?</button>
+                  </div>
+               </fieldset>
+            </td></tr>
+
+            <tr style="height: 20px;"><td></td></tr>
+            <tr><td colspan="2">
+               <button class="pure-button WidthFull">TOGGLE IO</button>
             </td></tr>
             <tr><td colspan="2">
-               <button class="pure-button" style="width: 100%;">DEVICE CONF</button>
+               <button class="pure-button WidthFull" onclick="navToDeviceConf()">
+                  DEVICE CONF</button>
             </td></tr>
             <tr><td colspan="2">
-               <button class="pure-button" style="width: 100%;">CONTROL CONF</button>
+               <button class="pure-button WidthFull">CONTROL CONF</button>
             </td></tr>
             <tr><td colspan="2">
-               <button class="pure-button" style="width: 100%;">FILES</button>
+               <button class="pure-button WidthFull">FILES</button>
+            </td></tr>
+            <tr><td colspan="2">
+               <button class="pure-button WidthFull" onclick="navToAbout()">
+                  ABOUT</button>
             </td></tr>
          </table>
 

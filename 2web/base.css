@@ -1,0 +1,67 @@
+/* !Font Size */
+.FontSize20 {
+   font-size: 20px;
+}
+
+.FontSize30 {
+   font-size: 30px;
+}
+
+/* !Font Weight */
+.FontWeight500 {
+   font-weight: 600;
+}
+
+/* !Width */
+.WidthFull {
+   width: 100%;
+}
+
+/* !Height */
+.HeightFull {
+   height: 100%;
+}
+
+.Height80 {
+   height: 80px;
+}
+
+.Border1 {
+   border: 1px solid #000;
+}
+
+.TextH1 {
+   margin: 0px; color: black; font-weight: 600;
+}
+
+.Text1 {
+   margin-left: 10px; margin-top: 7px;
+}
+
+/* !Margin */
+.Margin10 {
+   margin: 10px;
+}
+
+.Flex {
+   display: flex;
+}
+
+.Flex1 {
+   flex: 1;
+}
+
+.FlexGrow1 {
+   flex-grow: 1;
+}
+
+.Padding10 {
+   padding: 10px;
+}
+
+.PageBase {
+   display: flex; flex-direction: column; 
+   align-items: center;
+   justify-content: space-between; 
+   height: 100vh;
+}
