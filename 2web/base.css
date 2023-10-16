@@ -47,6 +47,11 @@
    margin-right: 10px;
 }
 
+.MarginL10 {
+   margin-left: 10px;
+}
+
+/* !Margin */
 .Flex {
    display: flex;
 }

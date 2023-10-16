@@ -1,21 +1,11 @@
 #define MAX_DISPLAY_QUEUE1 8
 #define MAX_DISPLAY_QUEUE2 20
 
-class Serv_Serial {
+class Serv_Serial: public Loggable {
     AppQueue<DispItem, MAX_DISPLAY_QUEUE1> dispQueue1;
     AppQueue<DispItem, MAX_DISPLAY_QUEUE2> dispQueue2;
 
     Disp_ST77 largeDisp;
-
-    //! storeCred Callback
-    std::function<void(const char* ssid, const char *passw)> 
-            storeCredCb = [&](const char* ssid, const char *passw) {
-        // storage.stoCred.storeData(ssid, passw);
-        // if (onHandleResetWifi) (*onHandleResetWifi)();
-    };
-
-    protected:
-        SerialControl serial;
 
     public:
         Serv_I2C i2c1;
@@ -23,7 +13,7 @@ class Serv_Serial {
         Mng_Storage storage;
         Mng_AppClock appClock;
 
-        std::function<void()> *onHandleResetWifi;
+        Serv_Serial(): Loggable("Serial") {}
 
         void setupSerial(PinConfig* conf) {
             //! setup i2C
@@ -57,8 +47,6 @@ class Serv_Serial {
                 digitalWrite(conf->out3, HIGH);
                 largeDisp.setup2(conf->out1, conf->out2, conf->rst0, conf->mosi0, conf->sck0);
             }
-
-            // serial.onParseString = &storeCredCb;
         }
 
         //! 1 Second Interval

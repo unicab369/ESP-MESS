@@ -2,7 +2,7 @@
 <html>
 <head>
    <meta charset="UTF-8">
-   <title>My Simple Website</title>
+   <title>ESP-MESS</title>
    <script src="script.js"></script>
    <link rel="stylesheet" type="text/css" href="styles.css">
    <link rel="stylesheet" type="text/css" href="buttons.css">
@@ -25,7 +25,7 @@
    </style>
 </head>
 
-<body>
+<body onload="initializePage()">
    <h1 style="text-align: center;">ESP-MESS V3.0.2</h1>
 
    <div class="container" style="overflow: hidden;">
@@ -57,15 +57,17 @@
                <fieldset>
                   <div class="WidthFull" style="display: flex;">
                      <label style="flex: 0.4;">IP Address</label>
-                     <input style="flex: 0.6;" type="text" id="aligned-name" placeholder="192.168.4.1" />
-                     <button style="margin-left: 10px;">?</button>
+                     <input style="flex: 0.6;" type="text" id="devIP_tField" 
+                        oninput="validateIP(this)" placeholder="192.168.4.1" />
+                     <button class="MarginL10" onclick="saveDevIP()">Save</button>
+                     <button class="MarginL10">?</button>
                   </div>
                </fieldset>
             </td></tr>
 
             <tr style="height: 20px;"><td></td></tr>
             <tr><td colspan="2">
-               <button class="pure-button WidthFull">TOGGLE IO</button>
+               <button class="pure-button WidthFull" onclick="sendRequest()">TOGGLE IO</button>
             </td></tr>
             <tr><td colspan="2">
                <button class="pure-button WidthFull" onclick="navToDeviceConf()">

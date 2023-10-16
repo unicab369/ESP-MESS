@@ -1,4 +1,5 @@
-// script.js
+let globalIP = sessionStorage.getItem('globalIP') || "192.168.4.1";
+
 function greet() {
    alert("Hello, world!");
 }
@@ -15,6 +16,23 @@ function navBack() {
    window.history.back();
 }
 
+function validateIP(inputField) {
+   inputField.value = inputField.value.replace(/[^0-9.]/g, '');
+}
+
+function saveDevIP() {
+   const inputField = document.getElementById("devIP_tField");
+   globalIP = inputField.value;
+   alert("IP address saved: " + globalIP)
+   sessionStorage.setItem('globalIP', globalIP);
+}
+
+function initializePage() {
+   const devIPInput = document.getElementById("devIP_tField");
+   devIPInput.value = globalIP;
+   sendCORSRequest();
+}
+
 const mockData1 = [
    { id: 0, name: "John", age: 30 },
    { id: 1, name: "Alice", age: 25 },
@@ -22,23 +40,23 @@ const mockData1 = [
 ];
 
 function addIdCell(index, row, item) {
-   const cell0 = row.insertCell(index);
-   cell0.textContent = item.id;
-   cell0.style.cssText = "background-color: red;";
+   const cell = row.insertCell(index);
+   cell.textContent = item.id;
+   cell.style.cssText = "width: 25px; text-align: center;";
 }
 
 function addInputCell(index, row, item) {
    const cell = row.insertCell(index);
-   
+   cell.style.cssText = 'width: 100%; display: flex;'
 
    const input = document.createElement('input');
    input.type = 'text'
-   input.style.cssText = 'font-size: 1.5rem; width: 80%; float: left;';
+   input.style.cssText = 'font-size: 1.2rem; width: 180px; flex: .7;';
    cell.appendChild(input)
 
    const clearBtn = document.createElement('button')
    clearBtn.textContent = 'x'
-   clearBtn.style.cssText = 'font-size: 1.5rem; width: 30px; float: left;'
+   clearBtn.style.cssText = 'font-size: 1.2rem; width: 30px;'
    clearBtn.addEventListener('click', function(event) {
       input.value = "";   
    })
@@ -49,7 +67,8 @@ function addInputCell(index, row, item) {
 
 function addButtonsCell(index, row, models) {
    const cell = row.insertCell(index);
-   
+   cell.style.cssText = 'width: 100px;'
+
    models.forEach((item) => {
       const button = document.createElement('button')
       button.textContent = item.text; // Set the button text
@@ -59,22 +78,70 @@ function addButtonsCell(index, row, models) {
 }
 
 function addDropdownCell(index, row, item) {
-   const cell2 = row.insertCell(index);
-   cell2.insertAdjacentHTML('beforeend', 
-   "<select id='stacked-state' style='width: 100%; font-size: 1.5rem;'>\
+   const cell = row.insertCell(index);
+   cell.style.cssText = 'width: 100px;'
+
+   cell.insertAdjacentHTML('beforeend', 
+   "<select id='stacked-state' font-size: 1.2rem;'>\
       <option>OUTPUT</option>\
       <option>WS2812</option>\
       <option>SEND_MSG</option>\
    </select>");
 }
 
+function sendCORSRequest() {
+   const url = 'http://' + globalIP + '/' + 'devConf'
+   const xhr = new XMLHttpRequest()
+
+   //! send OPTIONS request
+   xhr.open('OPTIONS', url, true)
+
+   xhr.onload = function () {
+      console.log("IM HERE AAAAAAAAAAAAAAAAAA")
+   };
+
+   xhr.send()
+}
+
+function sendRequest() {
+   const data = {
+      key1: 'val1', key2: 'val2'
+   }
+
+   const url = 'http://' + globalIP + '/' + 'devConf'
+
+   fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+         'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+   })
+   .then(response => {
+      if (!response.ok) {
+         // Check if the response status is not in the range of 200-299 (indicating an error)
+         throw new Error(`Request failed with status: ${response.status}`);
+      }
+      return response.text(); // Read the response body as text
+   })
+   .then(data => {
+      // Handle the response from the server.
+      console.log('Response data:', data);
+   })
+   .catch(error => {
+      console.error('Error:', error);
+   });
+}
+
 function loadSection1() {
-   // Data is fetched successfully, now render it in the table
-   const section1 = document.getElementById("section1");
-   section1.innerHTML = ""; // Clear previous data
+   const section = document.getElementById("section1");
+   section.innerHTML = ""; // Clear previous data
    
    mockData1.forEach((item) => {
-      const row = section1.insertRow();
+      const row = section.insertRow()
+      row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
+
       addIdCell(0, row, item);
       const input = addInputCell(1, row, item);
 
@@ -91,7 +158,7 @@ function loadSection1() {
          {
             text: 'Test', // Replace with the desired button text
             callback: function(event) {
-               alert("IM HERE 1");
+               sendRequest()
             }
          }, {
             text: 'Save',
@@ -117,6 +184,8 @@ const mockData2 = [
 function loadSection2() {
    mockData2.forEach((item) => {
       const row = section2.insertRow();
+      row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
+
       addIdCell(0, row, item);
       const input = addInputCell(1, row, item);
       input.placeholder = '00:00:00:00:00:00';
@@ -143,11 +212,6 @@ function loadSection2() {
             callback: function(event) {
                alert("IM HERE 1");
             }
-         }, {
-            text: 'Delete',
-            callback: function(event) {
-               alert("IM HERE 222");
-            }
          }
       ]
 
@@ -167,6 +231,8 @@ function loadSection3() {
 
    mockData2.forEach((item) => {
       const row = section3.insertRow();
+      row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
+
       addIdCell(0, row, item);
 
       const input = addInputCell(1, row, item)
@@ -177,11 +243,6 @@ function loadSection3() {
             text: 'Save', // Replace with the desired button text
             callback: function(event) {
                alert("IM HERE 1");
-            }
-         }, {
-            text: 'Delete',
-            callback: function(event) {
-               alert("IM HERE 222");
             }
          }
       ]

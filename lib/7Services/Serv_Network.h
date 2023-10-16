@@ -35,9 +35,6 @@ class Serv_Network: public Loggable {
         tweet.tweetSync.onReceiveBounce = NULL;
     };
 
-    Network_State state = NETWORK_START;
-    uint8_t retryCnt = 10;
-
     void checkWifi() {
         if (retryCnt < 0) return;
         String output = "[Wifi] Conn ... " + String(retryCnt);
@@ -67,7 +64,7 @@ class Serv_Network: public Loggable {
             espNow.setup(WiFi.channel()); 
         } 
         
-        AppPrint(output.c_str());
+        xLog(output.c_str());
         device->addDisplayQueues(output, 6);    //* LINE 6
     }
 
@@ -84,6 +81,9 @@ class Serv_Network: public Loggable {
         tweet.sendSyncMock();
         tweet.sendSyncMock();
     }
+
+    Network_State state = NETWORK_START;
+    uint8_t retryCnt = 0;
 
     public:
         Serv_Network(): Loggable("Net") {}
@@ -113,14 +113,14 @@ class Serv_Network: public Loggable {
         void resetWifi() {
             xLog(__func__);
             state = NETWORK_START;
-            // Sto_Cred cred = device->storage.stoCred;
-            retryCnt = 13;
+            EEPROM_Extractor<WiFiCred> cred = device->storage.stoCred;
+            retryCnt = 15;
             
             #ifdef ESP32
                 if (digitalRead(36)) {
-                    // wifi.setup(cred.ssid(), cred.passw());
+                    wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
                 } else {
-                    // wifi.setup(cred.ssid(), "cred.passw()");
+                    wifi.setup(cred.getValue()->ssid(), "cred.passw()");
                 }
             #else
                 wifi.setup(cred.ssid(), cred.passw());

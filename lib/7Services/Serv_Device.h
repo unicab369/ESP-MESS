@@ -94,6 +94,12 @@ class Serv_Device: public Loggable, public Serv_Serial {
         }
     };
 
+    //! storeCred Callback
+    std::function<void(char*)> storeCredCb = [&](char* inputStr) {
+        storage.handleConsoleStr(inputStr);
+        if (onHandleResetWifi) (*onHandleResetWifi)();
+    };
+
     public:
         Serv_Device(): Loggable("Dev"), Serv_Serial() {}
 
@@ -106,12 +112,15 @@ class Serv_Device: public Loggable, public Serv_Serial {
         PulseController led, buzzer;
         PinWritable relay1;
         RotaryEncoder rotary;
+        SerialControl serial;
         // Serv_Behavior servBehav;
             
         std::function<void()> *onHandleSingleClick;
         std::function<void()> *onHandleDoubleClick;
         std::function<void()> *onHandleAPRequest;
         std::function<void(RotaryDirection state, uint8_t counter)> *onHandleRotary;
+        
+        std::function<void()> *onHandleResetWifi;
 
         virtual void showLadderId() {}
 
@@ -134,6 +143,7 @@ class Serv_Device: public Loggable, public Serv_Serial {
 
             rotary.setup(conf->rotaryA, conf->rotaryB);
             rotary.onCallback = &rotaryCb;
+            serial.onParseString = &storeCredCb;
         }
 
         //! Tweet CommandTrigger

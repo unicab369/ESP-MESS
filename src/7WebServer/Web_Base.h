@@ -87,9 +87,9 @@ class Web_Base: public Loggable {
       }
 
       void startPage() {
-         server->sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-         server->sendHeader("Pragma", "no-cache");
-         server->sendHeader("Expires", "-1");
+         // server->sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+         // server->sendHeader("Pragma", "no-cache");
+         // server->sendHeader("Expires", "-1");
          
          //! STRICTLY REQUIRED for correct initialization of string
          buffer[0] = '\0';

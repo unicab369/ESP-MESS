@@ -59,11 +59,34 @@ class Web_DevConfig: public Web_Base {
         // storage->devConf.deleteData();
     };
     
+    std::function<void()> handleDevConf = [&]() {
+        String responseMessage = "Received a POST request to /devConf";
+        server->sendHeader("Content-Type", "text/plain");
+
+        server->sendHeader("Access-Control-Allow-Origin", "*");
+        server->send(200, "text/plain", responseMessage);
+
+        // Print the response message to the Serial Monitor
+        Serial.println(responseMessage);
+    };
+
+    std::function<void()> handleCORS = [&]() {
+        Serial.println("IM HERE OOOOOOOOOOOOOOOOOO");
+        server->sendHeader("Access-Control-Allow-Origin", "*");
+        server->sendHeader("Access-Control-Max-Age", "10000");
+        server->sendHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        server->sendHeader("Access-Control-Allow-Headers", "Content-Type");
+        server->send(204);
+    };
+
     public:
         Web_DevConfig(): Web_Base("Web_Contr") {}
 
         void begin(Serv_Network *network, WebServer *server) {
             load("/devConf", network, server);
+
+            server->on("/devConf", HTTP_POST, handleDevConf);
+            server->on("/devConf", HTTP_OPTIONS, handleCORS);
 
             server->on("/sav_cred", HTTP_POST, onSaveCred);
             server->on("/del_cred", HTTP_POST, onDeleteCred);

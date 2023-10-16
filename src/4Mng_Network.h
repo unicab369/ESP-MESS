@@ -37,9 +37,9 @@ class Mng_Network: public Serv_Network {
 
         void handleRotary(RotaryDirection state, uint8_t counter) {
             if (state == CLOCKWISE) {
-                tweet.command.sendIr(222333);   
+                // tweet.command.sendIr(222333);   
             } else {
-                tweet.attendant.startAttendant();
+                // tweet.attendant.startAttendant();
             }
         }
 
