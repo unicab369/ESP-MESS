@@ -2,7 +2,7 @@
 <html>
 <head>
    <meta charset="UTF-8">
-   <title>My Simple Website</title>
+   <title>ESP-MESS</title>
    <script src="script.js"></script>
    <link rel="stylesheet" type="text/css" href="styles.css">
    <link rel="stylesheet" type="text/css" href="buttons.css">
@@ -15,23 +15,44 @@
    </div>
 
    <div style="overflow-y: auto; text-align: left;" class="Border1 Flex1 Padding10 Margin10 WidthFull">
-      <table id="dataTable">
+      <table id="dataTable" class="TableBase">
          <thead>
-            <tr><th style="width: 30px;">#</th>
-               <th style="width: 30px;">Peer Id</th><th>Action</th><th>Test</th></tr>
+            <tr style="background-color: orange;">
+               <th style="width: 5%;">#</th>
+               <th style="width: 30%;" class="MarginR5">Target Id</th>
+               <th style="width: 25%;">Action</th>
+               <th style="width: 20%;">Configs</th>
+               <th style="width: 15%;"></th>
+            </tr>
          </thead>
          <tbody id="section1"></tbody>
       </table>
 
+      <!-- !spacing -->
       <div style="height: 20px;"></div>
 
-      <table>
-         <thead>
-            <tr><th style="width: 30px;">#</th>
-               <th style="width: 30px;">Peer Id</th>
-               <th>Peer Address</th></tr>
-         </thead>
+      <table class="TableBase">
+         <tr style="background-color: orange;">
+            <th style="width: 30px; margin-right: 10px;" class="MarginR5">#</th>
+            <th style="flex: 1;" class="MarginR5">Target Mac</th>
+            <th style="width: 100px;">Configs</th>
+            <th></th>
+         </tr>
          <tbody id="section2"></tbody>
+      </table>
+
+      <!-- !spacing -->
+      <div style="height: 20px;"></div>
+
+      <table class="TableBase">
+         <tr style="background-color: orange;">
+            <th style="width: 30px; margin-right: 10px;" class="MarginR5">#</th>
+            <th style="flex: 1;" class="MarginR5">Target Group</th>
+
+            <th style="width: 100px;">Configs</th>
+            <th></th>
+         </tr>
+         <tbody id="section3"></tbody>
       </table>
    </div>
    
@@ -39,6 +60,10 @@
       <button class="pure-button WidthFull" onclick="navBack()">BACK</button>
    </div>   
 
-   <script>loadData();</script>
+   <script>
+      loadSection1();
+      loadSection2();
+      loadSection3();
+   </script>
 </body>
 </html>

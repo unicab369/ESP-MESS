@@ -15,72 +15,111 @@ function navBack() {
    window.history.back();
 }
 
-function loadData() {
+const mockData1 = [
+   { id: 0, name: "John", age: 30 },
+   { id: 1, name: "Alice", age: 25 },
+   { id: 2, name: "Bob", age: 35 },
+];
+
+function addIdCell(index, row, item) {
+   const cell0 = row.insertCell(index);
+   cell0.textContent = item.id;
+   cell0.style.cssText = "background-color: red;";
+}
+
+function addInputCell(index, row, item) {
+   const cell = row.insertCell(index);
+   
+
+   const input = document.createElement('input');
+   input.type = 'text'
+   input.style.cssText = 'font-size: 1.5rem; width: 80%; float: left;';
+   cell.appendChild(input)
+
+   const clearBtn = document.createElement('button')
+   clearBtn.textContent = 'x'
+   clearBtn.style.cssText = 'font-size: 1.5rem; width: 30px; float: left;'
+   clearBtn.addEventListener('click', function(event) {
+      input.value = "";   
+   })
+   cell.appendChild(clearBtn)
+   
+   return input;
+}
+
+function addButtonsCell(index, row, models) {
+   const cell = row.insertCell(index);
+   
+   models.forEach((item) => {
+      const button = document.createElement('button')
+      button.textContent = item.text; // Set the button text
+      button.addEventListener('click', item.callback)
+      cell.appendChild(button)
+   })
+}
+
+function addDropdownCell(index, row, item) {
+   const cell2 = row.insertCell(index);
+   cell2.insertAdjacentHTML('beforeend', 
+   "<select id='stacked-state' style='width: 100%; font-size: 1.5rem;'>\
+      <option>OUTPUT</option>\
+      <option>WS2812</option>\
+      <option>SEND_MSG</option>\
+   </select>");
+}
+
+function loadSection1() {
    // Data is fetched successfully, now render it in the table
    const section1 = document.getElementById("section1");
    section1.innerHTML = ""; // Clear previous data
-
-   const mockData1 = [
-      { id: 0, name: "John", age: 30 },
-      { id: 1, name: "Alice", age: 25 },
-      { id: 2, name: "Bob", age: 35 },
-   ];
-
+   
    mockData1.forEach((item) => {
       const row = section1.insertRow();
-      const cell0 = row.insertCell(0);
-      const cell1 = row.insertCell(1);
-      const cell2 = row.insertCell(2);
-      const cell3 = row.insertCell(3);
+      addIdCell(0, row, item);
+      const input = addInputCell(1, row, item);
 
-      //! Cell0
-      cell0.textContent = item.id;
+      input.addEventListener('input', function(event) {
+         let inputValue = event.target.value;
+         inputValue = inputValue.replace(/\D/g, '');
+         event.target.value = inputValue;
+      });
 
-      //! Cell1
-      const input = document.createElement('input');
-      input.type = 'text';
-      cell1.appendChild(input);
+      addDropdownCell(2, row, item);
+      addInputCell(3, row, item);
 
-      //! Cell2
-      cell2.insertAdjacentHTML('beforeend', "<select id='stacked-state'>\
-         <option>OUTPUT</option>\
-         <option>WS2812</option>\
-         <option>SEND_MSG</option>\
-      </select>");
+      const buttonModels = [
+         {
+            text: 'Test', // Replace with the desired button text
+            callback: function(event) {
+               alert("IM HERE 1");
+            }
+         }, {
+            text: 'Save',
+            callback: function(event) {
+               alert("IM HERE 222");
+            }
+         }
+      ]
 
-      //! Cell3
-      const button2 = document.createElement('button');
-      button2.textContent = 'Click Me'; // Set the button text
-      cell3.appendChild(button2);
+      addButtonsCell(4, row, buttonModels);
    }); 
+}
 
+const mockData2 = [
+   { id: 0, name: "AA:AA:AA:AA:AA:01", age: 30 },
+   { id: 1, name: "AA:AA:AA:AA:AA:02", age: 25 },
+   { id: 2, name: "AA:AA:AA:AA:AA:03", age: 35 },
+   { id: 3, name: "", age: 35 },
+   { id: 4, name: "", age: 35 },
+   { id: 5, name: "", age: 35 },
+];
 
-   const mockData2 = [
-      { id: 0, name: "AA:AA:AA:AA:AA:01", age: 30 },
-      { id: 1, name: "AA:AA:AA:AA:AA:02", age: 25 },
-      { id: 2, name: "AA:AA:AA:AA:AA:03", age: 35 },
-      { id: 3, name: "", age: 35 },
-      { id: 4, name: "", age: 35 },
-      { id: 5, name: "", age: 35 },
-   ];
-
+function loadSection2() {
    mockData2.forEach((item) => {
       const row = section2.insertRow();
-      const cell0 = row.insertCell(0);
-      const cell1 = row.insertCell(1);
-      const cell2 = row.insertCell(2);
-      const cell3 = row.insertCell(3);
-      const cell4 = row.insertCell(4);
-
-      //! Cell0
-      cell0.textContent = item.id;
-
-      //! Cell1
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = item.name;
-      input.placeholder = '00:00:00:00:00:00'
-      cell1.appendChild(input);
+      addIdCell(0, row, item);
+      const input = addInputCell(1, row, item);
+      input.placeholder = '00:00:00:00:00:00';
 
       input.addEventListener('input', function (event) {
          const inputValue = event.target.value;
@@ -97,16 +136,57 @@ function loadData() {
          const isValid = /^[0-9a-fA-F:]*$/.test(inputValue);
          input.style.backgroundColor = isValid ? '' : 'red';
       });
-         
-      //! Cell3
-      const button2 = document.createElement('button');
-      button2.textContent = 'Save'; // Set the button text
-      cell3.appendChild(button2);
 
-      //! Cell4
-      const button3 = document.createElement('button');
-      button3.textContent = 'Del'; // Set the button text
-      cell3.appendChild(button3);
+      const buttonModels = [
+         {
+            text: 'Save', // Replace with the desired button text
+            callback: function(event) {
+               alert("IM HERE 1");
+            }
+         }, {
+            text: 'Delete',
+            callback: function(event) {
+               alert("IM HERE 222");
+            }
+         }
+      ]
+
+      addButtonsCell(2, row, buttonModels);
+   }); 
+}
+
+function loadSection3() {
+   const mockData2 = [
+      { id: 0, name: "aaaaaaaaaa", age: 30 },
+      { id: 1, name: "bbbbbbbbbb", age: 25 },
+      { id: 2, name: "ccccccc", age: 35 },
+      { id: 3, name: "", age: 35 },
+      { id: 4, name: "", age: 35 },
+      { id: 5, name: "", age: 35 },
+   ];
+
+   mockData2.forEach((item) => {
+      const row = section3.insertRow();
+      addIdCell(0, row, item);
+
+      const input = addInputCell(1, row, item)
+      input.placeholder = 'name'
+
+      const buttonModels = [
+         {
+            text: 'Save', // Replace with the desired button text
+            callback: function(event) {
+               alert("IM HERE 1");
+            }
+         }, {
+            text: 'Delete',
+            callback: function(event) {
+               alert("IM HERE 222");
+            }
+         }
+      ]
+
+      addButtonsCell(2, row, buttonModels);
    }); 
 }
 

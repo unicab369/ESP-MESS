@@ -1,6 +1,6 @@
 /* !Font Size */
 .FontSize20 {
-   font-size: 20px;
+   font-size: 3rem;
 }
 
 .FontSize30 {
@@ -43,6 +43,10 @@
    margin: 10px;
 }
 
+.MarginR5 {
+   margin-right: 10px;
+}
+
 .Flex {
    display: flex;
 }
@@ -64,4 +68,10 @@
    align-items: center;
    justify-content: space-between; 
    height: 100vh;
+   width: 100%;
+}
+
+.TableBase {
+   width: 100%;
+   background-color: gray;
 }
