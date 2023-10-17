@@ -80,3 +80,7 @@
    width: 100%;
    background-color: gray;
 }
+
+@import url(buttons.css);
+@import url(forms-r.css);
+@import url(menus.css);
