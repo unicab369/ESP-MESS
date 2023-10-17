@@ -1,3 +1,9 @@
+@import url(buttons.css);
+@import url(forms-r.css);
+@import url(menus.css);
+@import url(table.css);
+
+
 /* !Font Size */
 .FontSize20 {
    font-size: 3rem;
@@ -80,8 +86,3 @@
    width: 100%;
    background-color: gray;
 }
-
-@import url(buttons.css);
-@import url(forms-r.css);
-@import url(menus.css);
-@import url(table.css);
