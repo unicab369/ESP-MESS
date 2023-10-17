@@ -1,44 +1,3 @@
-// let globalIP = sessionStorage.getItem('globalIP') || "192.168.4.1";
-
-// function greet() {
-//    alert("Hello, world!");
-// }
-
-// function navToAbout() {
-//    window.location.href = 'PageAbout.html';
-// }
-
-// function navToDeviceConf() {
-//    window.location.href = 'PageDeviceConf.html';
-// }
-
-// function navBack() {
-//    window.history.back();
-// }
-
-// function validateIP(inputField) {
-//    inputField.value = inputField.value.replace(/[^0-9.]/g, '');
-// }
-
-// function saveDevIP() {
-//    const inputField = document.getElementById("devIP_tField");
-//    globalIP = inputField.value;
-//    alert("IP address saved: " + globalIP)
-//    sessionStorage.setItem('globalIP', globalIP);
-// }
-
-// function initializePage() {
-//    const devIPInput = document.getElementById("devIP_tField");
-//    devIPInput.value = globalIP;
-//    sendCORSRequest();
-// }
-
-const mockData1 = [
-   { id: 0, name: "John", age: 30 },
-   { id: 1, name: "Alice", age: 25 },
-   { id: 2, name: "Bob", age: 35 },
-];
-
 function addIdCell(index, row, item) {
    const cell = row.insertCell(index);
    cell.textContent = item.id;
@@ -81,12 +40,24 @@ function addDropdownCell(index, row, item) {
    const cell = row.insertCell(index);
    cell.style.cssText = 'width: 100px;'
 
-   cell.insertAdjacentHTML('beforeend', 
-   "<select id='stacked-state' font-size: 1.2rem;'>\
-      <option>OUTPUT</option>\
-      <option>WS2812</option>\
-      <option>SEND_MSG</option>\
-   </select>");
+   const select = document.createElement('select')
+   select.style.cssText = 'font-size: 1.2rem;'
+
+   const options = ['OUTPUT', 'WS2812', 'SEND_MSG']
+   options.forEach(optionText => {
+      const option = document.createElement('option')
+      option.text = optionText
+      option.selected = option.text == item.action
+      select.add(option);
+   });
+
+   // Add an event listener to the select element to track changes
+   select.addEventListener('change', function() {
+      item.action = select.value
+      console.log(item)
+   });
+
+   cell.appendChild(select);
 }
 
 function sendCORSRequest() {
@@ -134,11 +105,18 @@ function sendRequest() {
    });
 }
 
+
+const mockData1 = [
+   { id: 0, name: "John", action: 'OUTPUT' },
+   { id: 1, name: "Alice", action: 'WS2812' },
+   { id: 2, name: "Bob", action:'SEND_MSG' },
+];
+
 function loadSection1() {
    const section = document.getElementById("section1");
    section.innerHTML = ""; // Clear previous data
    
-   mockData1.forEach((item) => {
+   mockData1.forEach((item, index) => {
       const row = section.insertRow()
       row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
 
@@ -163,7 +141,7 @@ function loadSection1() {
          }, {
             text: 'Save',
             callback: function(event) {
-               alert("IM HERE 222");
+               console.log("zzzz = " + index)
             }
          }
       ]

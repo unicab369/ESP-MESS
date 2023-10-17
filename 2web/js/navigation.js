@@ -9,11 +9,15 @@ function navToAbout() {
 }
 
 function navToDeviceConf() {
-   window.location.href = 'PageDeviceConf.html';
+   window.location.href = 'PageBehaviors.html';
 }
 
 function navBack() {
    window.history.back();
+}
+
+function navToHome() {
+   window.location.href = 'PageHome.html';
 }
 
 function validateIP(inputField) {

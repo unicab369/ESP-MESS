@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+   <title>ESP-MESS</title>
+   <script src="js/navigation.js"></script>
+   <script src="script.js"></script>
+   <link rel="stylesheet" type="text/css" href="css/base.css">
+</head>
+<body class="PageBase">
+   <div style="text-align: center;" class="FontSize20 FontWeight500">
+      CONFIGURATIONS
+   </div>
+
+   <div class="pure-menu pure-menu-horizontal pure-menu-scrollable">
+      <!-- <a href="#" class="pure-menu-link pure-menu-heading">Yahoo</a> -->
+      <ul class="pure-menu-list">
+         <li class="pure-menu-item">
+            <a href="/2web/PageDevice.html" class="pure-menu-link">Device</a>
+         </li>
+         <li class="pure-menu-item">
+            <a href="/2web/PageBehaviors.html" class="pure-menu-link">Behaviors</a>
+         </li>
+      </ul>
+   </div>
+
+   <div style="overflow-y: auto; text-align: left;" 
+            class="Border1 Flex1 Padding10 Margin10 WidthFull">
+      <table id="dataTable" class="TableBase">
+         <thead>
+            <tr style="background-color: orange;">
+               <th>#</th>
+               <th>Target Id</th>
+               <th>Action</th>
+               <th>Configs</th>
+               <th>Buttons</th>
+            </tr>
+         </thead>
+         <tbody id="section1"></tbody>
+      </table>
+
+      <div style="height: 20px;"></div>
+      <table id="dataTable" class="TableBase">
+         <thead>
+            <tr style="background-color: orange;">
+               <th>#</th>
+               <th>Target Mac</th>
+               <th>Buttons</th>
+            </tr>
+         </thead>
+         <tbody id="section2"></tbody>
+      </table>
+
+      <div style="height: 20px;"></div>
+      <table id="dataTable" class="TableBase">
+         <thead>
+            <tr style="background-color: orange;">
+               <th>#</th>
+               <th>Target Group</th>
+               <th>Buttons</th>
+            </tr>
+         </thead>
+         <tbody id="section3"></tbody>
+      </table>
+   </div>
+   
+   <div class="Flex Padding10 WidthFull" style="height: 80px;" >
+      <button class="pure-button WidthFull" onclick="navToHome()">BACK</button>
+   </div>   
+
+   <script>
+      loadSection1();
+      loadSection2();
+      loadSection3();
+   </script>
+</body>
+</html>
