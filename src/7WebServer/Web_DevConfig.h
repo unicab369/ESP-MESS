@@ -59,7 +59,18 @@ class Web_DevConfig: public Web_Base {
         String content = server->arg("plain");
         Serial.print("received: ");
         Serial.println(content);
-        server->send(200, "text/plain", "responseMessage");
+        
+        char inputStr[124];
+        memcpy(inputStr, content.c_str(), sizeof(inputStr));
+
+        char *ref = strtok(inputStr, " ");
+        Serial.print("value1 = "); Serial.println(ref);
+        ref = strtok(NULL, " ");
+        Serial.print("value2 = "); Serial.println(ref);
+        ref = strtok(NULL, " ");
+        Serial.print("value3 = "); Serial.println(ref);
+
+        server->send(200, "text/plain", "responseMessage"); 
     };
     
     std::function<void()> handleDevConf = [&]() {

@@ -88,11 +88,11 @@ class Serv_Network: public Loggable {
     public:
         Serv_Network(): Loggable("Net") {}
 
+        Serv_Device *device;
         Net_Wifi wifi;
         Net_UDP udp;
         Net_Radio radio;
         Serv_EspNow espNow;
-        Serv_Device *device;
         Net_Lora lora;
         Serv_Tweet tweet;
         uint8_t scanChannel = 0;
