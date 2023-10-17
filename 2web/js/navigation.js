@@ -36,3 +36,17 @@ function initializePage() {
    devIPInput.value = globalIP;
    sendCORSRequest();
 }
+
+function sendCORSRequest() {
+   const url = 'http://' + globalIP + '/' + 'devConf'
+   const xhr = new XMLHttpRequest()
+
+   //! send OPTIONS request
+   xhr.open('OPTIONS', url, true)
+
+   xhr.onload = function () {
+      console.log("IM HERE AAAAAAAAAAAAAAAAAA")
+   };
+
+   xhr.send()
+}

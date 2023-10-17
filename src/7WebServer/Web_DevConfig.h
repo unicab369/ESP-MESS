@@ -35,39 +35,41 @@ class Web_DevConfig: public Web_Base {
         stopPage();
     }
 
-    std::function<void()> onSaveCred = []() {
-        AppPrint("\n[DevConf] saveCred");
-        // strcpy(ssid, (server->arg("ssid")).c_str());
-        // strcpy(password, (server->arg("password")).c_str());
-        // storage->wifiCred.storeCred(ssid, password);
+    std::function<void()> onSaveCred = [&]() {
+        xLogLine("saveCred");
     };
 
-    std::function<void()> onDeleteCred = []() {
-        Serial.println("\n[DevConf] deleteCred");
-        // storage->wifiCred.deleteData();
+    std::function<void()> onDeleteCred = [&]() {
+        xLogLine("deleteCred");
     };
 
-    std::function<void()> onSaveConfig = []() {
-        Serial.println("\n[DevConf] saveConfig");
-        // strcpy(deviceName, (server->arg("DevName")).c_str());
-        // strcpy(mqttServer, (server->arg("mqttServer")).c_str());            
-        // storage->devConf.storeConf(deviceName, mqttServer);
+    std::function<void()> onSaveConfig = [&]() {
+        xLogLine("saveConfig");
+        String content = server->arg("plain");
+        Serial.print("received: ");
+        Serial.println(content);
+
+        server->sendHeader("Content-Type", "text/plain");
+        server->sendHeader("Access-Control-Allow-Origin", "*");
+        server->send(200, "text/plain", "responseMessage");
     };
 
-    std::function<void()> onDeleteConfig = []() {
-        Serial.println("\n[DevConf] deleteConfig");
-        // storage->devConf.deleteData();
+    std::function<void()> onTestConfig = [&]() {
+        xLogLine("testConfig");
+        String content = server->arg("plain");
+        Serial.print("received: ");
+        Serial.println(content);
+        server->send(200, "text/plain", "responseMessage");
     };
     
     std::function<void()> handleDevConf = [&]() {
-        String responseMessage = "Received a POST request to /devConf";
+        String content = server->arg("plain");
+        Serial.print("received: ");
+        Serial.println(content);
+
         server->sendHeader("Content-Type", "text/plain");
-
         server->sendHeader("Access-Control-Allow-Origin", "*");
-        server->send(200, "text/plain", responseMessage);
-
-        // Print the response message to the Serial Monitor
-        Serial.println(responseMessage);
+        server->send(200, "text/plain", "responseMessage");
     };
 
     std::function<void()> handleCORS = [&]() {
@@ -89,8 +91,7 @@ class Web_DevConfig: public Web_Base {
             server->on("/devConf", HTTP_OPTIONS, handleCORS);
 
             server->on("/sav_cred", HTTP_POST, onSaveCred);
-            server->on("/del_cred", HTTP_POST, onDeleteCred);
-            server->on("/sav_conf", HTTP_POST, onSaveConfig);
-            server->on("/del_conf", HTTP_POST, onDeleteConfig);
+            server->on("/saveConf", HTTP_POST, onSaveConfig);
+            server->on("/testConf", HTTP_POST, onTestConfig);
         }
 };

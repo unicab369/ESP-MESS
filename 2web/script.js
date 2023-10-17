@@ -4,13 +4,17 @@ function addIdCell(index, row, item) {
    cell.style.cssText = "width: 25px; text-align: center;";
 }
 
-function addInputCell(index, row, item) {
+function addInputCell(index, row, item, key) {
    const cell = row.insertCell(index);
    cell.style.cssText = 'width: 100%; display: flex;'
 
    const input = document.createElement('input');
-   input.type = 'text'
    input.style.cssText = 'font-size: 1.2rem; width: 180px; flex: .7;';
+   input.type = 'text'
+   input.value = item[key]
+   input.addEventListener('change', function(event) {
+      item[key] = input.value;   //! store update
+   })
    cell.appendChild(input)
 
    const clearBtn = document.createElement('button')
@@ -43,7 +47,7 @@ function addDropdownCell(index, row, item) {
    const select = document.createElement('select')
    select.style.cssText = 'font-size: 1.2rem;'
 
-   const options = ['OUTPUT', 'WS2812', 'SEND_MSG']
+   const options = ['NONE', 'OUTPUT', 'WS2812', 'SEND_MSG']
    options.forEach(optionText => {
       const option = document.createElement('option')
       option.text = optionText
@@ -60,33 +64,18 @@ function addDropdownCell(index, row, item) {
    cell.appendChild(select);
 }
 
-function sendCORSRequest() {
-   const url = 'http://' + globalIP + '/' + 'devConf'
-   const xhr = new XMLHttpRequest()
-
-   //! send OPTIONS request
-   xhr.open('OPTIONS', url, true)
-
-   xhr.onload = function () {
-      console.log("IM HERE AAAAAAAAAAAAAAAAAA")
-   };
-
-   xhr.send()
-}
+const url_saveConf = 'http://' + globalIP + '/' + 'saveConf'
+const url_testConf = 'http://' + globalIP + '/' + 'testConf'
 
 function sendRequest() {
    const data = {
       key1: 'val1', key2: 'val2'
    }
 
-   const url = 'http://' + globalIP + '/' + 'devConf'
-
-   fetch(url, {
+   fetch(url_conf, {
       method: 'POST',
       mode: 'no-cors',
-      headers: {
-         'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data),
    })
    .then(response => {
@@ -105,23 +94,48 @@ function sendRequest() {
    });
 }
 
+function sendConf(url, dataStr) {
+   fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/json'},
+      body: dataStr,
+   })
+   .then(response => {
+      if (!response.ok) {
+         // Check if the response status is not in the range of 200-299 (indicating an error)
+         throw new Error(`Request failed with status: ${response.status}`);
+      }
+      return response.text(); // Read the response body as text
+   })
+   .then(data => {
+      // Handle the response from the server.
+      console.log('Response data:', data);
+   })
+   .catch(error => {
+      console.error('Error:', error);
+   });
+}
 
 const mockData1 = [
-   { id: 0, name: "John", action: 'OUTPUT' },
-   { id: 1, name: "Alice", action: 'WS2812' },
-   { id: 2, name: "Bob", action:'SEND_MSG' },
+   { id: 0, action: 'OUTPUT', value1: '11', value2: '200 1' },
+   { id: 1, action: 'WS2812', value1: '22', value2: '200 0' },
+   { id: 2, action:'SEND_MSG', value1: '33', value2: '200 2' },
 ];
+
+//! Clone
+const mockData1Out = [...mockData1];
 
 function loadSection1() {
    const section = document.getElementById("section1");
    section.innerHTML = ""; // Clear previous data
-   
-   mockData1.forEach((item, index) => {
+
+   mockData1Out.forEach((item, index) => {
       const row = section.insertRow()
       row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
 
       addIdCell(0, row, item);
-      const input = addInputCell(1, row, item);
+      const input = addInputCell(1, row, item, "value1");
 
       input.addEventListener('input', function(event) {
          let inputValue = event.target.value;
@@ -130,18 +144,21 @@ function loadSection1() {
       });
 
       addDropdownCell(2, row, item);
-      addInputCell(3, row, item);
+      addInputCell(3, row, item, "value2");
+
+      const target = mockData1Out[index]
+      const dataStr = target.value1 + " " + target.action + " " + target.value2
 
       const buttonModels = [
          {
             text: 'Test', // Replace with the desired button text
             callback: function(event) {
-               sendRequest()
+               sendConf(url_testConf, dataStr)
             }
          }, {
             text: 'Save',
             callback: function(event) {
-               console.log("zzzz = " + index)
+               sendConf(url_saveConf, dataStr)
             }
          }
       ]
