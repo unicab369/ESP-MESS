@@ -3,10 +3,18 @@
 <head>
    <meta charset="UTF-8">
    <title>ESP-MESS</title>
+
+   <!--! scripts -->
    <script src="js/navigation.js"></script>
-   <script src="script.js"></script>
+   <script src="js/script.js"></script>
+   <script src="js/confTargetAction.js"></script>
+   <script src="js/confTargetMac.js"></script>
+   <script src="js/confTargetGrp.js"></script>
+
+   <!--! styles -->
    <link rel="stylesheet" type="text/css" href="css/base.css">
 </head>
+
 <body class="PageBase">
    <div style="text-align: center; height: 50px;" class="FontSize20 FontWeight500">
       CONFIGURATIONS
@@ -26,6 +34,7 @@
 
    <div style="overflow-y: auto; text-align: left;" 
             class="Border1 Flex1 Padding10 Margin10 WidthFull">
+      <!--! Target Action -->
       <table id="dataTable" class="TableBase">
          <thead>
             <tr style="background-color: orange;">
@@ -39,6 +48,7 @@
          <tbody id="section1"></tbody>
       </table>
 
+      <!--! Target Mac -->
       <div style="height: 20px;"></div>
       <table id="dataTable" class="TableBase">
          <thead>
@@ -51,6 +61,7 @@
          <tbody id="section2"></tbody>
       </table>
 
+      <!--! Target Group -->
       <div style="height: 20px;"></div>
       <table id="dataTable" class="TableBase">
          <thead>

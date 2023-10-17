@@ -41,25 +41,35 @@ Loggable TestLog("Test");
    }
 
 #elif defined(TEST_AUDIO)
+   #include "MusicDefinitions.h"
    #include "SoundData.h"
    #include "XT_DAC_Audio.h"
 
+   int8_t PROGMEM TwinkleTwinkle[] = {
+      NOTE_C5,NOTE_C5,NOTE_G5,NOTE_G5,NOTE_A5,NOTE_A5,NOTE_G5,BEAT_2,
+      NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,NOTE_D5,NOTE_C5,BEAT_2,
+      NOTE_G5,NOTE_G5,NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,BEAT_2,
+      NOTE_G5,NOTE_G5,NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,BEAT_2,
+      NOTE_C5,NOTE_C5,NOTE_G5,NOTE_G5,NOTE_A5,NOTE_A5,NOTE_G5,BEAT_2,
+      NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,NOTE_D5,NOTE_C5,BEAT_4,  
+      NOTE_SILENCE,BEAT_5,SCORE_END
+   };
+
+
    XT_Wav_Class ForceWithYou(Force);  
    XT_DAC_Audio_Class DacAudio(25,0);    // Use GPIO 25, one of the 2 DAC pins and timer 0
+   XT_MusicScore_Class Music(TwinkleTwinkle,TEMPO_ALLEGRO,INSTRUMENT_PIANO);
 
-   uint32_t DemoCounter=0;  // Just a counter to use in the serial monitor
-                              // not essential to playing the sound
-                              
    void setup() {
       Serial.begin(115200);
-
+      DacAudio.Play(&Music); 
    }
 
    void loop() {
       DacAudio.FillBuffer();                // Fill the sound buffer with data
-      if(ForceWithYou.Playing==false)       // if not playing,
-         DacAudio.Play(&ForceWithYou);       // play it, this will cause it to repeat and repeat...
-      Serial.println(DemoCounter++);        // Showing that the sound will play as well as your code running here.
+      // if(ForceWithYou.Playing==false)       // if not playing,
+      //    // DacAudio.Play(&ForceWithYou);       // play it, this will cause it to repeat and repeat...
+      //    DacAudio.Play(&Music); 
    }
 
 #elif defined(TEST_BEHAVIOR)
