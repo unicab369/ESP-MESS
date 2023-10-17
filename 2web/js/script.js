@@ -64,9 +64,6 @@ function addDropdownCell(index, row, item) {
    cell.appendChild(select);
 }
 
-const url_saveConf = 'http://' + globalIP + '/' + 'saveConf'
-const url_testConf = 'http://' + globalIP + '/' + 'testConf'
-
 function sendRequest() {
    const data = {
       key1: 'val1', key2: 'val2'
@@ -106,14 +103,15 @@ function sendConf(url, dataStr) {
          // Check if the response status is not in the range of 200-299 (indicating an error)
          throw new Error(`Request failed with status: ${response.status}`);
       }
-      return response.text(); // Read the response body as text
+      return response.json(); // Read the response body as text
    })
    .then(data => {
       // Handle the response from the server.
       console.log('Response data:', data);
    })
    .catch(error => {
-      console.error('Error:', error);
+      // console.error('Error:', error);
+      console.log(error)
    });
 }
 

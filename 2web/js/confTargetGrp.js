@@ -1,3 +1,5 @@
+const url_saveGroup = 'http://' + globalIP + '/' + 'saveGroup'
+
 const mockData3 = [
    { id: 0, value1: "aaaaaaaaaa" },
    { id: 1, value1: "bbbbbbbbbb" },
@@ -11,6 +13,9 @@ const mockData3 = [
 const mockData3Out = [...mockData3]
 
 function loadSection3() {
+   const section3 = document.getElementById("section3");
+   section3.innerHTML = ""; // Clear previous data
+
    mockData3.forEach((item, index) => {
       const row = section3.insertRow();
       row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
@@ -27,7 +32,7 @@ function loadSection3() {
          {
             text: 'Save', // Replace with the desired button text
             callback: function(event) {
-               alert("IM HERE 1");
+               sendConf(url_saveGroup, dataStr)
             }
          }
       ]

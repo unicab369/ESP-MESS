@@ -1,3 +1,6 @@
+const url_saveConf = 'http://' + globalIP + '/' + 'saveConf'
+const url_testConf = 'http://' + globalIP + '/' + 'testConf'
+
 const mockData1 = [
    { id: 0, action: 'OUTPUT', value1: '11', value2: '200 1' },
    { id: 1, action: 'WS2812', value1: '22', value2: '200 0' },

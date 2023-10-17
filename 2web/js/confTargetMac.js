@@ -1,3 +1,5 @@
+const url_saveMac = 'http://' + globalIP + '/' + 'saveMac'
+
 const mockData2 = [
    { id: 0, value1: "AA:AA:AA:AA:AA:01" },
    { id: 1, value1: "AA:AA:AA:AA:AA:02" },
@@ -11,6 +13,9 @@ const mockData2 = [
 const mockData2Out = [...mockData2];
 
 function loadSection2() {
+   const section2 = document.getElementById("section2");
+   section2.innerHTML = ""; // Clear previous data
+
    mockData2Out.forEach((item, index) => {
       const row = section2.insertRow();
       row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
@@ -42,7 +47,7 @@ function loadSection2() {
          {
             text: 'Save', // Replace with the desired button text
             callback: function(event) {
-               alert("IM HERE 1");
+               sendConf(url_saveMac, dataStr)
             }
          }
       ]
