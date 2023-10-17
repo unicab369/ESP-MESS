@@ -75,6 +75,15 @@ void AppPrintHeap() {
     AppPrint("\n[FreeHeap]", freeHeap);
 }
 
+//! check if mac and compareMac is the same otherwise check if mac is not zeroes
+bool AppCheckMac(const uint8_t* mac, uint8_t* compareMac = NULL) {
+    if (compareMac) {
+        return memcmp(mac, compareMac, 6) == 0;
+    } else {
+        return memcmp(mac, (uint8_t[]){ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, 6) != 0;
+    }
+}
+
 #define INVALID_UINT8 255
 
 #include "TimeoutItem.h"

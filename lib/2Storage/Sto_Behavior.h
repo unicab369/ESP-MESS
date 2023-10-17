@@ -76,9 +76,9 @@ struct PeerItem {
 
    PeerItem() {}
    
-   PeerItem(const uint8_t macVal[6], uint64_t time = 0) {
+   PeerItem(const uint8_t macVal[6], uint64_t id = 0) {
       memcpy(mac, macVal, sizeof(mac));
-      builtTime = time;
+      peerId = id;
    }
 
    //! isValid if peerId is not 255 && mac is not 00:00:00:00:00:00
@@ -116,6 +116,13 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
             item->printRaw();
             Serial.println();
          });
+      }
+
+      uint8_t insertPeer(uint8_t* peerMac, uint8_t index) {
+         PeerItem newPeer(peerMac, index);
+         newPeer.builtTime = 0x1122334455667788;
+         updateData(index, &newPeer);
+         printAllPeers();
       }
 
       uint8_t addPeer(uint8_t* peerMac) {

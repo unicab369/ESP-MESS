@@ -41,7 +41,7 @@ function loadSection2() {
       });
 
       const target = mockData2Out[index]
-      const dataStr = target.value1
+      const dataStr = index + " " + target.value1
 
       const buttonModels = [
          {

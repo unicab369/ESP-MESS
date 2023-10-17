@@ -110,8 +110,7 @@ function sendConf(url, dataStr) {
       console.log('Response data:', data);
    })
    .catch(error => {
-      // console.error('Error:', error);
-      console.log(error)
+      console.error(error);
    });
 }
 

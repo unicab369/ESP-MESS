@@ -111,7 +111,7 @@ class Serv_Network: public Loggable {
         }
 
         void resetWifi() {
-            xLog(__func__);
+            xLogLine(__func__);
             state = NETWORK_START;
             EEPROM_Extractor<WiFiCred> cred = device->storage.stoCred;
             retryCnt = 15;

@@ -125,6 +125,7 @@ class Mng_Storage: public Loggable {
       EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [32 - 130/136]
       EEPROM_Extractor<DevConf> stoConf;     //! length 42 [136 - 178/184]
 
+      Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
       Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
       Sto_SD sd1;
@@ -141,6 +142,8 @@ class Mng_Storage: public Loggable {
 
          stoCred.load(32);
          stoConf.load(136);
+         stoPeer.load(192);
+
          // stoBehavior.reloadData();
 
          // littleFS.begin();

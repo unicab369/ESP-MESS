@@ -74,7 +74,7 @@ class Web_DevConfig: public Web_Base {
         Serial.print("value3 = "); Serial.println(ref);
 
         server->send(200, "application/json", "{\"ok\": true}"); 
-    };
+    }; 
     
     //! devConf
     std::function<void()> handleDevConf = [&]() {
@@ -103,15 +103,16 @@ class Web_DevConfig: public Web_Base {
         char* chars = (char*)content.c_str();
         xLogLinef("onSaveMac Received = %s", chars);
 
-        uint8_t myChar[6];
-        int i = 0;
-        char* token = strtok(chars, ":");
-        while (token != NULL && i < 6) {
-            myChar[i++] = (uint8_t)strtol(token, NULL, 16);
-            token = strtok(NULL, ":");      // Split the string into tokens based on ":"
+        uint8_t intValue;
+        uint8_t mac[6];
+        int result = sscanf(chars, "%hhu %2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx", 
+                    &intValue, &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
+        xLogf("IntValue = %hhu, result = %u", intValue, result);
+
+        if (result==7 && AppCheckMac(mac)) {
+            network->device->storage.stoPeer.insertPeer(mac, intValue);
         }
 
-        xLogStatus("ValidFormat", i==6);
         server->send(200, "application/json", "{\"ok\": true}"); 
     };
 

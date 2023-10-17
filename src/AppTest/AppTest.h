@@ -7,7 +7,7 @@
 // #define TEST_PCA96
 #define TEST_BEHAVIOR True
 // #define TEST_PWM True
-#define TEST_AUDIO True
+// #define TEST_AUDIO True
 
 Loggable TestLog("Test"); 
 

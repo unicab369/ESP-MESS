@@ -9,7 +9,7 @@ class Serv_Behavior {
 		}
 
 		void deleteData() {
-			stoPeer.deleteData();
+			// stoPeer.deleteData();
 			stoBehav.deleteData();
 		}
 
