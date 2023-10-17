@@ -7,6 +7,7 @@
 // #define TEST_PCA96
 #define TEST_BEHAVIOR True
 // #define TEST_PWM True
+#define TEST_AUDIO True
 
 Loggable TestLog("Test"); 
 
@@ -37,6 +38,28 @@ Loggable TestLog("Test");
 
    void loop() {
       pca96z.test();
+   }
+
+#elif defined(TEST_AUDIO)
+   #include "SoundData.h"
+   #include "XT_DAC_Audio.h"
+
+   XT_Wav_Class ForceWithYou(Force);  
+   XT_DAC_Audio_Class DacAudio(25,0);    // Use GPIO 25, one of the 2 DAC pins and timer 0
+
+   uint32_t DemoCounter=0;  // Just a counter to use in the serial monitor
+                              // not essential to playing the sound
+                              
+   void setup() {
+      Serial.begin(115200);
+
+   }
+
+   void loop() {
+      DacAudio.FillBuffer();                // Fill the sound buffer with data
+      if(ForceWithYou.Playing==false)       // if not playing,
+         DacAudio.Play(&ForceWithYou);       // play it, this will cause it to repeat and repeat...
+      Serial.println(DemoCounter++);        // Showing that the sound will play as well as your code running here.
    }
 
 #elif defined(TEST_BEHAVIOR)

@@ -76,7 +76,7 @@ class Mng_Config: public PinConfig, public Loggable {
                 out0 = 5;        // sdCard CS
                 out1 = 27;       // display CS
                 out2 = 26;       // display AO
-                out3 = 25;       // display backlight
+                // out3 = 25;       // display backlight
 
             #else
                 xLogSection("DIRECTIVE = ESP8266");
