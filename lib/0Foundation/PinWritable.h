@@ -40,12 +40,11 @@ class PWMWritable: public PinWritable {
     public:
         void setup(uint8_t pin, bool _inverted = false) {
             inverted = _inverted;
+            begin(pin, inverted);
 
             #ifdef ESP32
                 ledcSetup(ledChannel, freq, resolution);
                 ledcAttachPin(pin, ledChannel);
-            #else
-                setup(pin, inverted);
             #endif
         }
 

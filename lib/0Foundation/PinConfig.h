@@ -50,11 +50,8 @@ class PinConfig {
             // xSerial.setup(conf->swRx, conf->swTx);
 
             irSwitch.load(irSwitchp);
-
             edgeDetector.setup(pir1);
-
             button1.setup(btn1);
-
             rotary.setup(rotaryA, rotaryB);
         }
 

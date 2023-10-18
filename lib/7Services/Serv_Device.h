@@ -45,6 +45,7 @@ class Serv_Device: public Loggable, public Serv_Serial, public Mng_Config {
                 // network.handleSingleClick();
                 if (onHandleSingleClick) (*onHandleSingleClick)();
                 toggleRelay();
+                led.toggle();
 
                 // servDev.buzzer.toggle();
                 // led.toggle();
@@ -115,33 +116,13 @@ class Serv_Device: public Loggable, public Serv_Serial, public Mng_Config {
 
         virtual void showLadderId() {}
 
-        // Mng_Config conf;
-
         void configure() {
             setup();
-            // conf.setup();
-            // conf.setupIOs();
-
-            // led.setup(conf.led1);
-            // led.uniformPluse1000ms();
-            // relay1.begin(conf.relay1);
-
-            // // buzzer.setup(conf->buzzer1);
-            // ws2812.setup(conf.ws2812);
-            // // xSerial.setup(conf->swRx, conf->swTx);
-
             setupSerial(this);
 
-            // irSwitch.load(conf.irSwitch);
             irSwitch.callback = &irSwitchCb;
-
-            // edgeDetector.setup(conf.pir1);
             edgeDetector.callback = &pirCb;
-
-            // button1.setup(conf.btn1);
             button1.callback = &buttonCb;
-
-            // rotary.setup(conf.rotaryA, conf.rotaryB);
             rotary.onCallback = &rotaryCb;
             serial.onParseString = &storeCredCb;
         }
