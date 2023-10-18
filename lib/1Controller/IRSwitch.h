@@ -2,19 +2,18 @@
 #define IR_RECEIVE_THRESDHOLD 50
 
 class IRSwitch {
-    std::function<void(bool, uint32_t)> *callback;
     IRsend irSender;
     uint8_t pin;
     unsigned long timeRef = 0;
 
     public:
+        std::function<void(bool, uint32_t)> *callback;
         uint16_t receiveCounter = 0;
 
-        void load(uint8_t _pin, std::function<void(bool, uint32_t)> *cb) {
+        void load(uint8_t _pin) {
             Serial.print("[IR] "); Serial.println(__func__);
             if (_pin == 255) { return; }
             pin = _pin,
-            callback = cb;
             resetIR();
         }
 

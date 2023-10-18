@@ -30,8 +30,6 @@ class MyButton: private PinReadable, public Loggable {
     TimeoutItem press_timer;
     BNT_Hold holdStatus = HOLD_TRANSITION;
 
-    std::function<void(BTN_Action, BNT_Hold, uint32_t)> *callback;
-
     void reset_timers(BNT_State newState) {
         debounce_timer.reset();
         click_timer.reset();
@@ -56,16 +54,17 @@ class MyButton: private PinReadable, public Loggable {
     }
 
     public:
+        std::function<void(BTN_Action, BNT_Hold, uint32_t)> *callback;
+
         MyButton(): Loggable("Bnt") {}
 
-        void setup(uint8_t pin, std::function<void(BTN_Action, BNT_Hold, uint32_t)> *cb, uint32_t debounceTicks = 50, 
+        void setup(uint8_t pin, uint32_t debounceTicks = 50, 
                             uint32_t clickTicks = 200, uint32_t longPressTicks = 2000) {
             pin_setup(pin, true);
             if (!isValid()) { return; }
             debounce_timer.load(debounceTicks);
             click_timer.load(clickTicks-debounceTicks);
             press_timer.load(longPressTicks);
-            callback = cb;
         }
 
         void run() {

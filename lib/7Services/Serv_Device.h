@@ -113,7 +113,6 @@ class Serv_Device: public Loggable, public Serv_Serial {
         PinWritable relay1;
         RotaryEncoder rotary;
         SerialControl serial;
-        // Serv_Behavior servBehav;
             
         std::function<void()> *onHandleSingleClick;
         std::function<void()> *onHandleDoubleClick;
@@ -125,8 +124,6 @@ class Serv_Device: public Loggable, public Serv_Serial {
         virtual void showLadderId() {}
 
         void configure(PinConfig* conf) {
-            // servBehav.setup();
-            
             led.setup(conf->led1);
             led.uniformPluse1000ms();
             relay1.begin(conf->relay1);
@@ -137,9 +134,14 @@ class Serv_Device: public Loggable, public Serv_Serial {
 
             setupSerial(conf);
 
-            irSwitch.load(conf->irSwitch, &irSwitchCb);
-            edgeDetector.setup(conf->pir1, &pirCb);
-            button1.setup(conf->btn1, &buttonCb);
+            irSwitch.load(conf->irSwitch);
+            irSwitch.callback = &irSwitchCb;
+
+            edgeDetector.setup(conf->pir1);
+            edgeDetector.callback = &pirCb;
+
+            button1.setup(conf->btn1);
+            button1.callback = &buttonCb;
 
             rotary.setup(conf->rotaryA, conf->rotaryB);
             rotary.onCallback = &rotaryCb;
@@ -205,13 +207,5 @@ class Serv_Device: public Loggable, public Serv_Serial {
 
         void runMainTask2() {
             rotary.run();
-        }
-
-        void setFrequency() {
-            #ifdef ESP32
-                // system_update_cpu_freq(80);
-            #else
-                
-            #endif
         }
 };

@@ -50,14 +50,13 @@ class EdgeDetector: private PinReadable {
     uint32_t timeRef;
     uint32_t retriggerTimeout;        // trigger again on active HIGH
     bool didReset = false;
-    std::function<void(bool, uint8_t)> *callback;
 
     public:
+        std::function<void(bool, uint8_t)> *callback;
+
         EdgeDetector(): PinReadable() {}
         
-        void setup(uint8_t _pin, std::function<void(bool, uint8_t)> *cb, 
-                uint32_t cooldown = 1000, uint32_t retrigger = 5000) {
-            callback = cb;
+        void setup(uint8_t _pin, uint32_t cooldown = 1000, uint32_t retrigger = 5000) {
             retriggerTimeout = retrigger;
             cooldown_timer.load(cooldown);
             pin_setup(_pin);
