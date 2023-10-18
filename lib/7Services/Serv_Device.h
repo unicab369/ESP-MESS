@@ -180,6 +180,13 @@ class Serv_Device: public Loggable, public Serv_Serial {
             // storage.stoBehavior.handleCue(item->cue);
         }
 
+        void handleAction(ControlOutput action) {
+            if (action.pin == 200) {
+                led.stop();
+                led.toggle();
+            }
+        }
+
         void toggleRelay() {
             relay1.toggle();
         }

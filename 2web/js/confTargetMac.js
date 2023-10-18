@@ -5,23 +5,18 @@ const mockData2 = [
    { id: 1, value1: "AA:AA:AA:AA:AA:02" },
    { id: 2, value1: "AA:AA:AA:AA:AA:03" },
    { id: 3, value1: "" },
-   { id: 4, value1: ""  },
-   { id: 5, value1: "" },
 ];
 
 //! Clone
 const mockData2Out = [...mockData2];
 
 function loadSection2() {
-   const section2 = document.getElementById("section2");
-   section2.innerHTML = ""; // Clear previous data
+   const section = new PageSection("section2")
 
    mockData2Out.forEach((item, index) => {
-      const row = section2.insertRow();
-      row.style.cssText = 'height: 30px; width: 100%; background-color: green;'
-
-      addIdCell(0, row, item);
-      const input = addInputCell(1, row, item, "value1");
+      section.insertRow()
+      section.addIdCell(item)
+      const input = section.addInputCell(item, "value1")
       input.placeholder = '00:00:00:00:00:00';
 
       input.addEventListener('input', function (event) {
@@ -29,29 +24,29 @@ function loadSection2() {
          let filter = inputValue.replace(/:/g, ''); // Remove existing colons
          filter = inputValue.replace(/[^0-9A-Fa-f]/g, '');
          const sanitizedValue = filter.split('').map((char, index) => {
-            if (index > 0 && index % 2 === 0) { return `:${char}`; }
-            return char;
-         }).join('');
+            if (index > 0 && index % 2 === 0) { return `:${char}` }
+            return char
+         }).join('')
    
          // Update the input field with the formatted value
-         event.target.value = sanitizedValue.slice(0, 17).toUpperCase();
+         event.target.value = sanitizedValue.slice(0, 17).toUpperCase()
+         mockData2Out[index].value1 = target.value
 
-         const isValid = /^[0-9a-fA-F:]*$/.test(inputValue);
-         input.style.backgroundColor = isValid ? '' : 'red';
+         const isValid = /^[0-9a-fA-F:]*$/.test(inputValue)
+         input.style.backgroundColor = isValid ? '' : 'red'
       });
-
-      const target = mockData2Out[index]
-      const dataStr = index + " " + target.value1
 
       const buttonModels = [
          {
             text: 'Save', // Replace with the desired button text
             callback: function(event) {
+               const target = mockData2Out[index]
+               const dataStr = index + " " + target.value1
                sendConf(url_saveMac, dataStr)
             }
          }
       ]
 
-      addButtonsCell(2, row, buttonModels);
+      section.addButtonsCell(buttonModels)
    }); 
 }

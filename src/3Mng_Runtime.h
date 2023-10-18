@@ -170,10 +170,10 @@ class Mng_Runtime: public Loggable {
 // - broadcast channel
 
 // PIR Multi            (4)
-//! ESPNow, behavior     (3)
 // handler:
 // x toggle pin
 // ws2812 output
 // buzzer
 
-//! Update Webserver
+//! ESPNow, behavior     (3)
+//! Manage pins

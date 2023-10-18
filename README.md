@@ -10,12 +10,22 @@ src/1Configs/Conf_User.h:
 #define MY_SSID "YOUR_WIFI_SSID"
 #define MY_PASS "YOUR_WIFI_PASSWORD"
 
+# npm install
+https://nodejs.org/en
+cmd: npm install -g live-server
+cmd: live-server
+Run PowerShell as Administrator
+cmd: Set-ExecutionPolicy Unrestricted
+answer: Y
+
 # plugins
 
 PlatformIO IDE
 Better Comments
 REST Client
 Serial Monitor
+Live Preview
+Live Server
 
 # General Shortcuts
 Ctrl+C/V: Copy/Paste

@@ -80,7 +80,8 @@ bool AppCheckMac(const uint8_t* mac, uint8_t* compareMac = NULL) {
     if (compareMac) {
         return memcmp(mac, compareMac, 6) == 0;
     } else {
-        return memcmp(mac, (uint8_t[]){ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, 6) != 0;
+        uint8_t macInvalid[6];
+        return memcmp(mac, macInvalid, 6) != 0;
     }
 }
 

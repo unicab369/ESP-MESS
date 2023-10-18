@@ -74,6 +74,7 @@ class ControlWS2812 {
          value = valueVal;
       }
 
+
       bool extract(BehaviorItem* behav) {
          behav->produce(this);
          return actionCmd == ACTION_WS2812;

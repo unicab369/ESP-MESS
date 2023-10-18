@@ -48,33 +48,6 @@ class Web_DevConfig: public Web_Base {
 
         server->send(200, "application/json", "{\"ok\": true}"); 
     };
-
-    //! saveConf
-    std::function<void()> onSaveConfig = [&]() {
-        String content = server->arg("plain");
-        char* chars = (char*)content.c_str();
-        xLogLinef("onSaveConfig Received = %s", chars);
-
-        server->sendHeader("Content-Type", "text/plain");
-        server->sendHeader("Access-Control-Allow-Origin", "*");
-        server->send(200, "application/json", "{\"ok\": true}"); 
-    };
-
-    //! testConf
-    std::function<void()> onTestConfig = [&]() {
-        String content = server->arg("plain");
-        char* chars = (char*)content.c_str();
-        xLogLinef("onTestConfig Received = %s", chars);
-
-        char *ref = strtok(chars, " ");
-        Serial.print("value1 = "); Serial.println(ref);
-        ref = strtok(NULL, " ");
-        Serial.print("value2 = "); Serial.println(ref);
-        ref = strtok(NULL, " ");
-        Serial.print("value3 = "); Serial.println(ref);
-
-        server->send(200, "application/json", "{\"ok\": true}"); 
-    }; 
     
     //! devConf
     std::function<void()> handleDevConf = [&]() {
@@ -125,6 +98,52 @@ class Web_DevConfig: public Web_Base {
         server->send(200, "application/json", "{\"ok\": true}"); 
     };
 
+    //! saveConf
+    std::function<void()> onSaveConfig = [&]() {
+        String content = server->arg("plain");
+        char* chars = (char*)content.c_str();
+        xLogLinef("onSaveConfig Received = %s", chars);
+
+        server->sendHeader("Content-Type", "text/plain");
+        server->sendHeader("Access-Control-Allow-Origin", "*");
+        server->send(200, "application/json", "{\"ok\": true}"); 
+    };
+
+    //! testConf
+    std::function<void()> onTestConfig = [&]() {
+        String content = server->arg("plain");
+        char* chars = (char*)content.c_str();
+        xLogLinef("onTestConfig Received = %s", chars);
+
+        uint8_t targetId;
+        char action[20];
+        uint8_t pinCode;
+        uint8_t pinValue;
+        
+        int result = sscanf(chars, "%hhu %19s %hhu %hhu", &targetId, &action, &pinCode, &pinValue);
+
+        if (result == 4) {
+            xLog("IM HERE mmmmmmmmmmmm");
+            xLog(action);
+
+            if (strcmp(action, "OUTPUT") == 0) {
+                ControlOutput output(pinCode, pinValue);
+                network->device->handleAction(output);
+            } 
+            else if (strcmp(action, "WS2812") == 0) {
+                ControlWS2812 output(pinCode, pinValue);
+            }
+            else if (strcmp(action, "PUBLISH") == 0) {
+
+            }
+            else {
+                //! delete
+            }
+        }
+
+        server->send(200, "application/json", "{\"ok\": true}"); 
+    }; 
+    
     public:
         Web_DevConfig(): Web_Base("Web_Contr") {}
 

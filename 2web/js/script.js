@@ -1,68 +1,67 @@
-function addIdCell(index, row, item) {
-   const cell = row.insertCell(index);
-   cell.textContent = item.id;
-   cell.style.cssText = "width: 25px; text-align: center;";
-}
+// function addIdCell(index, row, item) {
+//    const cell = row.insertCell(index);
+//    cell.textContent = item.id;
+//    cell.style.cssText = "width: 25px; text-align: center;";
+// }
 
-function addInputCell(index, row, item, key) {
-   const cell = row.insertCell(index);
-   cell.style.cssText = 'width: 100%; display: flex;'
+// function addInputCell(index, row, item, key) {
+//    const cell = row.insertCell(index);
+//    cell.style.cssText = 'width: 100%; display: flex;'
 
-   const input = document.createElement('input');
-   input.style.cssText = 'font-size: 1.2rem; width: 180px; flex: .7;';
-   input.type = 'text'
-   input.value = item[key]
-   input.addEventListener('change', function(event) {
-      item[key] = input.value;   //! store update
-   })
-   cell.appendChild(input)
+//    const input = document.createElement('input');
+//    input.style.cssText = 'font-size: 1.2rem; width: 180px; flex: .7;';
+//    input.type = 'text'
+//    input.value = item[key]
+//    input.addEventListener('change', function(event) {
+//       item[key] = input.value;   //! store update
+//    })
+//    cell.appendChild(input)
 
-   const clearBtn = document.createElement('button')
-   clearBtn.textContent = 'x'
-   clearBtn.style.cssText = 'font-size: 1.2rem; width: 30px;'
-   clearBtn.addEventListener('click', function(event) {
-      input.value = "";   
-   })
-   cell.appendChild(clearBtn)
+//    const clearBtn = document.createElement('button')
+//    clearBtn.textContent = 'x'
+//    clearBtn.style.cssText = 'font-size: 1.2rem; width: 30px;'
+//    clearBtn.addEventListener('click', function(event) {
+//       input.value = "";   
+//    })
+//    cell.appendChild(clearBtn)
    
-   return input;
-}
+//    return input;
+// }
 
-function addButtonsCell(index, row, models) {
-   const cell = row.insertCell(index);
-   cell.style.cssText = 'width: 100px;'
+// function addButtonsCell(index, row, models) {
+//    const cell = row.insertCell(index);
+//    cell.style.cssText = 'width: 100px;'
 
-   models.forEach((item) => {
-      const button = document.createElement('button')
-      button.textContent = item.text; // Set the button text
-      button.addEventListener('click', item.callback)
-      cell.appendChild(button)
-   })
-}
+//    models.forEach((item) => {
+//       const button = document.createElement('button')
+//       button.textContent = item.text; // Set the button text
+//       button.addEventListener('click', item.callback)
+//       cell.appendChild(button)
+//    })
+// }
 
-function addDropdownCell(index, row, item) {
-   const cell = row.insertCell(index);
-   cell.style.cssText = 'width: 100px;'
+// function addDropdownCell(index, row, item, options) {
+//    const cell = row.insertCell(index);
+//    cell.style.cssText = 'width: 100px;'
 
-   const select = document.createElement('select')
-   select.style.cssText = 'font-size: 1.2rem;'
+//    const select = document.createElement('select')
+//    select.style.cssText = 'font-size: 1.2rem;'
 
-   const options = ['NONE', 'OUTPUT', 'WS2812', 'SEND_MSG']
-   options.forEach(optionText => {
-      const option = document.createElement('option')
-      option.text = optionText
-      option.selected = option.text == item.action
-      select.add(option);
-   });
+//    options.forEach(optionText => {
+//       const option = document.createElement('option')
+//       option.text = optionText
+//       option.selected = option.text == item.action
+//       select.add(option);
+//    });
 
-   // Add an event listener to the select element to track changes
-   select.addEventListener('change', function() {
-      item.action = select.value
-      console.log(item)
-   });
+//    // Add an event listener to the select element to track changes
+//    select.addEventListener('change', function() {
+//       item.action = select.value
+//       console.log(item)
+//    });
 
-   cell.appendChild(select);
-}
+//    cell.appendChild(select);
+// }
 
 function sendRequest() {
    const data = {
@@ -92,6 +91,7 @@ function sendRequest() {
 }
 
 function sendConf(url, dataStr) {
+   console.log("IM HERE " + url)
    fetch(url, {
       method: 'POST',
       mode: 'no-cors',
@@ -114,6 +114,95 @@ function sendConf(url, dataStr) {
    });
 }
 
+
+class PageSection {
+   constructor(id) {
+      this.section = document.getElementById(id)
+      this.section.innerHTML = ""
+   }
+
+   insertRow() {
+      this.row = this.section.insertRow()
+      this.row.style.cssText = 'height: 50px; width: 100%; background-color: green;'
+      this.cellIndex = 0
+   }
+
+   insertCell() {
+      const cell = this.row.insertCell(this.cellIndex)
+      this.cellIndex++
+      return cell
+   }
+
+   addIdCell(item) {
+      const cell = this.insertCell()
+      cell.textContent = item.id
+      cell.style.cssText = "width: 30px; text-align: center; font-size: 2rem;"
+   }
+
+   addButtonsCell(models) {
+      const cell = this.insertCell()
+   
+      models.forEach((item) => {
+         const button = document.createElement('button')
+         button.style.cssText = 'font-size: 2rem;'
+         button.textContent = item.text; // Set the button text
+         button.addEventListener('click', item.callback)
+         cell.appendChild(button)
+      })
+   }
+
+   addInputCell(item, key, width = '350px') {
+      const cell = this.insertCell()
+      cell.style.cssText = 'height: 100%;'
+   
+      const input = document.createElement('input');
+      input.style.cssText = 'font-size: 2rem; heigh: 100%; width: ' + width;
+      input.type = 'text'
+      input.value = item[key]
+      input.addEventListener('change', function(event) {
+         item[key] = input.value;   //! store update
+      })
+
+      const container = document.createElement('div');
+      container.style.cssText = "height: 100%;"
+      container.appendChild(input);
+      cell.appendChild(container)
+   
+      const clearBtn = document.createElement('button')
+      clearBtn.textContent = 'x'
+      clearBtn.style.cssText = 'font-size: 2rem; width: 30px;'
+      clearBtn.addEventListener('click', function(event) {
+         input.value = ""
+      })
+      container.appendChild(clearBtn)
+
+      return input
+   }
+
+   addDropdownCell(item, key, options) {
+      const cell = this.insertCell()
+      cell.style.cssText = 'width: 150px;'
+      
+      const select = document.createElement('select')
+      select.style.cssText = 'font-size: 1.5rem;'
+      select.className = "SizeFull"
+   
+      options.forEach(optionText => {
+         const option = document.createElement('option')
+         option.text = optionText
+         option.selected = optionText == item[key]
+         select.add(option);
+      });
+   
+      // Add an event listener to the select element to track changes
+      select.addEventListener('change', function() {
+         item[key] = select.value
+         console.log(item)
+      });
+   
+      cell.appendChild(select);
+   }
+}
 
 
 
