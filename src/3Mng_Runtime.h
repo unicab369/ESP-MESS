@@ -1,4 +1,3 @@
-#include "Mng_Config.h"
 #include "4Mng_Network.h"
 
 #ifndef ESP32 
@@ -111,14 +110,11 @@ class Mng_Runtime: public Loggable {
         Serv_Device device;
         Mng_Network network;
         Mng_Power power;
-        Mng_Config config;
 
         void setup() {
             xLog(__func__);
 
-            config.setup();
-            device.configure(&config);
-
+            device.configure();
             device.onHandleSingleClick = &onHandleSingleClick;
             device.onHandleDoubleClick = &onHandleDoubleClick;
             device.onHandleAPRequest = &onHandleAPRequest;

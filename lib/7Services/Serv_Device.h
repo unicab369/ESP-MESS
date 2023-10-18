@@ -1,7 +1,8 @@
 // #define TTGO_LORA32 true
 // #define DEV_KMC_70011 1
+#include "Mng_Config.h"
 
-class Serv_Device: public Loggable, public Serv_Serial {
+class Serv_Device: public Loggable, public Serv_Serial, public Mng_Config {
     //! iR Switch Callback
     std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
         String output = "IrRead = " + (status ? String(value) : "Locked");
@@ -103,15 +104,6 @@ class Serv_Device: public Loggable, public Serv_Serial {
     public:
         Serv_Device(): Loggable("Dev"), Serv_Serial() {}
 
-        WS28xx ws2812;
-        MyButton button1;
-        IRSwitch irSwitch;
-        EdgeDetector edgeDetector;
-        ExtraSerial xSerial;
-
-        PulseController led, buzzer;
-        PinWritable relay1;
-        RotaryEncoder rotary;
         SerialControl serial;
             
         std::function<void()> *onHandleSingleClick;
@@ -123,27 +115,33 @@ class Serv_Device: public Loggable, public Serv_Serial {
 
         virtual void showLadderId() {}
 
-        void configure(PinConfig* conf) {
-            led.setup(conf->led1);
-            led.uniformPluse1000ms();
-            relay1.begin(conf->relay1);
+        // Mng_Config conf;
 
-            // buzzer.setup(conf->buzzer1);
-            ws2812.setup(conf->ws2812);
-            // xSerial.setup(conf->swRx, conf->swTx);
+        void configure() {
+            setup();
+            // conf.setup();
+            // conf.setupIOs();
 
-            setupSerial(conf);
+            // led.setup(conf.led1);
+            // led.uniformPluse1000ms();
+            // relay1.begin(conf.relay1);
 
-            irSwitch.load(conf->irSwitch);
+            // // buzzer.setup(conf->buzzer1);
+            // ws2812.setup(conf.ws2812);
+            // // xSerial.setup(conf->swRx, conf->swTx);
+
+            setupSerial(this);
+
+            // irSwitch.load(conf.irSwitch);
             irSwitch.callback = &irSwitchCb;
 
-            edgeDetector.setup(conf->pir1);
+            // edgeDetector.setup(conf.pir1);
             edgeDetector.callback = &pirCb;
 
-            button1.setup(conf->btn1);
+            // button1.setup(conf.btn1);
             button1.callback = &buttonCb;
 
-            rotary.setup(conf->rotaryA, conf->rotaryB);
+            // rotary.setup(conf.rotaryA, conf.rotaryB);
             rotary.onCallback = &rotaryCb;
             serial.onParseString = &storeCredCb;
         }

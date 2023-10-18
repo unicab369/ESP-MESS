@@ -3,13 +3,11 @@
 // #define DEV_KMC_70011 1
 
 
-class Mng_Config: public PinConfig, public Loggable {
+class Mng_Config: public PinConfig {
     public:
-        Mng_Config(): Loggable("Mng_Conf") {}
-
         void setup() {
             #ifdef TTGO_LORA32
-                xLogSection("DIRECTIVE = TTGO_LORA32");
+                // xLogSection("DIRECTIVE = TTGO_LORA32");
                 // pinMode(16, OUTPUT);
                 // digitalWrite(16, HIGH);
                 // delay(20);
@@ -38,8 +36,7 @@ class Mng_Config: public PinConfig, public Loggable {
                 relay1 = 14;
 
             #elif ESP32
-                xLogSection("DIRECTIVE = ESP32");
-                // xLogSec("[DIRECTIVE]", "ESP32");
+                // xLogSection("DIRECTIVE = ESP32");
                 // use for disp0
                 // pinMode(5, OUTPUT);
                 // pinMode(18, OUTPUT);
@@ -54,7 +51,7 @@ class Mng_Config: public PinConfig, public Loggable {
                 // btn1 = 23;
                 // buzzer1 = 19;
 
-                ws2812 = 12;
+                ws2812p = 12;
                 led1 = 22;
                 btn1 = 34;
                 buzzer1 = 14;
@@ -79,7 +76,7 @@ class Mng_Config: public PinConfig, public Loggable {
                 out3 = 25;       // display backlight
 
             #else
-                xLogSection("DIRECTIVE = ESP8266");
+                // xLogSection("DIRECTIVE = ESP8266");
                 
                 // D0: 16, D1: 5, D2: 4, D3: 0, D4: 2, D5: 14, D6: 12, D7: 13, D8: 15
                 // sda0 = 4; scl0 = 5;
@@ -93,6 +90,8 @@ class Mng_Config: public PinConfig, public Loggable {
                 // SPI.pins(14, 12, 13, 15);
                 // SPI.begin();
                 // swRx = 14; swTx = 12;
-            #endif            
+            #endif
+
+            setupIOs();        
         }
 };

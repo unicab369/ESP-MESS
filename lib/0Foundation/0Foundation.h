@@ -91,7 +91,6 @@ bool AppCheckMac(const uint8_t* mac, uint8_t* compareMac = NULL) {
 TimerItem appTimer0;
 
 #include "Structs.h"
-#include "PinConfig.h"
 #include "IntCycle.h"
 #include "PinWritable.h"
 #include "Button.h"         // need TimeoutItem.h
@@ -107,4 +106,6 @@ TimerItem appTimer0;
 #include "2Storage.h"
 #include "SerialControl.h"
 #include "4Display.h"
+
+#include "PinConfig.h"
 #include <7Services.h>
