@@ -76,21 +76,21 @@ class PCA96Controller {
                 pwm.setPWM(servonum, 0, pulselen);
             }
 
-            delay(1000);
+            delay(500);
 
-            // Drive each servo one at a time using writeMicroseconds(), it's not precise due to calculation rounding!
-            // The writeMicroseconds() function is used to mimic the Arduino Servo library writeMicroseconds() behavior. 
-            for (uint16_t microsec = USMIN; microsec < USMAX; microsec++) {
-                Serial.print("IM HERE 2222 >>>> = "); Serial.println(microsec);
-                pwm.writeMicroseconds(servonum, microsec);
-            }
+            // // Drive each servo one at a time using writeMicroseconds(), it's not precise due to calculation rounding!
+            // // The writeMicroseconds() function is used to mimic the Arduino Servo library writeMicroseconds() behavior. 
+            // for (uint16_t microsec = USMIN; microsec < USMAX; microsec++) {
+            //     Serial.print("IM HERE 2222 >>>> = "); Serial.println(microsec);
+            //     pwm.writeMicroseconds(servonum, microsec);
+            // }
 
-            delay(1000);
-            for (uint16_t microsec = USMAX; microsec > USMIN; microsec--) {
-                pwm.writeMicroseconds(servonum, microsec);
-            }
+            // delay(500);
+            // for (uint16_t microsec = USMAX; microsec > USMIN; microsec--) {
+            //     pwm.writeMicroseconds(servonum, microsec);
+            // }
 
-            delay(1000);
+            // delay(500);
 
             servonum++;
             if (servonum > 1) servonum = 0; // Testing the first 8 servo channels

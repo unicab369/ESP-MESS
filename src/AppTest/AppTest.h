@@ -4,12 +4,28 @@
    uint8_t ledPin = 2;
 #endif
 
-// #define TEST_PCA96
-#define TEST_BEHAVIOR True
+#define TEST_PCA96
+// #define TEST_BEHAVIOR True
 // #define TEST_PWM True
 // #define TEST_AUDIO True
 
 Loggable TestLog("Test"); 
+Mng_Config conf;
+MyButton button1;
+RotaryEncoder rotary;
+SerialControl serial;
+
+void testSetup() {
+   conf.setup();
+   rotary.setup(conf.rotaryA, conf.rotaryB, 10);
+   Wire.begin(conf.sda0, conf.scl0);
+}
+
+void testRun() {
+   button1.run();
+   rotary.run();
+   serial.run();
+}
 
 #ifdef TEST_BLINK
    void setup() {
@@ -28,16 +44,49 @@ Loggable TestLog("Test");
 #elif defined(TEST_PCA96)
    PCA96Controller pca96z;
 
+   //! ButtonPress Callback
+   std::function<void(BTN_Action, BNT_Hold, uint32_t)> buttonCb = 
+                     [&](BTN_Action action, BNT_Hold hold, uint32_t elapse) {
+      TestLog.xLog("Button Pressed = %u", action);
+
+      switch (action) {
+         case ACTION_SINGLE_CLICK: {
+               ControlOutput action1(11, 22);    
+               break;
+         }   
+         case ACTION_DOUBLE_CLICK: {
+               break;
+         }
+         case ACTION_PRESS_ACTIVE: {
+               break;
+         }
+         case ACTION_PRESS_END: {
+               break;
+         }
+      }
+   };
+
+   //! RotaryEncoder Callback
+   std::function<void(RotaryDirection, uint16_t)> rotaryCb = [&](RotaryDirection state, uint16_t counter) {
+      TestLog.xLog("Rotary counter = %llu", counter);
+      pca96z.drivePWM(0, counter);
+      // pca96z.drivePWM(1, counter);
+   };
+
    void setup() {
       Serial.begin(115200);
-      Wire.begin(33, 32);
+      testSetup();
 
       pca96z.setup(&Wire);
-      delay(10);
+      button1.setup(conf.btn1, &buttonCb);
+
+      rotary.onCallback = &rotaryCb;
+      rotary.setup(conf.rotaryA, conf.rotaryB, 10, { 90, 500 });
    }
 
    void loop() {
-      pca96z.test();
+      // pca96z.test();
+      testRun();
    }
 
 #elif defined(TEST_AUDIO)
@@ -73,13 +122,8 @@ Loggable TestLog("Test");
    }
 
 #elif defined(TEST_BEHAVIOR)
-   MyButton button1;
-   RotaryEncoder rotary;
-   SerialControl serial;
-
    Mng_Storage storage;
    Serv_Behavior servBehav;
-   Mng_Config conf;
 
    uint8_t peer1Mac[6] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x00};
 
@@ -119,6 +163,8 @@ Loggable TestLog("Test");
 
    void setup() {
       Serial.begin(115200);
+
+      testSetup();
       storage.setup();
       servBehav.setup();
 
@@ -133,18 +179,15 @@ Loggable TestLog("Test");
       // ControlWS2812 action2(33, 44);
       // servBehav.storeAction<TRIGGER_DOUBLECLICK>(1, &action2, &peer1);
 
-      conf.setup();
+
       button1.setup(conf.btn1, &buttonCb);
       serial.onParseString = &storeCredCb;
 
-      rotary.setup(conf.rotaryA, conf.rotaryB);
       rotary.onCallback = &rotaryCb;
    }
 
    void loop() {
-      button1.run();
-      rotary.run();
-      serial.run();
+      testRun();
    }
 
 #elif defined(TEST_PWM)

@@ -7,7 +7,8 @@ enum RotaryDirection: int8_t {
 class RotaryEncoder: public Loggable {
    PinReadable pinA;
    PinReadable pinB;
-   uint16_t counter = 0; 
+   uint16_t counter = 0;
+   uint8_t increment = 0;
    RotaryDirection rotaryState = NOROTATION;
    TimerItem timer;
    MinMax minMax;
@@ -18,11 +19,13 @@ class RotaryEncoder: public Loggable {
 
       RotaryEncoder(): Loggable("Rotary") {}
 
-      void setup(uint8_t _pinA, uint8_t _pinB, MinMax _minMax = {.min = 0, .max = 4096}) {
+      void setup(uint8_t _pinA, uint8_t _pinB, uint8_t _increment = 1,
+               MinMax _minMax = {.min = 0, .max = 4096}) {
          bool check = pinA.pin_setup(_pinA, true) && pinB.pin_setup(_pinB, true);
          xLogStatus(__func__, check);
          if (!check) return;
 
+         increment = _increment;
          minMax = _minMax;
          isEnabled = true;
       }
@@ -30,7 +33,7 @@ class RotaryEncoder: public Loggable {
       void run() {
          if (onCallback == nullptr || !pinA.hasChanged() || !isEnabled) return;
          rotaryState = (pinA.compareToCurrentRead(pinB.pin_read())) ? COUNTERCLOCKWISE : CLOCKWISE;
-         counter += rotaryState;
+         counter += (rotaryState*increment);
 
          if (counter < minMax.min) {
                counter = minMax.min;
