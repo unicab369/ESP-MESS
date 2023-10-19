@@ -1,4 +1,4 @@
-class PinConfig {
+class Serv_IO {
     public:
         uint8_t irSwitchp = 255;
         uint8_t ws2812p = 255;

@@ -107,5 +107,4 @@ TimerItem appTimer0;
 #include "SerialControl.h"
 #include "4Display.h"
 
-#include "PinConfig.h"
 #include <7Services.h>

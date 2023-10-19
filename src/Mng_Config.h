@@ -3,7 +3,7 @@
 // #define DEV_KMC_70011 1
 
 
-class Mng_Config: public PinConfig {
+class Mng_Config: public Serv_IO {
     public:
         void setup() {
             #ifdef TTGO_LORA32
@@ -36,6 +36,7 @@ class Mng_Config: public PinConfig {
                 relay1 = 14;
 
             #elif ESP32
+                //! Lolin missing 1TX, 3RX, 21, 24
                 // xLogSection("DIRECTIVE = ESP32");
                 // use for disp0
                 // pinMode(5, OUTPUT);
@@ -65,10 +66,9 @@ class Mng_Config: public PinConfig {
                 sda1 = 4; scl1 = 0;
 
                 //! SPI Pins
-                sck0 = 18;       //! SCK
-                mosi0 = 23;      //! MOSI
-                miso0 = 19;      //! MISO
-                rst0 = 2;        //! RST
+                sck0 = 18; mosi0 = 23; miso0 = 19; rst0 = 2;
+                
+                //! large display: CS low enable
                 
                 out0 = 5;        // sdCard CS
                 out1 = 27;       // display CS

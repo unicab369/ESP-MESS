@@ -15,7 +15,7 @@ class Serv_Serial: public Loggable {
 
         Serv_Serial(): Loggable("Serial") {}
 
-        void setupSerial(PinConfig* conf) {
+        void setupSerial(Serv_IO* conf) {
             //! setup i2C
             if (conf->checkWire0()) {
                 i2c1.setup(conf->scl0, conf->sda0, &Wire);    //! ORDER DOES MATTER

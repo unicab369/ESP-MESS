@@ -20,6 +20,8 @@ answer: Y
 
 # plugins
 
+https://serial.huhn.me/
+
 PlatformIO IDE
 Better Comments
 REST Client

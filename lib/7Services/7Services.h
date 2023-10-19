@@ -238,6 +238,7 @@ typedef std::function<void(ReceivePacket2*)> ReceivePacketCb2;
 
 #include "5Tweet.h"
 
+#include "Serv_IO.h"
 #include "Serv_I2C.h"
 #include "Serv_ESP.h"
 #include "Serv_Power.h"
