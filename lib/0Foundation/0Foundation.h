@@ -94,12 +94,12 @@ TimerItem appTimer0;
 #include "IntCycle.h"
 #include "PinWritable.h"
 #include "Button.h"         // need TimeoutItem.h
+#include "Behavior.h"
 #include "PinSequence.h"
 #include "AsyncTimer.h"
 #include "ClockItem.h"
 #include "ExtraSerial.h"
 #include "AppQueue.h"
-#include "Behavior.h"
 
 #include "1Controller.h"
 #include "3Sensor.h"

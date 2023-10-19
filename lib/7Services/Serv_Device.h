@@ -161,10 +161,9 @@ class Serv_Device: public Loggable, public Serv_Serial, public Mng_Config {
             // storage.stoBehavior.handleCue(item->cue);
         }
 
-        void handleAction(ControlOutput action) {
-            if (action.pin == 200) {
-                led.stop();
-                led.toggle();
+        void handleAction(ControlOutput control) {
+            if (control.pin == 200) {
+                led.handle(control);
             }
         }
 

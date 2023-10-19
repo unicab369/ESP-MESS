@@ -68,12 +68,14 @@ class PinSequence: public PWMWritable, public Cycle_Timer {
         void turnON() override {
             stop();
             if (!isValid()) { return; }
+            toggleValue = 1;
             pwmWrite(255);
         }
 
         void turnOFF() override {
             stop();
             if (!isValid()) { return; }
+            toggleValue = 0;
             pwmWrite(0);
         }
 
@@ -121,5 +123,14 @@ class PulseController: public PinSequence {
             durations4[2] = pulseLength;
             durations4[3] = pitchLength;
             reload(PairValues::make(outputs4, durations4, 4));
+        }
+
+        void handle(ControlOutput control) {
+            switch (control.value) {
+                case 0: turnOFF(); break;
+                case 1: turnON(); break;
+                case 2: toggle(); break;
+                default: break;
+            }
         }
 };
