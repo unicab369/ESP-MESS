@@ -13,6 +13,7 @@ enum Cue_Trigger: uint8_t {
    TRIGGER_PIR = 0xB3,
    TRIGGER_IR = 0xB4,
    TRIGGER_STATE = 0xB5,
+   TRIGGER_NONE = 0xF1,
 };
 
 struct BehaviorItem {
@@ -29,10 +30,36 @@ struct BehaviorItem {
    }
    
    template <typename T>
-   void load(uint8_t peerIdIdVal, Cue_Trigger cueVal, T* control) {
+   void load(uint8_t peerIdVal, Cue_Trigger cueVal, T* control) {
       memcpy(data, control, sizeof(T));
-      peerId = peerIdIdVal;
+      peerId = peerIdVal;
       cue = cueVal;
+   }
+
+   template <typename T>
+   void load(uint8_t peerIdVal, const char* cueStr, T* control) {
+      Cue_Trigger trigger = TRIGGER_NONE;
+
+      if (strcmp(cueStr, "1CLICK") == 0) {
+         trigger = TRIGGER_SINGLECLICK;
+      }
+      else if (strcmp(cueStr, "2CLICK") == 0) {
+         trigger = TRIGGER_DOUBLECLICK;
+      }
+      else if (strcmp(cueStr, "CUE_PIR") == 0) {
+         trigger = TRIGGER_PIR;
+      }
+      else if (strcmp(cueStr, "CUE_IR") == 0) {
+         trigger = TRIGGER_IR;
+      }
+      else if (strcmp(cueStr, "CUE_STATE") == 0) {
+         trigger = TRIGGER_STATE;
+      }
+      else if (strcmp(cueStr, "CUE_THRESHOLD") == 0) {
+         trigger = TRIGGER_NONE;
+      }
+
+      load(peerIdVal, trigger, control);
    }
 
    template <typename T>

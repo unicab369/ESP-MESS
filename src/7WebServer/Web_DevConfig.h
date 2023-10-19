@@ -104,8 +104,37 @@ class Web_DevConfig: public Web_Base {
         char* chars = (char*)content.c_str();
         xLogLinef("onSaveConfig Received = %s", chars);
 
-        server->sendHeader("Content-Type", "text/plain");
-        server->sendHeader("Access-Control-Allow-Origin", "*");
+
+        uint8_t targetId;
+        char triggerChar[20], actionChar[20];
+        uint8_t pinCode;
+        uint8_t pinValue;
+        
+        int result = sscanf(chars, "%hhu %19s %19s %hhu %hhu", 
+                        &targetId, &triggerChar, &actionChar, &pinCode, &pinValue);
+
+        if (result == 5) {
+            xLogf("validated: %s %s", triggerChar, actionChar);
+            BehaviorItem behav_In;
+
+            if (strcmp(actionChar, "OUTPUT") == 0) {
+                ControlOutput output(pinCode, pinValue);
+                behav_In.load(targetId, (const char*)triggerChar, &output);
+                // stoBehav.updateData(behavIndex, &behav_In);     //! store behavior
+            } 
+            else if (strcmp(actionChar, "WS2812") == 0) {
+                ControlWS2812 output(pinCode, pinValue);
+
+            }
+            else if (strcmp(actionChar, "PUBLISH") == 0) {
+
+            }
+            else {
+                //! delete
+            }
+        }
+
+
         server->send(200, "application/json", "{\"ok\": true}"); 
     };
 
@@ -123,8 +152,7 @@ class Web_DevConfig: public Web_Base {
         int result = sscanf(chars, "%hhu %19s %hhu %hhu", &targetId, &action, &pinCode, &pinValue);
 
         if (result == 4) {
-            xLog("IM HERE mmmmmmmmmmmm");
-            xLog(action);
+            xLog("validated: %s", action);
 
             if (strcmp(action, "OUTPUT") == 0) {
                 ControlOutput output(pinCode, pinValue);
