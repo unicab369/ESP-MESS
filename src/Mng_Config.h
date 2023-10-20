@@ -56,9 +56,9 @@ class Mng_Config: public Serv_IO {
                 led1 = 22;
                 btn1 = 34;
                 buzzer1 = 14;
-                rotaryA = 13; rotaryB = 15;
+                // rotaryA = 13; rotaryB = 15;
                 // pir1 = 36;
-                // irSwitch = 26;
+                irSwitchp = 15;
                 // swRx = 0; swTx = 2;
                 
                 //! i2C Pins

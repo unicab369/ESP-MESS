@@ -1,13 +1,17 @@
-#ifdef ESP32 
+#ifdef CONFIG_IDF_TARGET_ESP32C3
+   uint8_t ledPin = 12;
+#elif defined(ESP32)
    uint8_t ledPin = 22;
 #else
    uint8_t ledPin = 2;
 #endif
 
-#define TEST_PCA96
-// #define TEST_BEHAVIOR True
-// #define TEST_PWM True
-// #define TEST_AUDIO True
+// #define TEST_PCA96 1
+// #define TEST_BEHAVIOR 1
+// #define TEST_PWM 1
+// #define TEST_AUDIO 1
+// #define TEST_BLINK 1
+#define TEST_MICROPHONE 1
 
 Loggable TestLog("Test"); 
 Mng_Config conf;
@@ -36,7 +40,23 @@ void testRun() {
 
    void loop() {
       AppPrint("IM HERE 111");
-      uint8_t read = digitalRead(ledPin);
+      uint8_t read = digitalRead(12);
+      digitalWrite(ledPin, !read);
+      delay(1000);
+   }
+
+#ifdef TEST_MICROPHONE
+   #include "AudioTools.h"
+   
+   void setup() {
+      Serial.begin(115200);
+      AppPrint("IM HERE 000");
+      pinMode(ledPin, OUTPUT);
+   }
+
+   void loop() {
+      AppPrint("IM HERE 111");
+      uint8_t read = digitalRead(12);
       digitalWrite(ledPin, !read);
       delay(1000);
    }

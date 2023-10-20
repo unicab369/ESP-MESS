@@ -75,10 +75,10 @@ class Mng_AppClock: public ClockItem {
             if (!rtc->checkDevice()) return;
             uint32_t rtcUnixTime = rtc->getTimeNow().unixtime();
 
-            if (rtcUnixTime > getTimeNow()) {
-                AppPrint("[AppClock]", "Sync with RTC = " + String(rtcUnixTime));
-                configure(rtcUnixTime, TIME_RTC);
-            }
+            // if (rtcUnixTime > getTimeNow()) {
+            //     AppPrint("[AppClock]", "Sync with RTC = " + String(rtcUnixTime));
+            //     configure(rtcUnixTime, TIME_RTC);
+            // }
         }
 
         void updateTimers(time_t time) {

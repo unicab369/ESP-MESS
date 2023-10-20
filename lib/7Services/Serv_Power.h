@@ -13,17 +13,18 @@ class Mng_Power {
     public:
         #ifdef ESP32
             uint8_t wakeup_pinCode(){
-                touch_pad_t  touchPin = esp_sleep_get_touchpad_wakeup_status();
+                // touch_pad_t  touchPin = esp_sleep_get_touchpad_wakeup_status();
 
                 #ifdef ESP32
-                    switch(touchPin) {
-                        case 0: return 4;   case 1: return 0;
-                        case 2: return 2;   case 3: return 15;
-                        case 4: return 13;  case 5: return 12;
-                        case 6: return 14;  case 7: return 27;
-                        case 8: return 33;  case 9: return 32;
-                        default: return 255;
-                    }
+                    return 255;
+                    // switch(touchPin) {
+                    //     case 0: return 4;   case 1: return 0;
+                    //     case 2: return 2;   case 3: return 15;
+                    //     case 4: return 13;  case 5: return 12;
+                    //     case 6: return 14;  case 7: return 27;
+                    //     case 8: return 33;  case 9: return 32;
+                    //     default: return 255;
+                    // }
                 #else
                     return pinCode;
                 #endif
@@ -99,8 +100,8 @@ class Mng_Power {
                 uint64_t value = pow(2, pin);
 
                 //! workable pins Only RTC IO 0,2,4,12-15,25-27.
-                esp_sleep_enable_ext1_wakeup(value, ESP_EXT1_WAKEUP_ALL_LOW);       
-                // esp_sleep_enable_ext0_wakeup(GPIO_NUM_23, GPIO_INTR_LOW_LEVEL);
+                // esp_sleep_enable_ext1_wakeup(value, ESP_EXT1_WAKEUP_ALL_LOW);       
+                // // esp_sleep_enable_ext0_wakeup(GPIO_NUM_23, GPIO_INTR_LOW_LEVEL);
                 esp_sleep_enable_timer_wakeup(msDuration*1000);
                 esp_sleep_enable_gpio_wakeup();
 

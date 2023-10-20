@@ -139,7 +139,7 @@ class Serv_Serial: public Loggable {
             if (!storage.isValidPath()) return;
             float temp, hum, lux;
             i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
-            storage.addStoreTempHumLuxQueue(temp, hum, lux, appClock.getTimeNow());
+            // storage.addStoreTempHumLuxQueue(temp, hum, lux, appClock.getTimeNow());
         }
 
         //! Handle Qeueues

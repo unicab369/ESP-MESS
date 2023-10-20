@@ -84,3 +84,20 @@ https://firebog.net/
 ```
 
 https://github.com/SensorsIot/IOTstack/blob/master/docs/Containers/InfluxDB.md#authentication
+
+
+# Extra
+CH32V Setup
+link: https://taunoerik.art/2023/08/05/programming-ch32v003/
+link: https://www.wch-ic.com/products/WCH-Link.html
+
+burning tool: https://www.wch.cn/downloads/file/418.html?time=2023-10-19%2022:06:13&code=z5CifoTC1ie3Nqxv8Wvr5IrsQdtDa9sBWsguVl6r
+
+PlatformIO Install
+PIO Home -> Platforms -> Advanced platform installation
+Add Url: https://github.com/Community-PIO-Ch32v/platform-ch32v
+pinOut: https://raw.githubusercontent.com/Tengo10/pinout-overview/main/pinouts/CH32v003/ch32v003j4m6.svg
+
+https://github.com/Community-PIO-CH32V/platform-ch32v/blob/develop/boards/genericCH32V003J4M6.json
+pio run -e ws2812bdemo
+pio run -e ws2812bdemo -t upload
