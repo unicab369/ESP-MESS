@@ -1,57 +1,38 @@
-#define CH32V 1
+#include <0Foundation.h>
+#include "3Mng_Runtime.h"
 
-#ifndef CH32V 1
-  #include <0Foundation.h>
-  #include "3Mng_Runtime.h"
+// #define UNIT_TEST 1
 
-  // #define UNIT_TEST 1
+Mng_Runtime runTime;
 
-  Mng_Runtime runTime;
-
-  #ifdef UNIT_TEST
-    #include "AppTest/AppTest.h"
-
-  #else
-    void setup() {
-      Serial.begin(115200);
-      runTime.setup();
-
-      #ifdef ESP32
-        xTaskCreatePinnedToCore([](void *pvParam) {
-          for (;;) { 
-            runTime.runJob1(); 
-          }
-        }, "loopCore0", 10000, NULL, 1, NULL, 0);
-
-        xTaskCreatePinnedToCore([](void *pvParam) {
-          for (;;) { 
-            runTime.runJob2();
-          }
-        }, "loopCore1", 5000, NULL, 1, NULL, 1);
-      #endif
-    }
-
-    void loop() {
-      #ifndef ESP32
-        // should not be called for ESP32
-        runTime.runJob1();
-        runTime.runJob2();
-      #endif
-    }
-  #endif
+#ifdef UNIT_TEST
+  #include "AppTest/AppTest.h"
 
 #else
-  #include <Arduino.h>
-  #define LED PC1
-
   void setup() {
-    pinMode(LED, OUTPUT);
+    Serial.begin(115200);
+    runTime.setup();
+
+    #ifdef ESP32
+      xTaskCreatePinnedToCore([](void *pvParam) {
+        for (;;) { 
+          runTime.runJob1(); 
+        }
+      }, "loopCore0", 10000, NULL, 1, NULL, 0);
+
+      xTaskCreatePinnedToCore([](void *pvParam) {
+        for (;;) { 
+          runTime.runJob2();
+        }
+      }, "loopCore1", 5000, NULL, 1, NULL, 1);
+    #endif
   }
 
   void loop() {
-  digitalWrite(LED, HIGH);
-  delay(1000);
-  digitalWrite(LED, LOW);
-  delay(1000);
+    #ifndef ESP32
+      // should not be called for ESP32
+      runTime.runJob1();
+      runTime.runJob2();
+    #endif
   }
 #endif
