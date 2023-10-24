@@ -1,12 +1,12 @@
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
 
-// #define UNIT_TEST 1
+#define UNIT_TEST 1
 
 Mng_Runtime runTime;
 
 #ifdef UNIT_TEST
-  #include "AppTest/AppTest.h"
+  #include "examples/AppTest.h"
 
 #else
   void setup() {

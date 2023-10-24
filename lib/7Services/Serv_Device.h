@@ -2,7 +2,7 @@
 // #define DEV_KMC_70011 1
 #include "Mng_Config.h"
 
-class Serv_Device: public Loggable, public Serv_Serial, public Mng_Config {
+class Serv_Device: public Serv_Serial, public Mng_Config {
     //! iR Switch Callback
     std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
         String output = "IrRead = " + (status ? String(value) : "Locked");
@@ -103,7 +103,7 @@ class Serv_Device: public Loggable, public Serv_Serial, public Mng_Config {
     };
 
     public:
-        Serv_Device(): Loggable("Dev"), Serv_Serial() {}
+        // Serv_Device(): Loggable("Dev"), Serv_Serial() {}
 
         SerialControl serial;
             

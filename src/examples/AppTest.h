@@ -10,8 +10,8 @@
 // #define TEST_BEHAVIOR 1
 // #define TEST_PWM 1
 // #define TEST_AUDIO 1
-// #define TEST_BLINK 1
-#define TEST_MICROPHONE 1
+#define TEST_BLINK 1
+// #define TEST_MICROPHONE 1
 
 Loggable TestLog("Test"); 
 Mng_Config conf;
@@ -36,16 +36,20 @@ void testRun() {
       Serial.begin(115200);
       AppPrint("IM HERE 000");
       pinMode(ledPin, OUTPUT);
+      pinMode(13, OUTPUT);
+      pinMode(5, OUTPUT);
    }
 
    void loop() {
-      AppPrint("IM HERE 111");
-      uint8_t read = digitalRead(12);
+      TestLog.xLog("IM HERE 111");
+      uint8_t read = digitalRead(ledPin);
       digitalWrite(ledPin, !read);
-      delay(1000);
+      digitalWrite(13, read);
+      digitalWrite(5, read);
+      delay(500);
    }
 
-#ifdef TEST_MICROPHONE
+#elif TEST_MICROPHONE
    #include "AudioTools.h"
    
    void setup() {
@@ -225,13 +229,8 @@ void testRun() {
    void loop() {
       led.run();
    }
-
 #else
-   void setup() {
-      Serial.begin(115200);
-   }
-
-   void loop() {
+   void donothing() {
 
    }
 #endif
