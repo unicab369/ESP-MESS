@@ -1,11 +1,37 @@
 # esp_mess
-esp_mess is an open-source firmware for ESP8266 and ESP32 microcontrollers, enabling rapid IoT prototyping for home automation, smart farming, smart business, and more. 
+esp_mess is an open-source firmware for ESP8266 and ESP32 microcontrollers, enabling\
+rapid IoT prototyping for home automation, smart farming, smart business, and more. 
+
+Why ESP-Mess? Back in 2020 during Covid, I got an opportunity to look back and decide\
+on what I want to do next. I thought about what I liked as a kid so I decided to build\
+a remote control car. While looking on Amazon for a good, ok, micontroller to use, I\
+stumbled upon the NodeMcu, a development board that house the ESP8266 module.\
+I didn't want to spend too much money on it so I was not expecting much paying some\
+money for a module. I didn't know something special has been awaited and since then\
+I have learned to do solder, basic electronics, embedded  programming, web developments\
+for microcontrollers, PCB design, and a variety of wireless communication technologies.
+
+I want to build a wireless bridge system, which can manage many devices using a wide\
+range of different wireless technogies. The goal is have a system that is extendable\
+and addative to different wireless application requirements. And use this as a mean\
+to explore and discover different iOT applications. But at the same time, keep the\
+cost minimal. Thus I created ESP-Mess.
 
 checkout our discord channel: 
 https://discord.com/channels/793348436475904022/858758498875342878
 
-need to create
+# below is the rough draft of the initial vision
+![Alt text](projectFirefly_4.png)
 
+# what is the state of the project?
+Right now it's functional but I have not finished document the setup. 
+I will try to make a video with instructions on how to work it.
+
+Currently I have got ESP-Now working and some work for the LoRa communication has completed.
+Next step is to refine the ESP-Now, LoRa, and then add support for BLE.
+
+# IGNORE the stuff below. They are just notes for myself.
+need to create
 src/1Configs/Conf_User.h:
 #define MY_SSID "YOUR_WIFI_SSID"
 #define MY_PASS "YOUR_WIFI_PASSWORD"
@@ -19,7 +45,6 @@ cmd: Set-ExecutionPolicy Unrestricted
 answer: Y
 
 # plugins
-
 https://serial.huhn.me/
 
 PlatformIO IDE
