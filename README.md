@@ -20,23 +20,23 @@ cost minimal. Thus I created ESP-Mess.
 checkout our discord channel: 
 https://discord.com/channels/793348436475904022/858758498875342878
 
-# below is the rough draft of the initial vision
+### below is the rough draft of the initial vision
 ![Alt text](projectFirefly_4.png)
 
-# what is the state of the project?
+### what is the state of the project?
 Right now it's functional but I have not finished document the setup. 
 I will try to make a video with instructions on how to work it.
 
 Currently I have got ESP-Now working and some work for the LoRa communication has completed.
 Next step is to refine the ESP-Now, LoRa, and then add support for BLE.
 
-# IGNORE the stuff below. They are just notes for myself.
+### IGNORE the stuff below. They are just notes for myself.
 need to create
 src/1Configs/Conf_User.h:
 #define MY_SSID "YOUR_WIFI_SSID"
 #define MY_PASS "YOUR_WIFI_PASSWORD"
 
-# npm install
+### npm install
 https://nodejs.org/en
 cmd: npm install -g live-server
 cmd: live-server
@@ -44,7 +44,7 @@ Run PowerShell as Administrator
 cmd: Set-ExecutionPolicy Unrestricted
 answer: Y
 
-# plugins
+### plugins
 https://serial.huhn.me/
 
 PlatformIO IDE
@@ -54,7 +54,7 @@ Serial Monitor
 Live Preview
 Live Server
 
-# General Shortcuts
+### General Shortcuts
 Ctrl+C/V: Copy/Paste
 Ctrl+S/O: Save/Open
 Ctrl+W: Close Tab or Window
@@ -71,11 +71,11 @@ Win+X: Secret Start Menu
 Win+E: File Explorer
 Win+D: Minimize All
 
-# Browser Shortcuts
+### Browser Shortcuts
 Ctrl+T: New Tab 
 Ctrl+Number: Switch tab Number
 
-# YouTube Shortcuts
+### YouTube Shortcuts
 up/down: increase/decrease volume
 left/right: Seek back and forth
 Shift+<: reduce playback rate
@@ -86,21 +86,21 @@ i: open mini player
 Shift+N: next video
 Shift+P: previous video
 
-# VsCode Shortcuts
+### VsCode Shortcuts
 Ctrl+/: Comment out Selected
 Ctrl+Click: click on variable or method to see definitions
 Ctrl+G: Goto line
 PlatformIO: Ctrl+Alt+U: Upload code
 
-# Window Screenshots
+### Window Screenshots
 Snipping Tools: Search for Snipping Tools app
 Snipping & Sketch: Win+Shift+S
 
-# PiHole Blocklists
+### PiHole Blocklists
 https://firebog.net/
 
 
-# App Flow
+### App Flow
 ```mermaid
   graph TD;
       Serv_Device-->Serv_Network; Serv_Network-->Net_Wifi;
@@ -111,7 +111,7 @@ https://firebog.net/
 https://github.com/SensorsIot/IOTstack/blob/master/docs/Containers/InfluxDB.md#authentication
 
 
-# Extra
+### Extra
 CH32V Setup
 link: https://taunoerik.art/2023/08/05/programming-ch32v003/
 link: https://www.wch-ic.com/products/WCH-Link.html
