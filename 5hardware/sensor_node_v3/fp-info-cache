@@ -1,4 +1,4 @@
-21945896935871320
+21947599351128130
 A_SensorNode
 BuzzerSmall
 
@@ -13,6 +13,13 @@ ESP12Base
 0
 16
 16
+A_SensorNode
+ESP32-WROOM-32D2
+
+
+0
+60
+39
 A_SensorNode
 LolinBase
 
