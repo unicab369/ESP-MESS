@@ -1,7 +1,3 @@
-#include <Arduino.h>
-#include <functional>
-#include <Wire.h>
-#include <SPI.h>
 #include "Loggable.h"
 
 void AppPrint(const char* key, const char* value = NULL, const char* value2 = NULL) {

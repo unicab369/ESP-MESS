@@ -1,5 +1,5 @@
 #ifdef ESP32
-   #include "LITTLEFS.h"
+   #include <LittleFS.h>
 #else
    #include "LittleFS.h"
 #endif

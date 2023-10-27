@@ -10,26 +10,28 @@
 // #define TEST_BEHAVIOR 1
 // #define TEST_PWM 1
 // #define TEST_AUDIO 1
-#define TEST_BLINK 1
+// #define TEST_BLINK 1
 // #define TEST_MICROPHONE 1
+// #define TEST_BLE 1
+#define TEST_BLE_BEACON 1
 
-Loggable TestLog("Test"); 
-Mng_Config conf;
-MyButton button1;
-RotaryEncoder rotary;
-SerialControl serial;
+// Loggable TestLog("Test"); 
+// Mng_Config conf;
+// MyButton button1;
+// RotaryEncoder rotary;
+// SerialControl serial;
 
-void testSetup() {
-   conf.setup();
-   rotary.setup(conf.rotaryA, conf.rotaryB, 10);
-   Wire.begin(conf.sda0, conf.scl0);
-}
+// void testSetup() {
+//    conf.setup();
+//    rotary.setup(conf.rotaryA, conf.rotaryB, 10);
+//    Wire.begin(conf.sda0, conf.scl0);
+// }
 
-void testRun() {
-   button1.run();
-   rotary.run();
-   serial.run();
-}
+// void testRun() {
+//    button1.run();
+//    rotary.run();
+//    serial.run();
+// }
 
 #ifdef TEST_BLINK
    void setup() {
@@ -47,6 +49,162 @@ void testRun() {
       digitalWrite(13, read);
       digitalWrite(5, read);
       delay(500);
+   }
+
+#elif TEST_BLE_BEACON
+   #include "BLEDevice.h"
+   #include "BLEUtils.h"
+   #include "BLEServer.h"
+   #include "BLEBeacon.h"
+   #include "esp_sleep.h"
+
+   #define GPIO_DEEP_SLEEP_DURATION     10  // sleep x seconds and then wake up
+   RTC_DATA_ATTR static time_t last;        // remember last boot in RTC Memory
+   RTC_DATA_ATTR static uint32_t bootcount; // remember number of boots in RTC Memory
+
+   BLEAdvertising *pAdvertising;   // BLE Advertisement type
+   #define BEACON_UUID "87b99b2c-90fd-11e9-bc42-526af7764f64" // UUID 1 128-Bit (may use linux tool uuidgen or random numbers via https://www.uuidgenerator.net/)
+
+   void setBeacon() {
+      BLEBeacon oBeacon = BLEBeacon();
+      oBeacon.setManufacturerId(0x4C00); // fake Apple 0x004C LSB (ENDIAN_CHANGE_U16!)
+      oBeacon.setProximityUUID(BLEUUID(BEACON_UUID));
+      oBeacon.setMajor((bootcount & 0xFFFF0000) >> 16);
+      oBeacon.setMinor(bootcount & 0xFFFF);
+
+      BLEAdvertisementData oAdvertisementData = BLEAdvertisementData();
+      BLEAdvertisementData oScanResponseData = BLEAdvertisementData();
+      oAdvertisementData.setFlags(0x04); // BR_EDR_NOT_SUPPORTED 0x04
+
+      std::string strServiceData = "aaa";
+      strServiceData += (char)26;     // Len
+      strServiceData += (char)0xFF;   // Type
+      strServiceData += oBeacon.getData();
+      oAdvertisementData.addData(strServiceData);
+      pAdvertising->setAdvertisementData(oAdvertisementData);
+      pAdvertising->setScanResponseData(oScanResponseData);
+   }
+
+   void setup() {
+      Serial.begin(115200);
+
+      Serial.printf("start ESP32 %d\n", bootcount++);
+
+      // Create the BLE Device
+      BLEDevice::init("ESP32 as iBeacon");
+
+      // Create the BLE Server
+      BLEServer *pServer = BLEDevice::createServer(); // <-- no longer required to instantiate BLEServer, less flash and ram usage
+      pAdvertising = BLEDevice::getAdvertising();
+      BLEDevice::startAdvertising();
+      setBeacon();
+
+      // Start advertising
+      pAdvertising->start();
+      Serial.println("Advertizing started...");
+      delay(100);
+      pAdvertising->stop();
+      Serial.printf("enter deep sleep\n");
+      esp_deep_sleep(1000000LL * GPIO_DEEP_SLEEP_DURATION);
+      Serial.printf("in deep sleep\n");
+   }
+
+   void loop() {
+
+   }
+
+#elif TEST_BLE
+   #include <BLEDevice.h>
+   #include <BLEServer.h>
+   #include <BLEUtils.h>
+   #include <BLE2902.h>
+
+   BLEServer* pServer = NULL;
+   BLECharacteristic* pCharacteristic = NULL;
+   BLEDescriptor *pDescr;
+   BLE2902 *pBLE2902;
+
+   bool deviceConnected = false;
+   bool oldDeviceConnected = false;
+   uint32_t value = 0;
+
+   // See the following for generating UUIDs:
+   // https://www.uuidgenerator.net/
+
+   #define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+   #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+   class MyServerCallbacks: public BLEServerCallbacks {
+      void onConnect(BLEServer* pServer) {
+         deviceConnected = true;
+      };
+
+      void onDisconnect(BLEServer* pServer) {
+         deviceConnected = false;
+      }
+   };
+
+   void setup() {
+      Serial.begin(115200);
+
+      // Create the BLE Device
+      BLEDevice::init("ESP32");
+
+      // Create the BLE Server
+      pServer = BLEDevice::createServer();
+      pServer->setCallbacks(new MyServerCallbacks());
+
+      // Create the BLE Service
+      BLEService *pService = pServer->createService(SERVICE_UUID);
+
+      // Create a BLE Characteristic
+      pCharacteristic = pService->createCharacteristic(
+                           CHARACTERISTIC_UUID,
+                           BLECharacteristic::PROPERTY_NOTIFY
+                        );                   
+
+      // Create a BLE Descriptor
+      
+      pDescr = new BLEDescriptor((uint16_t)0x2901);
+      pDescr->setValue("A very interesting variable");
+      pCharacteristic->addDescriptor(pDescr);
+      
+      pBLE2902 = new BLE2902();
+      pBLE2902->setNotifications(true);
+      pCharacteristic->addDescriptor(pBLE2902);
+
+      // Start the service
+      pService->start();
+
+      // Start advertising
+      BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+      pAdvertising->addServiceUUID(SERVICE_UUID);
+      pAdvertising->setScanResponse(false);
+      pAdvertising->setMinPreferred(0x0);  // set value to 0x00 to not advertise this parameter
+      BLEDevice::startAdvertising();
+      Serial.println("Waiting a client connection to notify...");
+   }
+
+   void loop() {
+      // notify changed value
+      if (deviceConnected) {
+         pCharacteristic->setValue(value);
+         pCharacteristic->notify();
+         value++;
+         delay(1000);
+      }
+      // disconnecting
+      if (!deviceConnected && oldDeviceConnected) {
+         delay(500); // give the bluetooth stack the chance to get things ready
+         pServer->startAdvertising(); // restart advertising
+         Serial.println("start advertising");
+         oldDeviceConnected = deviceConnected;
+      }
+      // connecting
+      if (deviceConnected && !oldDeviceConnected) {
+         // do stuff here on connecting
+         oldDeviceConnected = deviceConnected;
+      }
    }
 
 #elif TEST_MICROPHONE

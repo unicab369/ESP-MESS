@@ -1,9 +1,13 @@
-#include <0Foundation.h>
-#include "3Mng_Runtime.h"
+#include <Arduino.h>
+#include <functional>
+#include <Wire.h>
+#include <SPI.h>
+// #include <0Foundation.h>
+// #include "3Mng_Runtime.h"
 
 #define UNIT_TEST 1
 
-Mng_Runtime runTime;
+// Mng_Runtime runTime;
 
 #ifdef UNIT_TEST
   #include "examples/AppTest.h"
