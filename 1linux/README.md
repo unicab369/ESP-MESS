@@ -26,6 +26,10 @@
     - if not working try: ssh *username*@*raspi_IP_addr* (check wifi router)
     - allow root access command: sudo su -
 
+6, Status commands:
+    - free -m OR free -h
+    - top
+
 *Note: to handle WARNING REMOTE HOST IDENTIFICATION HAS CHANGED
 go to the target path (eg: /User/*userName*/.ssh/known_hosts) file and delete the content of the file. Then try again.
 
