@@ -1,7 +1,5 @@
 #ifdef ESP32
    #include <LittleFS.h>
-#else
-   #include "LittleFS.h"
 #endif
 
 #include "Sto_RTC.h"

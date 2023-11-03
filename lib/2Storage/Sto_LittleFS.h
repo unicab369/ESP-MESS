@@ -110,7 +110,7 @@ class FS_Obj: public FileInterface {
 
 class Sto_LittleFS: public Sto_Interface {
     #ifdef ESP32
-        FS_Obj obj = FS_Obj(&LITTLEFS);
+        FS_Obj obj = FS_Obj(&LittleFS);
     #else
         FS_Obj obj = FS_Obj(&LittleFS);
     #endif
@@ -120,9 +120,9 @@ class Sto_LittleFS: public Sto_Interface {
 
         void begin() {
             #ifdef ESP32
-                if (!LITTLEFS.begin(FORMAT_IF_FAILED)) {     // ESP32 ONLY
-                    Serial.print("[LittleFS] Begin: "); Serial.println(LITTLEFS.begin() ? "success" : "failed");
-                }
+                // if (!LittleFS.begin(FORMAT_IF_FAILED)) {     // ESP32 ONLY
+                    Serial.print("[LittleFS] Begin: "); Serial.println(LittleFS.begin() ? "success" : "failed");
+                // }
             #else 
                 Serial.print("[LittleFS] Begin: "); Serial.println(LittleFS.begin() ? "success" : "failed");
             #endif
