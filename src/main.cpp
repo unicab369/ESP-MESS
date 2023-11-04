@@ -5,14 +5,15 @@
 #include <0Foundation.h>
 // #include "3Mng_Runtime.h"
 
-#define UNIT_TEST 1
+#define MODE_TEST 1
+#define MODE_SLEEP 1
 
-// Mng_Runtime runTime;
-
-#ifdef UNIT_TEST
+#ifdef MODE_TEST
   #include "examples/AppTest.h"
 
 #else
+  Mng_Runtime runTime;
+
   void setup() {
     Serial.begin(115200);
     runTime.setup();
@@ -30,7 +31,7 @@
         }
       }, "loopCore1", 5000, NULL, 1, NULL, 1);
     #endif
-  }
+  } 
 
   void loop() {
     #ifndef ESP32

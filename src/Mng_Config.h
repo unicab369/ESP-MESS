@@ -79,10 +79,10 @@ class Mng_Config: public Serv_IO {
                 // xLogSection("DIRECTIVE = ESP8266");
                 
                 // D0: 16, D1: 5, D2: 4, D3: 0, D4: 2, D5: 14, D6: 12, D7: 13, D8: 15
-                // sda0 = 4; scl0 = 5;
+                sda0 = 5; scl0 = 4;
                 led1 = 2;
                 btn1 = 0;
-                relay1 = 14;
+                // relay1 = 14;
                 // ws2812 = 15;
                 // irSwitch = 12;
                 // pir1 = 14;

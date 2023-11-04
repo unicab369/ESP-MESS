@@ -6,11 +6,11 @@
    uint8_t ledPin = 2;
 #endif
 
-#define TEST_PCA96 1
+// #define TEST_PCA96 1
 // #define TEST_BEHAVIOR 1
 // #define TEST_PWM 1
 // #define TEST_AUDIO 1
-// #define TEST_BLINK 1
+#define TEST_BLINK 1
 // #define TEST_MICROPHONE 1
 // #define TEST_BLE 1
 // #define TEST_BLE_BEACON 1
