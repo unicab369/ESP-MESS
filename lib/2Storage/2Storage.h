@@ -25,7 +25,7 @@ struct DeviceStats {
 //! please keep size minimal, dont inherit Loggable
 class Sto_Stat: public EEPROM_Value<DeviceStats>{
    public:
-      uint16_t resetCnt() { return value.resetCnt; }
+      uint64_t resetCnt() { return value.resetCnt; }
 
       void load(uint16_t address) {
          loadData(address);

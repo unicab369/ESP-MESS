@@ -3,10 +3,10 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <0Foundation.h>
-// #include "3Mng_Runtime.h"
+#include "3Mng_Runtime.h"
 
 // #define MODE_TEST 1
-#define MODE_SLEEP 1
+// #define MODE_SLEEP 1
 
 #ifdef MODE_TEST
   #include "examples/AppTest.h"

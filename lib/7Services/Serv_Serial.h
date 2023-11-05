@@ -100,8 +100,8 @@ class Serv_Serial: public Loggable {
             char networkInfo[64];
             sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
 
-            // uint64_t resetCount = storage.resetCount.value;
-            // sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
+            uint64_t resetCount = storage.stoStat.resetCnt();
+            sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
 
             //! Oled Mini
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
