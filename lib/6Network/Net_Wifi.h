@@ -75,6 +75,14 @@ class Net_Wifi: public Loggable {
 
             xLog("hostName", hostName);
         }
+
+        void setTxPower(uint16_t power) {
+            #ifdef ESP32
+                WiFi.setTxPower(WIFI_POWER_19_5dBm);
+            #else 
+                WiFi.setOutputPower(power);
+            #endif
+        }
 };
 
 

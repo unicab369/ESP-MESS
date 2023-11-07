@@ -140,12 +140,15 @@ enum Sign_Record: uint8_t {
 struct RecordItem {
     Sign_Record cue;
     float value1, value2, value3;
+    float value4, value5;
 
-    void update(float val1, float val2, float val3) {
+    void update(float val1, float val2, float val3, float val4, float val5) {
         cue = RECORD_TEMPHUMLUX;
         value1 = val1;
         value2 = val2;
         value3 = val3;
+        value4 = val4;
+        value5 = val5;
     }
 };
 

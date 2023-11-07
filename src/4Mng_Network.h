@@ -14,7 +14,7 @@ class Mng_Network: public Serv_Network {
 
         void handleDoubleClick() {
             tweet.command.sendDoubleClick(33);
-            tweet.record.sendTempHumLux(2,3,4);
+            tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
         }
 
         void handle_1secInterval() {

@@ -59,6 +59,12 @@
         "variant": "cpp",
         "bitset": "cpp",
         "regex": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "codecvt": "cpp",
+        "condition_variable": "cpp",
+        "iostream": "cpp",
+        "mutex": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp"
     }
 }

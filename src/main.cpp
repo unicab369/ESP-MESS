@@ -12,6 +12,7 @@
   #include "examples/AppTest.h"
 
 #elif defined(MODE_SLEEP)
+  #include <Adafruit_INA219.h>
   Mod2_SHT3 sht;
   Mod2_BH17 bh17;
   Serv_Tweet tweet;
@@ -27,6 +28,8 @@
 
   unsigned long timeRef, timeDif;
 
+  Adafruit_INA219 ina219;
+
   void setup() {
     pinMode(13, OUTPUT);
     digitalWrite(13, HIGH);
@@ -37,13 +40,17 @@
     sht.setup(&Wire);
     bh17.setup(&Wire);
 
+    if(!ina219.begin()){
+      Serial.println("INA219 not connected!");
+    }
+
     // request readings: need to wait at least 20ms before collect reading
     // start the Wifi to save wait time
     sht.requestReadings();
     bh17.requestReadings();
-    delay(20);   //! this is needed if wifi is not used
+    // delay(20);   //! this is needed if wifi is not used
 
-    WiFi.setOutputPower(20);
+    wifi.setTxPower(20);
     wifi.startAP(true, 8);
     tweet.setup(&device, espNow.mac, &onTweet2);
     Serial.print("Channel = "); Serial.println(WiFi.channel());
@@ -55,10 +62,14 @@
     float temp = sht.getTemp();
     float hum = sht.getHum();
     float lux = bh17.getLux();
+    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
+
+    float busvoltage = ina219.getBusVoltage_V();
+    float current_mA = ina219.getCurrent_mA();
+    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
 
     // send readings
-    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
-    tweet.record.sendTempHumLux(temp, hum, lux);
+    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
     ESP.deepSleep(3e6);
   }
 

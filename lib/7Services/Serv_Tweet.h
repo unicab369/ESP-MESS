@@ -41,36 +41,6 @@ class Serv_Tweet {
             tweetSync.sendSyncMock();
         }
 
-        // void handleCommandItem(CommandItem* item) {
-        //     switch (item->cue) {
-        //         case TRIGGER_STARTUP: {
-        //             addDisplayQueues("Recv Startup");
-        //             break;
-        //         }
-        //         case TRIGGER_SINGLECLICK: {
-        //             addDisplayQueues("Recv Single: " + String(item->value));
-        //             // device->led.toggle();
-        //             break;
-        //         }
-        //         case TRIGGER_DOUBLECLICK: {
-        //             addDisplayQueues("Recv Double: " + String(item->value));
-        //             // device->led.repeatPulses(1000);
-        //             break;  
-        //         }
-        //         case TRIGGER_PIR: {
-        //             addDisplayQueues("Recv Pir: " + String(item->value));
-        //             break;
-        //         }
-        //         case TRIGGER_IR: {
-        //             addDisplayQueues("Recv Ir: " + String(item->value));
-        //             break;
-        //         }
-        //         default: {
-        //             addDisplayQueues("Recv Unknown");
-        //         }
-        //     }
-        // }
-
         void handleMessage(ReceivePacket2* packet) {
             DataContent& content = packet->dataPacket.content;
             // device->handleReceivePacket(packet);
@@ -78,7 +48,6 @@ class Serv_Tweet {
             switch (packet->dataPacket.info.sourceCmd) {
                 case CMD_TRIGGER: {
                     device->handleCommandTrigger(packet); break;
-                    // handleCommandItem(&content.commandItem); break;
                 }
                 case CMD_SYNC: {
                     addDisplayQueues("Recv CMD_SYNC: ");

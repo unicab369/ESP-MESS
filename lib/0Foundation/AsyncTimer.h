@@ -1,3 +1,5 @@
+#define SERVICE_BEGIN_TIME 3
+
 struct RunTimeModel {
     uint32_t maxLoopTime = 0;
 
