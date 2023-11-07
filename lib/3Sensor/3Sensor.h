@@ -27,13 +27,7 @@ class I2CInterface {
 
 class Serv_Sensor {
     SensorBase *sensors[2];
-    bool readFree = true;
-    int currentIndex = 0;
 
-    void startNextReading() {
-        currentIndex++;
-        readFree = true;        // free the reading
-    }
     public:
         Mod2_SHT3 sht;
         Mod2_BH17 bh17;
@@ -46,29 +40,16 @@ class Serv_Sensor {
             isLoaded = true;
         }
 
-        void reset() {
-            if (!isLoaded) return; 
-            for (int i=0; i<2; i++) { sensors[i]->reset(); }
-            currentIndex = 0;
-            readFree = true;
+        void requestReadings() {
+            for (int i=0; i<2; i++) {
+                sensors[i]->requestReadings();
+            }
         }
 
-        // return active status
-        bool checkStatus() {
-            if (!isLoaded || currentIndex >= 2) { return false; }
-            
-            if (readFree) {
-                // request reading when read is free
-                readFree = false;
-                bool validate = sensors[currentIndex]->requestReadings();
-                if (!validate) startNextReading();
-            } else {
-                // otherwise collect the data
-                bool validate = sensors[currentIndex]->collectReadings();
-                if (validate) startNextReading();
+        void collectReadings() {
+            for (int i=0; i<2; i++) {
+                sensors[i]->collectReadings();
             }
-
-            return true;
         }
 };
 
@@ -88,10 +69,6 @@ class Mng_Sensor {
             isLoaded = true;
         }
 
-        void reset() {
-            sensors.reset();
-        }
-
         void getTempHumLux(float *temp, float *hum, float *lux) {
             *temp = sensors.sht.getTemp();
             *hum = sensors.sht.getHum();
@@ -104,12 +81,19 @@ class Mng_Sensor {
                     sensors.sht.getTemp(), sensors.sht.getHum(), sensors.bh17.getLux());
             return output;
         }
-        
-        bool checkStatus() {
-            if (!isLoaded) return false;
-            return sensors.checkStatus();
 
-            // lox.run();
-            // mpu.run();
+        void requestReadings() {
+            if (!isLoaded) return;
+            sensors.requestReadings();
         }
+
+        void collectReadings() {
+            if (!isLoaded) return;
+            sensors.collectReadings();
+        }
+        
+        // bool checkStatus() {
+        //     // lox.run();
+        //     // mpu.run();
+        // }
 };

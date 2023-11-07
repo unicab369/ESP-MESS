@@ -34,7 +34,6 @@ class Mng_Runtime: public Loggable {
             }
             //! Reset sensors reading every second
             device.addStoreQueue();
-            device.i2c1.sensors.reset();
 
             #ifndef ESP32 
                 network.handle_1secInterval_job2();

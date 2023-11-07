@@ -1,6 +1,5 @@
 class SensorBase {
     TwoWire *wire;
-    TimeoutItem requestTimer;
     int address;
     int dataLen = 0;
 
@@ -27,7 +26,6 @@ class SensorBase {
             if(wire->endTransmission() != 0) return false;
 
             registerCmd(cmd, cmdLen);
-            requestTimer.load(wait);
             dataLen = _dataLen;
             return true;
         }
@@ -40,7 +38,6 @@ class SensorBase {
         virtual void reset() { }
         
         bool collectReadings() {
-            if (requestTimer.check() == false) return false;
             wire->requestFrom(address, dataLen);
             uint16_t buf[dataLen] = { 0 };
 

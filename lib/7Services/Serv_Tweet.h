@@ -81,12 +81,15 @@ class Serv_Tweet {
                     // handleCommandItem(&content.commandItem); break;
                 }
                 case CMD_SYNC: {
+                    addDisplayQueues("Recv CMD_SYNC: ");
                     tweetSync.handleMessage(&content.syncItem); break;
                 }
                 case CMD_POST: {
+                    addDisplayQueues("Recv CMD_POST: ");
                     record.handleMessage(&content.recordItem); break;
                 }
                 case CMD_ATTENDANT: {
+                    addDisplayQueues("Recv CMD_ATTENDANT: ");
                     attendant.handleMessage(packet); break;
                 }
             }

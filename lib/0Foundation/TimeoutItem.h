@@ -58,7 +58,11 @@ class TimeoutItem {
 
     public:
         bool isZero() { return cooldown == 0; }
-        uint32_t elapsed() { return timer.elapsed(); }
+        uint32_t elapsed(bool resetOnElapsed = false) { 
+            uint32_t output = timer.elapsed();
+            if (resetOnElapsed) reset();
+            return output; 
+        }
         
         void load(uint32_t _cooldown) {
             cooldown = _cooldown;

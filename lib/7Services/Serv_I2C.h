@@ -57,7 +57,6 @@ class Serv_I2C: public Loggable {
 
         //! Run
         void run() {
-            sensors.checkStatus();
             // pca96.test();
 
             // pca96.drivePWM(0, value);

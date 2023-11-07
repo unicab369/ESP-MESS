@@ -18,36 +18,51 @@
   Serv_EspNow espNow;
   Serv_Device device;
   Net_Wifi wifi;
+  TimeoutItem testTimer;       //* print time logger
 
   std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
-      espNow.send(packet, sizeof(DataPacket2));
+    Serial.println("IM HERE 3");
+    espNow.send(packet, sizeof(DataPacket2));
   };
 
-  void setup() {
-    Serial.begin(115200);
-    Serial.println("\n\nIM HERE");
+  unsigned long timeRef, timeDif;
 
-    // WiFi.setOutputPower(0);
-    wifi.startAP(false, 11);
-    espNow.setup(11);
-    tweet.setup(&device, espNow.mac, &onTweet2);
+  void setup() {
+    pinMode(13, OUTPUT);
+    digitalWrite(13, HIGH);
+    Serial.begin(115200);
+
+    // setup i2C
     Wire.begin(4, 5);
     sht.setup(&Wire);
     bh17.setup(&Wire);
+
+    // request readings: need to wait at least 20ms before collect reading
+    // start the Wifi to save wait time
+    sht.requestReadings();
+    bh17.requestReadings();
+    delay(20);   //! this is needed if wifi is not used
+
+    WiFi.setOutputPower(20);
+    wifi.startAP(true, 8);
+    tweet.setup(&device, espNow.mac, &onTweet2);
+    Serial.print("Channel = "); Serial.println(WiFi.channel());
+    espNow.setup(WiFi.channel());
+
+    // collect readings
+    sht.collectReadings();
+    bh17.collectReadings();
+    float temp = sht.getTemp();
+    float hum = sht.getHum();
+    float lux = bh17.getLux();
+
+    // send readings
+    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
+    tweet.record.sendTempHumLux(temp, hum, lux);
+    ESP.deepSleep(3e6);
   }
 
   void loop() {
-    sht.requestReadings();
-    bh17.requestReadings();
-    delay(20);
-    sht.collectReadings();
-    float temp = sht.getTemp();
-    float hum = sht.getHum();
-    bh17.collectReadings();
-    float lux = bh17.getLux();
-    Serial.printf("temp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
-    // tweet.record.sendTempHumLux(temp, hum, lux);
-    ESP.deepSleep(3e6);
   }
 
 #else

@@ -11,7 +11,7 @@
 #endif
 
 class Net_Wifi: public Loggable {
-    char hostName[21];
+    char hostName[21] = "fakeHostName";
 
     void setHostName() {
         #ifdef ESP32
