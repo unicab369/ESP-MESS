@@ -8,6 +8,8 @@ class Serv_Tweet {
         Tweet_Attendant attendant;
         Tweet_Record record;
 
+        TweetRecordCb *tweetRecordCb;
+
         void addDisplayQueues(String str) {
             device->addDisplayQueues(str, 6);
         }
@@ -28,6 +30,8 @@ class Serv_Tweet {
             tweetSync.onTweet2 = onTweet2;
             record.onTweet2 = onTweet2;
             attendant.onTweet2 = onTweet2;
+
+            record.callback = tweetRecordCb;
         } 
 
         void updateChannel(uint8_t channel) {

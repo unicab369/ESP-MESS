@@ -62,11 +62,6 @@ class Serv_Serial: public Loggable {
             } else if (i2c1.dispMode == DISPLAY_2ND) {
                 handleDisplayMode();
             }
-
-            addDisplayQueue2(appClock.getDisplay(), 1);             //* LINE 1
-            addDisplayQueue2(aTimer1->record(), 2);                      //* LINE 2
-            addDisplayQueue2(aTimer2->record(), 3);                      //* LINE 3
-            addDisplayQueue2(i2c1.sensors.getTempHumLux(), 5);      //* LINE 5
         }
 
         //! 5 Seconds Interval
@@ -79,9 +74,6 @@ class Serv_Serial: public Loggable {
                 addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
                 addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
             }
-            addDisplayQueue2(hostName, 0);         //* LINE 0
-            addDisplayQueue2(sdSize, 4);           //* LINE 4
-            addDisplayQueue2("Heap: " + String(ESP.getFreeHeap()), 6);          //* LINE 6
         }
 
         //! 3 Seconds Interval

@@ -13,7 +13,7 @@ class Mng_Runtime: public Loggable {
         if (runTime->secondsChanged == true) {
             //! RUNTIME (inclusive): 1 second interval
             device.render1s_Interval(&asyncTimer1, &asyncTimer2, [&]() {
-                network.handle_1secInterval();
+                
             });
 
             if (runTime->isSecondInterval(5)) {
@@ -26,7 +26,8 @@ class Mng_Runtime: public Loggable {
 
             } else if (runTime->isSecondInterval(2)) {
                 device.render2s_Interval(network.wifi.localIp());
-                
+                // network.handle_2secInterval();
+
                 // //! Enable Rotary on 2nd second to prevent automatic trigger at the start
                 device.rotary.isEnabled = true;
             } else {
@@ -120,7 +121,7 @@ class Mng_Runtime: public Loggable {
             device.onHandleResetWifi = &onHandleResetWifi;
             device.onHandleRotary = &onHandleRotary;
 
-            network.setupNetwork(&device);
+            network.setup(&device);
 
             //! setup AsyncTimers
             asyncTimer1.setup(&runtimeCb1);

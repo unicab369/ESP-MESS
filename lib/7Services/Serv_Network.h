@@ -12,7 +12,7 @@ class Serv_Network: public Loggable {
     //     tweet.handleMessage(packet);
     // };
 
-    std::function<void(ReceivePacket2*)> tweetHandler = [&](ReceivePacket2* packet) {
+    std::function<void(ReceivePacket2*)> onEspNowCallback = [&](ReceivePacket2* packet) {
         tweet.handleMessage(packet);
     };
 
@@ -49,7 +49,7 @@ class Serv_Network: public Loggable {
             tweet.updateChannel(WiFi.channel());
 
             //! load ESPNow callback
-            espNow.callback2 = &tweetHandler;
+            espNow.callback2 = &onEspNowCallback;
             espNow.setup(WiFi.channel()); 
 
         } else if (retryCnt < 1) {
@@ -60,7 +60,7 @@ class Serv_Network: public Loggable {
             tweet.tweetSync.onReceiveBounce = &onReceiveBounce;
 
             //! load ESPNow callback
-            espNow.callback2 = &tweetHandler;
+            espNow.callback2 = &onEspNowCallback;
             espNow.setup(WiFi.channel()); 
         } 
         
@@ -85,6 +85,18 @@ class Serv_Network: public Loggable {
     Network_State state = NETWORK_START;
     uint8_t retryCnt = 0;
 
+    protected:
+        void setupNetwork(Serv_Device* _device) {
+            xLogSection(__func__);
+            device = _device;
+            tweet.setup(device, espNow.mac, &onTweet2);
+            resetWifi();
+
+            // radio.setup(5, 2);
+            // const char *mqtt = "10.0.0.5";
+            // mqtt_service.start(mqtt);
+        }
+
     public:
         Serv_Network(): Loggable("Net") {}
 
@@ -98,17 +110,6 @@ class Serv_Network: public Loggable {
         uint8_t scanChannel = 0;
 
         const char* getHostName() { return wifi.getHostName(); }
-
-        void setupNetwork(Serv_Device *_device) {
-            xLogSection(__func__);
-            device = _device;
-            tweet.setup(device, espNow.mac, &onTweet2);
-            resetWifi();
-
-            // radio.setup(5, 2);
-            // const char *mqtt = "10.0.0.5";
-            // mqtt_service.start(mqtt);
-        }
 
         void resetWifi() {
             xLogLine(__func__);

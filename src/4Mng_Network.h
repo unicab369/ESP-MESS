@@ -3,7 +3,31 @@
 class Mng_Network: public Serv_Network {
     Web_Server wServer;
 
+    void iotPlotter(uint32_t timeStamp, float temp, float hum, float lux, float volt, float mA) {
+        wServer.makePostRequest(timeStamp, temp, hum, lux, volt, mA);
+    }
+    
+    TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
+        iotPlotter(0, val1, val2, val3, val4, val5);
+    };
+
+    std::function<void(ReceivePacket2*)> onHandleTweet = [&](ReceivePacket2* packet) {
+        DataContent& content = packet->dataPacket.content;
+
+        switch (packet->dataPacket.info.sourceCmd) {
+            case CMD_POST: {
+                break;
+            }
+            default: break;
+        }
+    };
+
     public:
+        void setup(Serv_Device* device) {
+            tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
+            setupNetwork(device);
+        }
+
         void handleSingleClick() {
             // char myStr[] = "Hello There!";
             // lora.sendData(myStr);
