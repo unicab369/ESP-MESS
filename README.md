@@ -17,7 +17,7 @@ checkout our discord channel:
 https://discord.com/channels/793348436475904022/858758498875342878
 
 A Live ESP-MESS Node:
-This is an ESP-MESS Node that runs on a Lithium-ion 18650 battery and a solar panel. The device records the temperature, humidity, ambient light level, battery voltage level, and the charging current from the solar panel. It utilizes ESP-Now to send a signal to another Node, which is connected to my WiFi network. This Node publishes the readings to IoTPlotter for storage and data analysis.
+This is an ESP-MESS Node that runs on a Lithium-ion 18650 battery and a solar panel. The device records the temperature, humidity, ambient light level, battery voltage level, and the charging current from a solar panel. It utilizes ESP-Now to send signals to another Node, which is connected to my WiFi network. This Node publishes the readings to IoTPlotter for storage and data analysis.
 https://iotplotter.com/user/feed/627987619219815565
 
 ### A Solar Node
