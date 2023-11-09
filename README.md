@@ -1,117 +1,48 @@
-# esp_mess
-esp_mess is an open-source firmware for ESP8266 and ESP32 microcontrollers, enabling\
+# What is it?
+ESP-MESS is an open-source firmware for ESP8266 and ESP32 microcontrollers, enabling\
 rapid IoT prototyping for home automation, smart farming, smart business, and more. 
 
-Why ESP-Mess? Back in 2020 during Covid, I got an opportunity to look back and decide on what I want to do next. I thought about what I liked as a kid so I decided to build a remote control car. While looking on Amazon for a good, ok, micontroller to use, I stumbled upon the NodeMcu, a development board that house the ESP8266 module. I didn't want to spend too much money on it so I was not expecting much paying some money for a module. I didn't know something special has been awaited and since then I have learned to do solder, basic electronics, embedded  programming, web developments for microcontrollers, PCB design, and a variety of wireless communication technologies.
+## Why ESP-Mess? 
+Back in 2020 during Covid, I got an opportunity to look back and decide on what I want to do next. I thought about what I liked as a kid so I decided to build a remote control car. While looking on Amazon for a micontroller to use, I stumbled upon the NodeMcu, a development board that house the ESP8266 module. I was not expecting much from a development board. I just didn't know something special has been awaited and since then I have learned to do solder, basic electronics, embedded  programming, web developments for microcontrollers, PCB design, and a variety of wireless communication technologies.
 
-I want to build a wireless bridge system, which can manage many devices using a wide range of different wireless technogies. The goal is have a system that is extendable and addative to different wireless application requirements. And use this as a mean to explore and discover different iOT applications. But at the same time, keep the cost minimal. Thus I created ESP-Mess.
+I am building a Wireless Bridge System that can manage multiple devices using a variety of wireless technologies. The system is designed to be flexible and scalable, allowing it to adapt to different wireless application requirements. My goal is to explore and discover different IoT applications while keeping the cost minimal. To achieve this, I created ESP-MESS.
+
+## Why a Wireless Bridge System (WBSys)?
+Because it's cool. It's very cool. Ok, seriously,
+different wireless technologies have their own unique advantages and disadvantages. For instance, LoRa technology allows devices to communicate with each other over long distances, which is not possible with WiFi or Bluetooth. However, LoRa has a low data rate, which makes it unsuitable for transmitting large amounts of data such as videos or audios. On the other hand, UWB (Ultra Wide Band) technology has a short range but enables devices to be accurately positioned relative to another device (the claim is yet to be verified to be 10-30 cm). WiFi can stream a lot more data over the air compared to Bluetooth, but at the cost of higher power consumption, making it less suitable for battery-operated devices than Bluetooth or BLE. These are just a few examples of the advantages and disadvantages of different wireless technologies.
+
+## Ok, so what can WBSys be used for?
+WBSys is a Wireless Bridge System that enables users to extend, manage, monitor, and control networks of devices. The system can be configured to achieve specific goals, such as a Proof of Concept (POC). By supporting different wireless technologies, WBSys provides users with greater flexibility in selecting devices and configurations that best meet their requirements. ESP-MESS is an implementation of this system, and the supporting devices have been carefully selected based on their performance and price. This allows users to choose components that best fit their budgets while meeting their requirements.
 
 checkout our discord channel: 
 https://discord.com/channels/793348436475904022/858758498875342878
 
-### below is the rough draft of the initial vision
-![Alt text](projectFirefly_4.png)
+A Live ESP-MESS Node:
+This is an ESP-MESS Node that runs on a Lithium-ion 18650 battery and a solar panel. The device records the temperature, humidity, ambient light level, battery voltage level, and the charging current from the solar panel. It utilizes ESP-Now to send a signal to another Node, which is connected to my WiFi network. This Node publishes the readings to IoTPlotter for storage and data analysis.
+https://iotplotter.com/user/feed/627987619219815565
 
-### what is the state of the project?
+### A Solar Node
+<img src="src/Images/SolarNode.jpg" alt="drawing" width="200"/>
+
+### Data visualization
+<img src="src/Images/SolarNodeReadings.png" alt="drawing" width="50%"/>
+
+<br>
+
+# What is the vision?
+### Below is the rough draft of the initial vision. Please excuse my English.
+<img src="src/Images/projectFirefly_4.png" alt="drawing" width="50%"/>
+
+### An example a configuration
+<img src="src/Images/ExampleConfiguration.jpg" alt="drawing" width="50%"/>
+
+# what is the state of the project?
 Right now it's functional but I have not finished document the setup. 
 I will try to make a video with instructions on how to work it.
 
 Currently I have got ESP-Now working and some work for the LoRa communication has completed.
 Next step is to refine the ESP-Now, LoRa, and then add support for BLE.
 
-### IGNORE the stuff below. They are just notes for myself.
-need to create
-src/1Configs/Conf_User.h:
-#define MY_SSID "YOUR_WIFI_SSID"
-#define MY_PASS "YOUR_WIFI_PASSWORD"
-
-### npm install
-https://nodejs.org/en
-cmd: npm install -g live-server
-cmd: live-server
-Run PowerShell as Administrator
-cmd: Set-ExecutionPolicy Unrestricted
-answer: Y
-
-### plugins
-https://serial.huhn.me/
-
-PlatformIO IDE
-Better Comments
-REST Client
-Serial Monitor
-Live Preview
-Live Server
-
-### General Shortcuts
-Ctrl+C/V: Copy/Paste
-Ctrl+S/O: Save/Open
-Ctrl+W: Close Tab or Window
-Ctrl+Z: Undo
-Ctrl+F: Find
-Ctrl+A: Select All
-Ctrl+N: New Window
-
-Alt+Tab: Switch between windows
-Win+Left/Right: Snap-in window (in Multitasking turn off checkboxes)
-Win+Number: Switch between apps in order
-Win+S: Search
-Win+X: Secret Start Menu
-Win+E: File Explorer
-Win+D: Minimize All
-
-### Browser Shortcuts
-Ctrl+T: New Tab 
-Ctrl+Number: Switch tab Number
-
-### YouTube Shortcuts
-up/down: increase/decrease volume
-left/right: Seek back and forth
-Shift+<: reduce playback rate
-Shift+>: increase playback rate
-Spacebar: Play/Pause
-c: caption on or off
-i: open mini player
-Shift+N: next video
-Shift+P: previous video
-
-### VsCode Shortcuts
-Ctrl+/: Comment out Selected
-Ctrl+Click: click on variable or method to see definitions
-Ctrl+G: Goto line
-PlatformIO: Ctrl+Alt+U: Upload code
-
-### Window Screenshots
-Snipping Tools: Search for Snipping Tools app
-Snipping & Sketch: Win+Shift+S
-
-### PiHole Blocklists
-https://firebog.net/
-
-
-### App Flow
-```mermaid
-  graph TD;
-      Serv_Device-->Serv_Network; Serv_Network-->Net_Wifi;
-      Serv_Network-->Web_Server;
-      Web_Server-->Web_Root;
-```
-
-https://github.com/SensorsIot/IOTstack/blob/master/docs/Containers/InfluxDB.md#authentication
-
-
-### Extra
-CH32V Setup
-link: https://taunoerik.art/2023/08/05/programming-ch32v003/
-link: https://www.wch-ic.com/products/WCH-Link.html
-
-burning tool: https://www.wch.cn/downloads/file/418.html?time=2023-10-19%2022:06:13&code=z5CifoTC1ie3Nqxv8Wvr5IrsQdtDa9sBWsguVl6r
-
-PlatformIO Install
-PIO Home -> Platforms -> Advanced platform installation
-Add Url: https://github.com/Community-PIO-Ch32v/platform-ch32v
-pinOut: https://raw.githubusercontent.com/Tengo10/pinout-overview/main/pinouts/CH32v003/ch32v003j4m6.svg
-
-https://github.com/Community-PIO-CH32V/platform-ch32v/blob/develop/boards/genericCH32V003J4M6.json
-pio run -e ws2812bdemo
-pio run -e ws2812bdemo -t upload
+### What am I working on right now?
+Right now I'm testing a few BLE modules. I'm trying to measure the power consumption of different devices and comparing them with each other.
+This way I can pick one that I think is best suited for a low power device that monitors different sensors readings.
