@@ -83,26 +83,28 @@
     Serial.begin(115200);
     runTime.setup();
 
-    #ifdef ESP32
-      xTaskCreatePinnedToCore([](void *pvParam) {
-        for (;;) { 
-          runTime.runJob1(); 
-        }
-      }, "loopCore0", 10000, NULL, 1, NULL, 0);
+    #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+      // xTaskCreatePinnedToCore([](void *pvParam) {
+      //   for (;;) { 
+      //     runTime.runJob1(); 
+      //   }
+      // }, "loopCore0", 10000, NULL, 1, NULL, 0);
 
-      xTaskCreatePinnedToCore([](void *pvParam) {
-        for (;;) { 
-          runTime.runJob2();
-        }
-      }, "loopCore1", 5000, NULL, 1, NULL, 1);
+      // xTaskCreatePinnedToCore([](void *pvParam) {
+      //   for (;;) { 
+      //     runTime.runJob2();
+      //   }
+      // }, "loopCore1", 5000, NULL, 1, NULL, 1);
+    #else
+      for(;;) {
+        // should not be called for ESP32
+        runTime.runJob1();
+        runTime.runJob2();
+      }
     #endif
   } 
 
   void loop() {
-    #ifndef ESP32
-      // should not be called for ESP32
-      runTime.runJob1();
-      runTime.runJob2();
-    #endif
+    // should not be called
   }
 #endif

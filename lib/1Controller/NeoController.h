@@ -1,5 +1,6 @@
 #include <Adafruit_NeoPixel.h>
-#include <FastLED.h>
+// #include <FastLED.h>
+#include "pixeltypes.h"
 
 uint8_t fadeColor(uint8_t current, uint8_t target, uint8_t amount) {
     int output = current;
@@ -235,11 +236,11 @@ class ColorFader {
         }
 
         void step() {
-            if (refColor == targetColor()) {
-                colorIndex.step();
-            } else {
-                refColor = fadeToward(refColor, targetColor(), 10);
-            }
+            // if (refColor == targetColor()) {
+            //     colorIndex.step();
+            // } else {
+            //     refColor = fadeToward(refColor, targetColor(), 10);
+            // }
         }
 };
 
@@ -423,7 +424,7 @@ class NeoRainbowFrame: public NeoFrame {
     void onHandleCycle() {
         for(int i=0; i<controller->numPixels(); i++) {
             CRGB rgbValue = CRGB(0x000000);
-            rgbValue.setHue(hue+i*256/(controller->numPixels()*2));
+            // rgbValue.setHue(hue+i*256/(controller->numPixels()*2));
             controller->loadPixelCRGB(i, rgbValue);
         }
         

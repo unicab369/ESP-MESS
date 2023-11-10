@@ -10,11 +10,12 @@
 // #define TEST_BEHAVIOR 1
 // #define TEST_PWM 1
 // #define TEST_AUDIO 1
-#define TEST_BLINK 1
+// #define TEST_BLINK 1
 // #define TEST_MICROPHONE 1
 // #define TEST_BLE 1
 // #define TEST_BLE_BEACON 1
 // #define TEST_BLE5 1
+#define TEST_BLE_SCANNER 1
 
 Loggable TestLog("Test"); 
 Mng_Config conf;
@@ -36,19 +37,43 @@ void testRun() {
 #ifdef TEST_BLINK
    void setup() {
       Serial.begin(115200);
-      // AppPrint("IM HERE 000");
+      AppPrint("IM HERE 000");
       pinMode(ledPin, OUTPUT);
-      pinMode(13, OUTPUT);
-      pinMode(5, OUTPUT);
+      // pinMode(13, OUTPUT);
+      // pinMode(5, OUTPUT);
    }
 
    void loop() {
-      // TestLog.xLog("IM HERE 111");
+      TestLog.xLog("IM HERE 111");
       uint8_t read = digitalRead(ledPin);
       digitalWrite(ledPin, !read);
-      digitalWrite(13, read);
-      digitalWrite(5, read);
-      delay(500);
+      // digitalWrite(13, read);
+      // digitalWrite(5, read);
+      delay(200);
+   }
+
+#elif TEST_BLE_SCANNER
+   #include <Net_Bluetooth.h>
+
+   Net_Bluetooth bluetooth;
+
+   void setup() {
+      Serial.begin(115200);
+      Serial.println("Scanning...");
+      AppPrint("IM HERE 000");
+      pinMode(ledPin, OUTPUT);
+
+      bluetooth.setup();
+   }
+
+   void loop() {
+      // put your main code here, to run repeatedly:
+      Serial.println("IM HERE zzz");
+      bluetooth.run();
+
+      delay(1000);
+      uint8_t read = digitalRead(ledPin);
+      digitalWrite(ledPin, !read);
    }
 
 #elif TEST_BLE5

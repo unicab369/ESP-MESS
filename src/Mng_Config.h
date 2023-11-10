@@ -35,6 +35,9 @@ class Mng_Config: public Serv_IO {
                 btn1 = 0;
                 relay1 = 14;
 
+            #elif CONFIG_IDF_TARGET_ESP32C3
+                Serial.println("IM HERE zzz 333");
+                
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24
                 // xLogSection("DIRECTIVE = ESP32");
