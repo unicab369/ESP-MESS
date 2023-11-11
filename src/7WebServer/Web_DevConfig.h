@@ -83,7 +83,7 @@ class Web_DevConfig: public Web_Base {
         xLogf("IntValue = %hhu, result = %u", intValue, result);
 
         if (result==7 && AppCheckMac(mac)) {
-            network->device->storage.stoPeer.insertPeer(mac, intValue);
+            // network->device->storage.stoPeer.insertPeer(mac, intValue);
         }
 
         server->send(200, "application/json", "{\"ok\": true}"); 

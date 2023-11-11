@@ -97,10 +97,10 @@ class Serv_Network: public Loggable {
             xLogSection(__func__);
             device = _device;
             tweet.setup(device, espNow.mac, &onTweet2);
-            // resetWifi();
+            resetWifi();
 
-            // //! load ESPNow callback
-            // espNow.callback2 = &onEspNowCallback;
+            //! load ESPNow callback
+            espNow.callback2 = &onEspNowCallback;
 
             // radio.setup(5, 2);
             // const char *mqtt = "10.0.0.5";
@@ -114,13 +114,11 @@ class Serv_Network: public Loggable {
             retryCnt = 15;
             
             #ifdef ESP32
-                // Serial.print("cred = "); Serial.println(cred.getValue()->ssid());
-                // Serial.print("pass = "); Serial.println(cred.getValue()->password());
-                // if (digitalRead(36)) {
-                //     wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
-                // } else {
-                //     wifi.setup(cred.getValue()->ssid(), "cred.passw()");
-                // }
+                if (digitalRead(36)) {
+                    wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
+                } else {
+                    wifi.setup(cred.getValue()->ssid(), "cred.passw()");
+                }
             #else
                 wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
             #endif

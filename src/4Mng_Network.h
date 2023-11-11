@@ -52,15 +52,15 @@ class Mng_Network {
         }
 
         void handle_1secInterval_job2() {
-            // Network_State state = servWifi.pollNetworkState();
-            // if (state != NETWORK_FAILED && state != NETWORK_READY) return;
+            Network_State state = servWifi.pollNetworkState();
+            if (state != NETWORK_FAILED && state != NETWORK_READY) return;
             
-            // AppPrintSeparator("[Runtime]", "network configured");
-            // // char *dateStr = servWifi.device->appClock.getDateStr();
-            // // AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
-            // // servWifi.device->storage.loadStoragePath(dateStr);
-            // AppPrintHeap();
-            // wServer.setup(&servWifi);
+            AppPrintSeparator("[Runtime]", "network configured");
+            // char *dateStr = servWifi.device->appClock.getDateStr();
+            // AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
+            // servWifi.device->storage.loadStoragePath(dateStr);
+            AppPrintHeap();
+            wServer.setup(&servWifi);
         }
 
         void handleRotary(RotaryDirection state, uint8_t counter) {

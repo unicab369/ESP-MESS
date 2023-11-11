@@ -41,23 +41,21 @@ class PairChar {
       char value2[len2] = "";
 
       bool extractValues(const char* key, char* input) {
-         Serial.println("IM HERER aaaaa");
-         
          //! strtok detroys the original string, copy it before perform operation
          char inputStr[124] = "";
-         // memcpy(inputStr, input, sizeof(inputStr));
-         // char *ref = strtok(inputStr, " ");
+         memcpy(inputStr, input, sizeof(inputStr));
+         char *ref = strtok(inputStr, " ");
 
-         // if (strcmp(ref, key) == 0) {
-         //    ref = strtok(NULL, " ");
-         //    strcpy(value1, ref);
+         if (strcmp(ref, key) == 0) {
+            ref = strtok(NULL, " ");
+            strcpy(value1, ref);
 
-         //    ref = strtok(NULL, " ");
-         //    ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
-         //    strcpy(value2, ref);
+            ref = strtok(NULL, " ");
+            ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
+            strcpy(value2, ref);
 
-         //    return true;
-         // }
+            return true;
+         }
 
          return false;
       }
@@ -68,11 +66,12 @@ class PairChar {
 class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
    public:
       const char* ssid() {
-         return "aaa";
+         return "bbb";
          // return value1; 
       }
+
       const char* password() { 
-         return "bbb";
+         return "aaa";
          // return value2;
       }
 
@@ -91,8 +90,13 @@ class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
 //! please keep size minimal, dont inherit Loggable
 class DevConf: public PairChar<21,21>, public ExtractorInterface {
    public:
-      const char* name() { return value1; }
-      const char* mqttIP() { return value2; }
+      const char* name() { 
+         return value1; 
+      }
+
+      const char* mqttIP() { 
+         return value2; 
+      }
 
       bool makeExtraction(const char* key, char* input) override {
          return extractValues(key, input);
@@ -129,8 +133,8 @@ class Mng_Storage: public Loggable {
       EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [32 - 130/136]
       EEPROM_Extractor<DevConf> stoConf;     //! length 42 [136 - 178/184]
 
-      Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
-      Sto_Behavior stoBehavior;
+      // Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
+      // Sto_Behavior stoBehavior;
       Sto_LittleFS littleFS;
       Sto_SD sd1;
 
@@ -146,7 +150,7 @@ class Mng_Storage: public Loggable {
 
          stoCred.load(32);
          stoConf.load(136);
-         stoPeer.load(192);
+         // stoPeer.load(192);
 
          // stoBehavior.reloadData();
 
@@ -206,7 +210,7 @@ class Mng_Storage: public Loggable {
          stoStat.deleteData();
          stoCred.deleteData();
          stoConf.deleteData();
-         stoBehavior.deleteData();
+         // stoBehavior.deleteData();
       }
 
       // void resetBootCnt() {
