@@ -42,6 +42,9 @@ class Mng_Config: public Serv_IO {
                 led1 = 22;
                 btn1 = 16;
                 rotaryA = 13; rotaryB = 15;
+                
+                //! i2C Pins
+                sda0 = 33; scl0 = 32;
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24

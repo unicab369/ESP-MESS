@@ -21,10 +21,14 @@ class SensorBase {
             return wire->read();
         }
 
-        bool _requestReadings(byte* cmd, byte cmdLen, unsigned long wait, byte _dataLen) {
-            wire->beginTransmission(address);
-            if(wire->endTransmission() != 0) return false;
+        bool checkConnection() {
+            Wire.beginTransmission(address);
+            byte err = Wire.endTransmission();
+            return err == 0;
+        }
 
+        bool _requestReadings(byte* cmd, byte cmdLen, unsigned long wait, byte _dataLen) {
+            if (checkConnection()==false) return false;
             registerCmd(cmd, cmdLen);
             dataLen = _dataLen;
             return true;
@@ -38,6 +42,7 @@ class SensorBase {
         virtual void reset() { }
         
         bool collectReadings() {
+            if (checkConnection()==false) return false;
             wire->requestFrom(address, dataLen);
             uint16_t buf[dataLen] = { 0 };
 
