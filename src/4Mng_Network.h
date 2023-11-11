@@ -1,7 +1,9 @@
 #include "7WebServer/Web_Server.h"      // Flash +6%
 
-class Mng_Network: public Serv_Network {
+class Mng_Network {
     Web_Server wServer;
+    Net_Radio radio;
+    Net_Lora lora;
 
     void iotPlotter(uint32_t timeStamp, float temp, float hum, float lux, float volt, float mA) {
         wServer.makePostRequest(timeStamp, temp, hum, lux, volt, mA);
@@ -23,22 +25,24 @@ class Mng_Network: public Serv_Network {
     };
 
     public:
+        Serv_Network servWifi;
+        
         void setup(Serv_Device* device) {
-            tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
-            setupNetwork(device);
+            servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
+            servWifi.setupNetwork(servWifi.device);
         }
 
         void handleSingleClick() {
             // char myStr[] = "Hello There!";
             // lora.sendData(myStr);
-            tweet.command.sendSingleClick(22);
-            tweet.sendSyncMock();
+            servWifi.tweet.command.sendSingleClick(22);
+            servWifi.tweet.sendSyncMock();
             // espNow.sendCustomPacket();
         }
 
         void handleDoubleClick() {
-            tweet.command.sendDoubleClick(33);
-            tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
+            servWifi.tweet.command.sendDoubleClick(33);
+            servWifi.tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
         }
 
         void handle_1secInterval() {
@@ -48,15 +52,15 @@ class Mng_Network: public Serv_Network {
         }
 
         void handle_1secInterval_job2() {
-            Network_State state = pollNetworkState();
-            if (state != NETWORK_FAILED && state != NETWORK_READY) return;
+            // Network_State state = servWifi.pollNetworkState();
+            // if (state != NETWORK_FAILED && state != NETWORK_READY) return;
             
-            AppPrintSeparator("[Runtime]", "network configured");
-            char *dateStr = device->appClock.getDateStr();
-            AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
-            device->storage.loadStoragePath(dateStr);
-            AppPrintHeap();
-            wServer.setup(this);
+            // AppPrintSeparator("[Runtime]", "network configured");
+            // // char *dateStr = servWifi.device->appClock.getDateStr();
+            // // AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
+            // // servWifi.device->storage.loadStoragePath(dateStr);
+            // AppPrintHeap();
+            // wServer.setup(&servWifi);
         }
 
         void handleRotary(RotaryDirection state, uint8_t counter) {
@@ -68,13 +72,13 @@ class Mng_Network: public Serv_Network {
         }
 
         void startAP(bool forceReset) {
-            wifi.startAP(forceReset, scanChannel);
-            espNow.changeChannel(scanChannel);
+            servWifi.wifi.startAP(forceReset, servWifi.scanChannel);
+            servWifi.espNow.changeChannel(servWifi.scanChannel);
         }
 
         void run() { 
-            udp.run();
-            espNow.run();
+            servWifi.udp.run();
+            servWifi.espNow.run();
             wServer.run();
             // radio.run();
         }

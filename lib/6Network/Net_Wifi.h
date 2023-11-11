@@ -12,6 +12,7 @@
 
 class Net_Wifi: public Loggable {
     char hostName[21] = "fakeHostName";
+    bool isLoaded = false;
 
     void setHostName() {
         #ifdef ESP32
@@ -39,7 +40,10 @@ class Net_Wifi: public Loggable {
     public:
         Net_Wifi(): Loggable("Wifi") {} 
 
-        bool isConnected() { return WiFi.status() == WL_CONNECTED; }
+        bool isConnected() { 
+            if (!isLoaded) return false;
+            return WiFi.status() == WL_CONNECTED;
+        }
 
         String localIp() { 
             return isConnected() ? WiFi.localIP().toString() : "0.0.0.0"; 
@@ -55,6 +59,7 @@ class Net_Wifi: public Loggable {
             xLog(__func__, hostName);
             setHostName();
             beginWifi(ssid, passw);
+            isLoaded = true;
         }
 
         void startAP(bool forceReset, int channel = 0) {

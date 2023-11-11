@@ -48,8 +48,8 @@ class Serv_Network: public Loggable {
             udp.requestTime(&udpTimeRequestCb);
             tweet.updateChannel(WiFi.channel());
 
-            //! load ESPNow callback
-            espNow.callback2 = &onEspNowCallback;
+            // //! load ESPNow callback
+            // espNow.callback2 = &onEspNowCallback;
             espNow.setup(WiFi.channel()); 
 
         } else if (retryCnt < 1) {
@@ -59,8 +59,8 @@ class Serv_Network: public Loggable {
             //! load tweetSync callback
             tweet.tweetSync.onReceiveBounce = &onReceiveBounce;
 
-            //! load ESPNow callback
-            espNow.callback2 = &onEspNowCallback;
+            // //! load ESPNow callback
+            // espNow.callback2 = &onEspNowCallback;
             espNow.setup(WiFi.channel()); 
         } 
         
@@ -76,26 +76,10 @@ class Serv_Network: public Loggable {
             state = NETWORK_DONE;
             return;
         }
-
-        tweet.sendSyncMock();
-        tweet.sendSyncMock();
-        tweet.sendSyncMock();
     }
 
     Network_State state = NETWORK_START;
     uint8_t retryCnt = 0;
-
-    protected:
-        void setupNetwork(Serv_Device* _device) {
-            xLogSection(__func__);
-            device = _device;
-            tweet.setup(device, espNow.mac, &onTweet2);
-            resetWifi();
-
-            // radio.setup(5, 2);
-            // const char *mqtt = "10.0.0.5";
-            // mqtt_service.start(mqtt);
-        }
 
     public:
         Serv_Network(): Loggable("Net") {}
@@ -103,13 +87,25 @@ class Serv_Network: public Loggable {
         Serv_Device *device;
         Net_Wifi wifi;
         Net_UDP udp;
-        Net_Radio radio;
         Serv_EspNow espNow;
-        Net_Lora lora;
         Serv_Tweet tweet;
         uint8_t scanChannel = 0;
 
         const char* getHostName() { return wifi.getHostName(); }
+
+        void setupNetwork(Serv_Device* _device) {
+            xLogSection(__func__);
+            device = _device;
+            tweet.setup(device, espNow.mac, &onTweet2);
+            // resetWifi();
+
+            // //! load ESPNow callback
+            // espNow.callback2 = &onEspNowCallback;
+
+            // radio.setup(5, 2);
+            // const char *mqtt = "10.0.0.5";
+            // mqtt_service.start(mqtt);
+        }
 
         void resetWifi() {
             xLogLine(__func__);
@@ -118,11 +114,13 @@ class Serv_Network: public Loggable {
             retryCnt = 15;
             
             #ifdef ESP32
-                if (digitalRead(36)) {
-                    wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
-                } else {
-                    wifi.setup(cred.getValue()->ssid(), "cred.passw()");
-                }
+                // Serial.print("cred = "); Serial.println(cred.getValue()->ssid());
+                // Serial.print("pass = "); Serial.println(cred.getValue()->password());
+                // if (digitalRead(36)) {
+                //     wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
+                // } else {
+                //     wifi.setup(cred.getValue()->ssid(), "cred.passw()");
+                // }
             #else
                 wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
             #endif
@@ -146,7 +144,7 @@ class Serv_Network: public Loggable {
                 }
 
                 case NETWORK_START: {
-                    checkWifi(); 
+                    // checkWifi(); 
                     break;
                 } 
                 default: break;

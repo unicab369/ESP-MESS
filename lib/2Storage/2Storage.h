@@ -37,25 +37,27 @@ class Sto_Stat: public EEPROM_Value<DeviceStats>{
 template <uint8_t len1, uint8_t len2>
 class PairChar {
    public:
-      char value1[len1];
-      char value2[len2];
+      char value1[len1] = "";
+      char value2[len2] = "";
 
       bool extractValues(const char* key, char* input) {
+         Serial.println("IM HERER aaaaa");
+         
          //! strtok detroys the original string, copy it before perform operation
-         char inputStr[124];
-         memcpy(inputStr, input, sizeof(inputStr));
-         char *ref = strtok(inputStr, " ");
+         char inputStr[124] = "";
+         // memcpy(inputStr, input, sizeof(inputStr));
+         // char *ref = strtok(inputStr, " ");
 
-         if (strcmp(ref, key) == 0) {
-            ref = strtok(NULL, " ");
-            strcpy(value1, ref);
+         // if (strcmp(ref, key) == 0) {
+         //    ref = strtok(NULL, " ");
+         //    strcpy(value1, ref);
 
-            ref = strtok(NULL, " ");
-            ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
-            strcpy(value2, ref);
+         //    ref = strtok(NULL, " ");
+         //    ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
+         //    strcpy(value2, ref);
 
-            return true;
-         }
+         //    return true;
+         // }
 
          return false;
       }
@@ -65,8 +67,14 @@ class PairChar {
 //! please keep size minimal, dont inherit Loggable
 class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
    public:
-      const char* ssid() { return value1; }
-      const char* password() { return value2; }
+      const char* ssid() {
+         return "aaa";
+         // return value1; 
+      }
+      const char* password() { 
+         return "bbb";
+         // return value2;
+      }
 
       bool makeExtraction(const char* key, char* input) override {
          return extractValues(key, input);

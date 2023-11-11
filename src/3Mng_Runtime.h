@@ -18,14 +18,14 @@ class Mng_Runtime: public Loggable {
 
             if (runTime->isSecondInterval(5)) {
                 char hostName[22];
-                strcpy(hostName, network.getHostName());
+                strcpy(hostName, network.servWifi.getHostName());
                 device.render5s_Interval(hostName);
 
             } else if (runTime->isSecondInterval(3)) { 
                 device.render3s_Interval(&asyncTimer1, &asyncTimer2);
 
             } else if (runTime->isSecondInterval(2)) {
-                device.render2s_Interval(network.wifi.localIp());
+                device.render2s_Interval(network.servWifi.wifi.localIp());
                 // network.handle_2secInterval();
 
                 // //! Enable Rotary on 2nd second to prevent automatic trigger at the start
@@ -78,7 +78,7 @@ class Mng_Runtime: public Loggable {
     };
 
     std::function<void()> onHandleResetWifi = [&]() {
-        network.resetWifi();        //! Reset Wifi
+        network.servWifi.resetWifi();        //! Reset Wifi
     };
 
     std::function<void(RotaryDirection state, uint8_t counter)> onHandleRotary = 

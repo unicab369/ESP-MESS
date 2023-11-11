@@ -1,7 +1,7 @@
 
 // #define TTGO_LORA32 true
 // #define DEV_KMC_70011 1
-
+#define ESP_MESS_V3 1
 
 class Mng_Config: public Serv_IO {
     public:
@@ -37,7 +37,12 @@ class Mng_Config: public Serv_IO {
 
             #elif CONFIG_IDF_TARGET_ESP32C3
                 Serial.println("IM HERE zzz 333");
-                
+            
+            #elif ESP_MESS_V3
+                led1 = 22;
+                btn1 = 16;
+                rotaryA = 13; rotaryB = 15;
+
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24
                 // xLogSection("DIRECTIVE = ESP32");
@@ -55,13 +60,13 @@ class Mng_Config: public Serv_IO {
                 // btn1 = 23;
                 // buzzer1 = 19;
 
-                ws2812p = 12;
+                // ws2812p = 12;
                 led1 = 22;
                 btn1 = 34;
-                buzzer1 = 14;
-                rotaryA = 13; rotaryB = 15;
+                // buzzer1 = 14;
+                // rotaryA = 13; rotaryB = 15;
                 // pir1 = 36;
-                irSwitchp = 15;
+                // irSwitchp = 15;  //! Need update
                 // swRx = 0; swTx = 2;
                 
                 //! i2C Pins

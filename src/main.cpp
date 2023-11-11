@@ -84,20 +84,20 @@
     runTime.setup();
 
     #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-      // xTaskCreatePinnedToCore([](void *pvParam) {
-      //   for (;;) { 
-      //     runTime.runJob1(); 
-      //   }
-      // }, "loopCore0", 10000, NULL, 1, NULL, 0);
+      xTaskCreatePinnedToCore([](void *pvParam) {
+        for (;;) { 
+          runTime.runJob1();
+        }
+      }, "loopCore0", 10000, NULL, 1, NULL, 0);
 
-      // xTaskCreatePinnedToCore([](void *pvParam) {
-      //   for (;;) { 
-      //     runTime.runJob2();
-      //   }
-      // }, "loopCore1", 5000, NULL, 1, NULL, 1);
+      xTaskCreatePinnedToCore([](void *pvParam) {
+        for (;;) { 
+          runTime.runJob2();
+        }
+      }, "loopCore1", 5000, NULL, 1, NULL, 1);
     #else
       for(;;) {
-        // should not be called for ESP32
+        //! should not be called for ESP32
         runTime.runJob1();
         runTime.runJob2();
       }
@@ -105,6 +105,6 @@
   } 
 
   void loop() {
-    // should not be called
+    //! should not be called
   }
 #endif

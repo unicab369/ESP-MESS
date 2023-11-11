@@ -18,19 +18,19 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
 
     //! RotaryEncoder Callback
     std::function<void(RotaryDirection, uint16_t)> rotaryCb = [&](RotaryDirection state, uint16_t counter) {
-        #ifdef ESP32
-            String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
-            AppPrint("Read ", readings);
-            addDisplayQueues(readings, 5);
-        #endif
+        // #ifdef ESP32
+        //     String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
+        //     AppPrint("Read ", readings);
+        //     addDisplayQueues(readings, 5);
+        // #endif
 
-        String dir = (state == CLOCKWISE) ? "CW" : "CCW";
-        String output =  "val=" + String(counter) + " Dir=" + dir;
-        AppPrint("[Rot]", output);
-        addDisplayQueues(output, 6);       // display
+        // String dir = (state == CLOCKWISE) ? "CW" : "CCW";
+        // String output =  "val=" + String(counter) + " Dir=" + dir;
+        // AppPrint("[Rot]", output);
+        // addDisplayQueues(output, 6);       // display
 
-        // i2c1.pca96.drivePWM(0, counter);
-        if (onHandleRotary) (*onHandleRotary)(state, counter);
+        // // i2c1.pca96.drivePWM(0, counter);
+        // if (onHandleRotary) (*onHandleRotary)(state, counter);
     };
 
     BNT_Hold releasedState = HOLD_TRANSITION;
