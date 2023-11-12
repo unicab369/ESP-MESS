@@ -15,6 +15,10 @@ class Serv_Serial: public Loggable {
 
         Serv_Serial(): Loggable("Serial") {}
 
+        const char* getSSID() {
+            return storage.stoCred.getValue()->ssid();
+        }
+
         void setupSerial(Serv_IO* conf) {
             //! setup i2C
             if (conf->checkWire0()) {

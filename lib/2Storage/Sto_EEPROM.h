@@ -137,12 +137,15 @@ template <class T>
 class EEPROM_Extractor: public EEPROM_Value<T> {
    public:
       void load(uint16_t address) {
+         Serial.println("\n\nzzzzzzzzzzzzzzzzzzzyyyyyyyyyyyyy");
+         
          EEPROM_Value<T>::loadData(address);
          ExtractorInterface* extractor = &(this->value);
          extractor->printValues();
       }
 
       bool extract(const char* key, char* input) {
+         Serial.println("\n\nzzzzzzzzzzzzzzzzzzzyyyyyyyyyyyyy 2222");
          ExtractorInterface* extractor = &(this->value);
 
          bool check = extractor->makeExtraction(key, input);

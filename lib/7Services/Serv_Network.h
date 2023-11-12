@@ -110,15 +110,23 @@ class Serv_Network: public Loggable {
         void resetWifi() {
             xLogLine(__func__);
             state = NETWORK_START;
-            EEPROM_Extractor<WiFiCred> cred = device->storage.stoCred;
             retryCnt = 15;
             
             #ifdef ESP32
-                if (digitalRead(36)) {
-                    wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
-                } else {
-                    wifi.setup(cred.getValue()->ssid(), "cred.passw()");
-                }
+                // if (digitalRead(36)) {
+                    Serial.println("IM HERE aaaa");
+                    const char *val = device->getSSID();
+                    Serial.print("\n\n*** is null = "); Serial.println(val == nullptr);
+
+                    // TODO: BROKEN, NEED FIX
+                    // Serial.print("len = "); Serial.println(strlen(val));
+                    // Serial.print("**value = "); Serial.println(val);
+
+                    // Serial.print("\n\n**SSID = "); Serial.println(cred.getValue()->ssid());
+                    // wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
+                // } else {
+                //     // wifi.setup(cred.getValue()->ssid(), "cred.passw()");
+                // }
             #else
                 wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
             #endif

@@ -37,20 +37,27 @@ class Sto_Stat: public EEPROM_Value<DeviceStats>{
 template <uint8_t len1, uint8_t len2>
 class PairChar {
    public:
-      char value1[len1] = "";
-      char value2[len2] = "";
+      char value1[len1] = "";    
+      char value2[len2] = "";   
 
       bool extractValues(const char* key, char* input) {
          //! strtok detroys the original string, copy it before perform operation
          char inputStr[124] = "";
          memcpy(inputStr, input, sizeof(inputStr));
+
+         Serial.println("\n\n**IM HERE zzzzz");
+         Serial.println(inputStr);
+
          char *ref = strtok(inputStr, " ");
 
          if (strcmp(ref, key) == 0) {
             ref = strtok(NULL, " ");
+            Serial.print("IM HERE 222 = "); Serial.println(ref);
             strcpy(value1, ref);
 
             ref = strtok(NULL, " ");
+            Serial.print("Leng = "); Serial.println(strlen(ref));
+            Serial.print("IM HERE 333 = "); Serial.println(ref);
             ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
             strcpy(value2, ref);
 
@@ -65,14 +72,12 @@ class PairChar {
 //! please keep size minimal, dont inherit Loggable
 class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
    public:
-      const char* ssid() {
-         return "bbb";
-         // return value1; 
+      char* ssid() {
+         return value1; 
       }
 
-      const char* password() { 
-         return "aaa";
-         // return value2;
+      char* password() {
+         return value2;
       }
 
       bool makeExtraction(const char* key, char* input) override {
