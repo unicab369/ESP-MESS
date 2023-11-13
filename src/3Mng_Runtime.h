@@ -12,12 +12,10 @@ class Mng_Runtime: public Loggable {
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
             #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-                //! Code crashes without feeding watchdog. Why?
-                TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
-                TIMERG0.wdt_feed=1;
-                TIMERG0.wdt_wprotect=0;
-            #else
-                Serial.println("IM HERE zzzzz3333");
+                // //! Code crashes without feeding watchdog. Why?
+                // TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+                // TIMERG0.wdt_feed=1;
+                // TIMERG0.wdt_wprotect=0;
             #endif
 
             //! RUNTIME (inclusive): 1 second interval
@@ -120,8 +118,8 @@ class Mng_Runtime: public Loggable {
         Mng_Network network;
         Mng_Power power;
 
-        void setup() {
-            xLog(__func__);
+        void setupRunTime() {
+            xLogSection(__func__);
 
             device.configure();
             device.onHandleSingleClick = &onHandleSingleClick;

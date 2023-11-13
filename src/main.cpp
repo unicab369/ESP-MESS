@@ -81,7 +81,7 @@
 
   void setup() {
     Serial.begin(115200);
-    runTime.setup();
+    runTime.setupRunTime();
 
     #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
       xTaskCreatePinnedToCore([](void *pvParam) {

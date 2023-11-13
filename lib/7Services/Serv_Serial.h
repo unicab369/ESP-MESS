@@ -15,11 +15,9 @@ class Serv_Serial: public Loggable {
 
         Serv_Serial(): Loggable("Serial") {}
 
-        const char* getSSID() {
-            return storage.stoCred.getValue()->ssid();
-        }
-
         void setupSerial(Serv_IO* conf) {
+            xLogSection(__func__);
+            
             //! setup i2C
             if (conf->checkWire0()) {
                 i2c1.setup(conf->scl0, conf->sda0, &Wire);    //! ORDER DOES MATTER
@@ -33,7 +31,7 @@ class Serv_Serial: public Loggable {
                 i2c2.setup(conf->scl1, conf->sda1, &Wire1);
             #endif
 
-            storage.setup();
+            storage.setupStorage();
 
             if (conf->checkHSPIPins() && conf->out3 != 255) {
                 MY_ESP.printSPIPins();
@@ -58,7 +56,7 @@ class Serv_Serial: public Loggable {
             // bool checkConn = i2c2.ch32v.checkConnection();
             // xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
-            
+
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();

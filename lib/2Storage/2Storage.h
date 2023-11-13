@@ -44,20 +44,13 @@ class PairChar {
          //! strtok detroys the original string, copy it before perform operation
          char inputStr[124] = "";
          memcpy(inputStr, input, sizeof(inputStr));
-
-         Serial.println("\n\n**IM HERE zzzzz");
-         Serial.println(inputStr);
-
          char *ref = strtok(inputStr, " ");
 
          if (strcmp(ref, key) == 0) {
             ref = strtok(NULL, " ");
-            Serial.print("IM HERE 222 = "); Serial.println(ref);
             strcpy(value1, ref);
 
             ref = strtok(NULL, " ");
-            Serial.print("Leng = "); Serial.println(strlen(ref));
-            Serial.print("IM HERE 333 = "); Serial.println(ref);
             ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
             strcpy(value2, ref);
 
@@ -68,26 +61,48 @@ class PairChar {
       }
 };
 
+bool extractValues(const char* key, char* input, char *value1, char *value2) {
+   //! strtok detroys the original string, copy it before perform operation
+   char inputStr[124] = "";
+   memcpy(inputStr, input, sizeof(inputStr));
+   char *ref = strtok(inputStr, " ");
+
+   if (strcmp(ref, key) == 0) {
+      ref = strtok(NULL, " ");
+      strcpy(value1, ref);
+
+      ref = strtok(NULL, " ");
+      ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
+      strcpy(value2, ref);
+
+      return true;
+   }
+
+   return false;
+}
+
 //! This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
-class WiFiCred: public PairChar<33, 64>, public ExtractorInterface {
+class WiFiCred: public ExtractorInterface {
    public:
-      char* ssid() {
-         return value1; 
-      }
+      char ssid[33] = "";
+      char password[64] = "";
 
-      char* password() {
-         return value2;
+      void testPrint() {
+         Serial.println("DDDDDDDDDDDDDDDDDD");
+         Serial.print("len1 = "); Serial.println(strlen(ssid));
+         Serial.print("ssid = "); Serial.println(ssid);
+         Serial.print("pass = "); Serial.println(password);
       }
 
       bool makeExtraction(const char* key, char* input) override {
-         return extractValues(key, input);
+         return extractValues(key, input, ssid, password);
       }
 
       void printValues() override {
          Loggable logger = Loggable("WiFiCred");
-         logger.xLogf("SSID = %s", ssid());
-         logger.xLogf("PASSW = %s", password());   
+         logger.xLogf("SSID = %s", ssid);
+         logger.xLogf("PASSW = %s", password);   
       }
 };
 
@@ -148,13 +163,15 @@ class Mng_Storage: public Loggable {
 
       Mng_Storage(): Loggable("Mng_Sto") {}
 
-      void setup() {
+      void setupStorage() {
+         xLogSection(__func__);
+
          EEPROM.begin(EEPROM_SIZE);
          stoStat.load(0);
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
-         stoCred.load(32);
-         stoConf.load(136);
+         stoCred.loadEEPROM(32);
+         stoConf.loadEEPROM(144);
          // stoPeer.load(192);
 
          // stoBehavior.reloadData();

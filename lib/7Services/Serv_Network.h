@@ -111,19 +111,12 @@ class Serv_Network: public Loggable {
             xLogLine(__func__);
             state = NETWORK_START;
             retryCnt = 15;
-            
+            WiFiCred cred = device->storage.stoCred.value;
+            cred.testPrint();
+
             #ifdef ESP32
                 // if (digitalRead(36)) {
-                    Serial.println("IM HERE aaaa");
-                    const char *val = device->getSSID();
-                    Serial.print("\n\n*** is null = "); Serial.println(val == nullptr);
-
-                    // TODO: BROKEN, NEED FIX
-                    // Serial.print("len = "); Serial.println(strlen(val));
-                    // Serial.print("**value = "); Serial.println(val);
-
-                    // Serial.print("\n\n**SSID = "); Serial.println(cred.getValue()->ssid());
-                    // wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
+                    // wifi.setup(cred->ssid, cred->password);
                 // } else {
                 //     // wifi.setup(cred.getValue()->ssid(), "cred.passw()");
                 // }

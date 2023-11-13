@@ -95,9 +95,9 @@ class EEPROM_Value: public Sto_EEPROM {
       //! startAddr contains checkByte, content follows startAddr
       uint16_t startAddr = 0;
       uint16_t contentAddr() { return startAddr + 1; }
-      T value;
 
    public:
+      T value;
       T* getValue() { return &value; }
 
       bool loadData(uint16_t addr) {
@@ -136,16 +136,17 @@ class ExtractorInterface {
 template <class T>
 class EEPROM_Extractor: public EEPROM_Value<T> {
    public:
-      void load(uint16_t address) {
-         Serial.println("\n\nzzzzzzzzzzzzzzzzzzzyyyyyyyyyyyyy");
+      void loadEEPROM(uint16_t address) {
+         Serial.print("############################### "); Serial.println("loadEEPROM");
          
          EEPROM_Value<T>::loadData(address);
+         Serial.print("objectSize = "); Serial.println(sizeof(T));
          ExtractorInterface* extractor = &(this->value);
          extractor->printValues();
       }
 
       bool extract(const char* key, char* input) {
-         Serial.println("\n\nzzzzzzzzzzzzzzzzzzzyyyyyyyyyyyyy 2222");
+         Serial.print("############################### "); Serial.println("extractEEPROM");
          ExtractorInterface* extractor = &(this->value);
 
          bool check = extractor->makeExtraction(key, input);
