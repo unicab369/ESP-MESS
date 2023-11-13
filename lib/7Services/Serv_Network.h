@@ -128,7 +128,7 @@ class Serv_Network: public Loggable {
                 //     // wifi.setup(cred.getValue()->ssid(), "cred.passw()");
                 // }
             #else
-                wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
+                // wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
             #endif
         }
 

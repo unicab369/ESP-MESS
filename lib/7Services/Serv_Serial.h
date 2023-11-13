@@ -55,6 +55,10 @@ class Serv_Serial: public Loggable {
 
         //! 1 Second Interval
         void render1s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2, std::function<void()> handleDisplayMode) {
+            bool checkConn = i2c2.ch32v.checkConnection();
+            xLogf("I2C1 Connection = %d", checkConn);
+            i2c2.ch32v.requestReadings();
+
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();
 
@@ -62,6 +66,7 @@ class Serv_Serial: public Loggable {
                 addDisplayQueue1(aTimer1->record(), 2);             //* LINE 2
                 addDisplayQueue1(aTimer2->record(), 3);             //* LINE 3
                 addDisplayQueue1(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+                // i2c2.sen
 
             } else if (i2c1.dispMode == DISPLAY_2ND) {
                 handleDisplayMode();

@@ -30,7 +30,7 @@ class Serv_I2C: public Loggable {
         Mng_Sensor sensors;
         Mod_RTC rtc;
         PCA96Controller pca96;
-
+        Mod_Ch32v003 ch32v;
         bool isLoaded = false;
     
         void setup(int scl, int sda, TwoWire *wire = &Wire) {
@@ -40,6 +40,8 @@ class Serv_I2C: public Loggable {
 
             wire->begin(sda, scl);
             sensors.setup(wire);
+            ch32v.setup(wire);
+
             rtc.setup(wire);
             pca96.setup(wire);
             disp.setup(wire);

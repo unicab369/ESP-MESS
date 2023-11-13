@@ -24,6 +24,7 @@ class I2CInterface {
 #include "Mod_BH17.h"
 #include "Mod_VL53L0X.h"
 #include "Mod_MPU6050.h"
+#include "Mod_Ch32v003.h"
 
 class Serv_Sensor {
     SensorBase *sensors[2];

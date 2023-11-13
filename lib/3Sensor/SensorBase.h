@@ -21,12 +21,6 @@ class SensorBase {
             return wire->read();
         }
 
-        bool checkConnection() {
-            Wire.beginTransmission(address);
-            byte err = Wire.endTransmission();
-            return err == 0;
-        }
-
         bool _requestReadings(byte* cmd, byte cmdLen, unsigned long wait, byte _dataLen) {
             if (checkConnection()==false) return false;
             registerCmd(cmd, cmdLen);
@@ -41,6 +35,12 @@ class SensorBase {
         virtual bool requestReadings() { return false; }
         virtual void reset() { }
         
+        bool checkConnection() {
+            Wire.beginTransmission(address);
+            byte err = Wire.endTransmission();
+            return err == 0;
+        }
+
         bool collectReadings() {
             if (checkConnection()==false) return false;
             wire->requestFrom(address, dataLen);

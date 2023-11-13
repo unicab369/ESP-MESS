@@ -11,10 +11,14 @@ class Mng_Runtime: public Loggable {
     //! MAIN JOB
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
-            //! Code crashes without feeding watchdog. Why?
-            TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
-            TIMERG0.wdt_feed=1;
-            TIMERG0.wdt_wprotect=0;
+            #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+                //! Code crashes without feeding watchdog. Why?
+                TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+                TIMERG0.wdt_feed=1;
+                TIMERG0.wdt_wprotect=0;
+            #else
+                Serial.println("IM HERE zzzzz3333");
+            #endif
 
             //! RUNTIME (inclusive): 1 second interval
             device.render1s_Interval(&asyncTimer1, &asyncTimer2, [&]() {

@@ -5,7 +5,7 @@
         public:
             void setup(int8_t rx, int8_t tx) {
                 if (rx == 255 || tx == 255) return;
-                Serial1.begin(9600, SERIAL_8N1, tx, rx);
+                Serial1.begin(115200, SERIAL_8N1, rx, tx);
                 didLoad = true;
             }
 

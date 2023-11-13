@@ -37,19 +37,19 @@ void testRun() {
 #ifdef TEST_BLINK
    void setup() {
       Serial.begin(115200);
-      AppPrint("IM HERE 000");
+      AppPrint("\nIM HERE 000");
       pinMode(ledPin, OUTPUT);
       // pinMode(13, OUTPUT);
       // pinMode(5, OUTPUT);
    }
 
    void loop() {
-      TestLog.xLog("IM HERE 111");
+      TestLog.xLog("\nIM HERE 111");
       uint8_t read = digitalRead(ledPin);
       digitalWrite(ledPin, !read);
       // digitalWrite(13, read);
       // digitalWrite(5, read);
-      delay(50);
+      delay(1000);
    }
 
 #elif TEST_BLE_SCANNER

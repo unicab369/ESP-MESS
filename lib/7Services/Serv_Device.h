@@ -177,10 +177,10 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
             led.run();
             ws2812.run();
             serial.run();
+            xSerial.run();
 
             // buzzer.run();
             // edgeDetector.run();
-            // xSerial.run();
         }
 
         void runMainTask2() {
