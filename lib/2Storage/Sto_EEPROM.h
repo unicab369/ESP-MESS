@@ -130,26 +130,27 @@ class EEPROM_Value: public Sto_EEPROM {
 class ExtractorInterface {
    public:
       virtual void printValues() {}
-      virtual bool makeExtraction(const char* key, char* input) {}
+      virtual bool makeExtraction(char* input) {}
 };
 
 template <class T>
 class EEPROM_Extractor: public EEPROM_Value<T> {
    public:
       void loadEEPROM(uint16_t address) {
-         Serial.print("############################### "); Serial.println("loadEEPROM");
+         Serial.print(__func__); Serial.print(": "); Serial.print(address);
+         Serial.print(" len = "); Serial.println(sizeof(T));
          
          EEPROM_Value<T>::loadData(address);
-         Serial.print("objectSize = "); Serial.println(sizeof(T));
-         ExtractorInterface* extractor = &(this->value);
+         T* extractor = &(this->value);
          extractor->printValues();
       }
 
-      bool extract(const char* key, char* input) {
-         Serial.print("############################### "); Serial.println("extractEEPROM");
-         ExtractorInterface* extractor = &(this->value);
+      //! CRASHES if const char* key is removed. WHY???
+      bool extractToEEPROM(const char* key, char* input) {
+         Serial.print(__func__); Serial.print(": "); Serial.print(input);
+         T* extractor = &(this->value);
 
-         bool check = extractor->makeExtraction(key, input);
+         bool check = extractor->makeExtraction(input);
          if (check) {
                EEPROM_Value<T>::storeData();
                EEPROM_Value<T>::reloadData();

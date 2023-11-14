@@ -34,73 +34,44 @@ class Sto_Stat: public EEPROM_Value<DeviceStats>{
       }
 };
 
-template <uint8_t len1, uint8_t len2>
-class PairChar {
-   public:
-      char value1[len1] = "";    
-      char value2[len2] = "";   
-
-      bool extractValues(const char* key, char* input) {
-         //! strtok detroys the original string, copy it before perform operation
-         char inputStr[124] = "";
-         memcpy(inputStr, input, sizeof(inputStr));
-         char *ref = strtok(inputStr, " ");
-
-         if (strcmp(ref, key) == 0) {
-            ref = strtok(NULL, " ");
-            strcpy(value1, ref);
-
-            ref = strtok(NULL, " ");
-            ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
-            strcpy(value2, ref);
-
-            return true;
-         }
-
-         return false;
-      }
-};
-
 bool extractValues(const char* key, char* input, char *value1, char *value2) {
    //! strtok detroys the original string, copy it before perform operation
-   char inputStr[124] = "";
+   char inputStr[240] = "";
    memcpy(inputStr, input, sizeof(inputStr));
    char *ref = strtok(inputStr, " ");
+   // Serial.print("\n*********KEY = "); Serial.println(key);
 
    if (strcmp(ref, key) == 0) {
       ref = strtok(NULL, " ");
       strcpy(value1, ref);
+      // Serial.print("\n*********VALUE = "); Serial.println(key);
 
-      ref = strtok(NULL, " ");
-      ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
-      strcpy(value2, ref);
+      if (value2 != nullptr) {
+         ref = strtok(NULL, " ");
+         ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
+         strcpy(value2, ref);
+      }
 
       return true;
    }
 
+   // Serial.print("\n*********KEY222 = "); Serial.println(key);
    return false;
 }
 
 //! This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
-class WiFiCred: public ExtractorInterface {
+class Dat_Cred: public ExtractorInterface {
    public:
       char ssid[33] = "";
       char password[64] = "";
 
-      void testPrint() {
-         Serial.println("DDDDDDDDDDDDDDDDDD");
-         Serial.print("len1 = "); Serial.println(strlen(ssid));
-         Serial.print("ssid = "); Serial.println(ssid);
-         Serial.print("pass = "); Serial.println(password);
-      }
-
-      bool makeExtraction(const char* key, char* input) override {
-         return extractValues(key, input, ssid, password);
+      bool makeExtraction(char* input) override {
+         return extractValues("cred", input, ssid, password);
       }
 
       void printValues() override {
-         Loggable logger = Loggable("WiFiCred");
+         Loggable logger = Loggable("Dat_Cred");
          logger.xLogf("SSID = %s", ssid);
          logger.xLogf("PASSW = %s", password);   
       }
@@ -108,24 +79,63 @@ class WiFiCred: public ExtractorInterface {
 
 //! This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
-class DevConf: public PairChar<21,21>, public ExtractorInterface {
+class Dat_Conf: public ExtractorInterface {
    public:
-      const char* name() { 
-         return value1; 
+      char name[21], mqttIP[21];
+
+      bool makeExtraction(char* input) override {
+         return extractValues("conf", input, name, mqttIP);
       }
 
-      const char* mqttIP() { 
-         return value2; 
+      void printValues() override {
+         Loggable logger = Loggable("Dat_Conf");
+         logger.xLogf("name = %s", name);
+         logger.xLogf("mqttIP = %s", mqttIP);    
+      }
+};
+
+class Dat_Plotter: public ExtractorInterface {
+   public:
+      char iotPlotter[63];
+      char feedId[32];
+
+      bool makeExtraction(char* input) override {
+         return extractValues("iotPlotter", input, iotPlotter, feedId);
       }
 
-      bool makeExtraction(const char* key, char* input) override {
-         return extractValues(key, input);
+      void printValues() override {
+         Loggable logger = Loggable("Dat_Plotter");
+         logger.xLogf("iotPlotter = %s", iotPlotter);
+         logger.xLogf("feedId = %s", feedId);
+      }
+};
+
+class Dat_Settings: public ExtractorInterface {
+   public:
+      bool xSerial = true;
+      bool espNow = true;
+      
+      bool makeExtraction(char* input) override {
+         char value[2], value2[2];
+
+         if (extractValues("xSerial", input, value, NULL)) {
+            Serial.println("TTTTTTTTTT 1111");
+            xSerial = strcmp("1", value) == 0;
+            return true;
+         }
+         else if (extractValues("espNow", input, value2, NULL)) {
+            Serial.println("TTTTTTTTTT 2222");
+            espNow = strchr(value2, '1');    //! search for char, strcmp doesn't work
+            return true;
+         }
+
+         return false;
       }
 
       void printValues() override {
          Loggable logger = Loggable("DevConf");
-         logger.xLogf("name = %s", name());
-         logger.xLogf("mqttIP = %s", mqttIP());    
+         logger.xLogf("xSerial = %d", xSerial);
+         logger.xLogf("espNow = %d", espNow);
       }
 };
 
@@ -149,9 +159,11 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat stoStat;                      //! length 17 [0 - 17]
-      EEPROM_Extractor<WiFiCred> stoCred;    //! length 98 [32 - 130/136]
-      EEPROM_Extractor<DevConf> stoConf;     //! length 42 [136 - 178/184]
+      Sto_Stat stoStat;                               //! length 17 [0 - 17]
+      EEPROM_Extractor<Dat_Cred> stoCred;             //! start 32 + len 104
+      EEPROM_Extractor<Dat_Conf> stoConf;              //! start 144 + len 48
+      EEPROM_Extractor<Dat_Plotter> stoPlotter;       //! start 200 + len 100
+      EEPROM_Extractor<Dat_Settings> stoSettings;     //! start 312 + len 4?
 
       // Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
       // Sto_Behavior stoBehavior;
@@ -172,6 +184,9 @@ class Mng_Storage: public Loggable {
 
          stoCred.loadEEPROM(32);
          stoConf.loadEEPROM(144);
+         stoPlotter.loadEEPROM(200);
+         stoSettings.loadEEPROM(312);
+
          // stoPeer.load(192);
 
          // stoBehavior.reloadData();
@@ -184,11 +199,17 @@ class Mng_Storage: public Loggable {
       void handleConsoleStr(char* inputStr) {
          xLogf("%s %s", __func__, inputStr);
          
-         if (stoCred.extract("cred", inputStr)) {
-            xLog("IM HERE AAAAAAAAAAAAA");
+         if (stoCred.extractToEEPROM("cred", inputStr)) {
+            xLog("cred extracted");
          }
-         else if(stoConf.extract("conf", inputStr)) {
-            xLog("IM HERE BBBBBBBBBBBBB");
+         else if(stoConf.extractToEEPROM("conf", inputStr)) {
+            xLog("conf extracted");
+         }
+         else if (stoPlotter.extractToEEPROM("iotPlotter", inputStr)) {
+            xLog("iotPlotter extracted");
+         }
+         else if (stoSettings.extractToEEPROM("settings", inputStr)) {
+            xLog("setting extracted");
          }
       }
 

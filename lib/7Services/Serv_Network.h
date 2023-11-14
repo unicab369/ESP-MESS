@@ -49,7 +49,6 @@ class Serv_Network: public Loggable {
             tweet.updateChannel(WiFi.channel());
 
             // //! load ESPNow callback
-            // espNow.callback2 = &onEspNowCallback;
             espNow.setup(WiFi.channel()); 
 
         } else if (retryCnt < 1) {
@@ -60,7 +59,6 @@ class Serv_Network: public Loggable {
             tweet.tweetSync.onReceiveBounce = &onReceiveBounce;
 
             // //! load ESPNow callback
-            // espNow.callback2 = &onEspNowCallback;
             espNow.setup(WiFi.channel()); 
         } 
         
@@ -111,17 +109,13 @@ class Serv_Network: public Loggable {
             xLogLine(__func__);
             state = NETWORK_START;
             retryCnt = 15;
-            WiFiCred cred = device->storage.stoCred.value;
+            Dat_Cred cred = device->storage.stoCred.value;
 
-            #ifdef ESP32
-                // if (digitalRead(36)) {
-                wifi.setup(cred.ssid, cred.password);
-                // } else {
-                //     // wifi.setup(cred.getValue()->ssid(), "cred.passw()");
-                // }
-            #else
-                // wifi.setup(cred.getValue()->ssid(), cred.getValue()->password());
-            #endif
+            // if (digitalRead(36)) {
+            wifi.setup(cred.ssid, cred.password);
+            // } else {
+            //     // wifi.setup(cred.getValue()->ssid(), "cred.passw()");
+            // }
         }
 
         Network_State pollNetworkState() {
@@ -142,7 +136,7 @@ class Serv_Network: public Loggable {
                 }
 
                 case NETWORK_START: {
-                    // checkWifi(); 
+                    checkWifi(); 
                     break;
                 } 
                 default: break;

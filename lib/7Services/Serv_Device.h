@@ -97,7 +97,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
     };
 
     //! storeCred Callback
-    std::function<void(char*)> storeCredCb = [&](char* inputStr) {
+    std::function<void(char*)> parseStringCb = [&](char* inputStr) {
         storage.handleConsoleStr(inputStr);
         if (onHandleResetWifi) (*onHandleResetWifi)();
     };
@@ -124,7 +124,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
             edgeDetector.callback = &pirCb;
             button1.callback = &buttonCb;
             rotary.onCallback = &rotaryCb;
-            serial.onParseString = &storeCredCb;
+            serial.onParseString = &parseStringCb;
         }
 
         //! Tweet CommandTrigger
