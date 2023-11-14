@@ -6,7 +6,8 @@ class Mng_Network {
     Net_Lora lora;
 
     void iotPlotter(uint32_t timeStamp, float temp, float hum, float lux, float volt, float mA) {
-        wServer.makePostRequest(timeStamp, temp, hum, lux, volt, mA);
+        Dat_Plotter plotter = servWifi.device->storage.stoPlotter.value;
+        wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
     }
     
     TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {

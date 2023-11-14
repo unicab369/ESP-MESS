@@ -48,7 +48,7 @@ bool extractValues(const char* key, char* input, char *value1, char *value2) {
 
       if (value2 != nullptr) {
          ref = strtok(NULL, " ");
-         ref[strlen(ref) - 1] = '\0';  // Replace '\n' with string terminator
+         ref[strlen(ref)] = '\0';  // add string terminator
          strcpy(value2, ref);
       }
 
@@ -96,16 +96,16 @@ class Dat_Conf: public ExtractorInterface {
 
 class Dat_Plotter: public ExtractorInterface {
    public:
-      char iotPlotter[63];
+      char apiKey[63];
       char feedId[32];
 
       bool makeExtraction(char* input) override {
-         return extractValues("iotPlotter", input, iotPlotter, feedId);
+         return extractValues("iotPlotter", input, apiKey, feedId);
       }
 
       void printValues() override {
          Loggable logger = Loggable("Dat_Plotter");
-         logger.xLogf("iotPlotter = %s", iotPlotter);
+         logger.xLogf("iotPlotter = %s", apiKey);
          logger.xLogf("feedId = %s", feedId);
       }
 };
@@ -119,12 +119,10 @@ class Dat_Settings: public ExtractorInterface {
          char value[2], value2[2];
 
          if (extractValues("xSerial", input, value, NULL)) {
-            Serial.println("TTTTTTTTTT 1111");
             xSerial = strcmp("1", value) == 0;
             return true;
          }
          else if (extractValues("espNow", input, value2, NULL)) {
-            Serial.println("TTTTTTTTTT 2222");
             espNow = strchr(value2, '1');    //! search for char, strcmp doesn't work
             return true;
          }
