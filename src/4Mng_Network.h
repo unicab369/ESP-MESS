@@ -29,7 +29,7 @@ class Mng_Network {
         
         void setup(Serv_Device* device) {
             servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
-            servWifi.setupNetwork(servWifi.device);
+            servWifi.setupNetwork(device);
         }
 
         void handleSingleClick() {

@@ -103,7 +103,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
     };
 
     public:
-        // Serv_Device(): Loggable("Dev"), Serv_Serial() {}
+        Serv_Device(): Serv_Serial() {}
 
         SerialControl serial;
             
