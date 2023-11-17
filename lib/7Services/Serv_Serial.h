@@ -12,12 +12,15 @@ class Serv_Serial: public Loggable {
         Serv_I2C i2c2;
         Mng_Storage storage;
         Mng_AppClock appClock;
+        Mod_RTC1302 rtc2;
 
         Serv_Serial(): Loggable("Serial") {}
 
         void setupSerial(Serv_IO* conf) {
             xLogSection(__func__);
             
+            rtc2.setup();
+
             //! setup i2C
             if (conf->checkWire0()) {
                 i2c1.setup(conf->scl0, conf->sda0, &Wire);    //! ORDER DOES MATTER
@@ -56,7 +59,11 @@ class Serv_Serial: public Loggable {
             // bool checkConn = i2c2.ch32v.checkConnection();
             // xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
-
+            // rtc2.run();
+            // String timeStr = i2c1.rtc.timeDisplay();
+            // // xLogf("TimeStr = %s", timeStr.c_str());
+            // Serial.println(timeStr);
+            // i2c1.as5600.run();
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();

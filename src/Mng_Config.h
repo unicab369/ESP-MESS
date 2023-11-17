@@ -28,7 +28,7 @@ class Mng_Config: public Serv_IO {
                 //     // i2c.disp.printline("Lora: " + String(packet->data0), 5);
                 //     // digitalWrite(2, !digitalRead(2));
                 // });
-
+x
             #elif defined(DEV_KMC_70011)
                 xLogSection("DIRECTIVE = DEV_KMC_70011");
                 led1 = 13;
@@ -43,6 +43,8 @@ class Mng_Config: public Serv_IO {
                 btn1 = 16;
                 rotaryA = 13; rotaryB = 15;
                 
+                irSwitchp = 36;
+
                 //! i2C Pins
                 sda0 = 33; scl0 = 32;
                 sda1 = 0; scl1 = 2;

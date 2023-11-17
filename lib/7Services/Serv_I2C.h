@@ -21,6 +21,27 @@ struct DispItem {
     }
 };
 
+#include "AS5600.h"
+
+AS5600 as5600;   //  use default Wire
+
+class Mod_AS5600: private Loggable {
+    public:
+        Mod_AS5600(): Loggable("AS5600") {}
+
+        void setup(TwoWire *wire = &Wire) {
+            // as5600 = AS5600(wire);
+            as5600.begin();
+            
+            xLogStatus("AS56002 = ", as5600.isConnected());
+            Serial.print("AS5600 = "); Serial.println(as5600.isConnected());
+        }
+
+        void run() {
+            xLog("Value = %f", as5600.getAngularSpeed(AS5600_MODE_RPM));
+        }
+};
+
 class Serv_I2C: public Loggable {
     public:
         Serv_I2C(): Loggable("I2C") {}
@@ -31,6 +52,8 @@ class Serv_I2C: public Loggable {
         Mod_RTC rtc;
         PCA96Controller pca96;
         Mod_Ch32v003 ch32v;
+        Mod_AS5600 as5600;
+
         bool isLoaded = false;
     
         void setup(int scl, int sda, TwoWire *wire = &Wire) {
@@ -41,6 +64,7 @@ class Serv_I2C: public Loggable {
             wire->begin(sda, scl);
             sensors.setup(wire);
             ch32v.setup(wire);
+            as5600.setup(wire);
 
             rtc.setup(wire);
             pca96.setup(wire);
