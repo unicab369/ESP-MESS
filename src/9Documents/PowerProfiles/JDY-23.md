@@ -1,4 +1,8 @@
 # JDY-23
+
+### Links
+https://fcc.report/FCC-ID/2AXM8-JDY-23/4936741.pdf
+
 ### Commands
 AT+VER<br>
 AT+RST<br>
