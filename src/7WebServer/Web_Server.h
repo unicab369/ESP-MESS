@@ -56,6 +56,8 @@ class Web_Server: public Loggable {
         }
 
         void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
+            return;
+            
             http.begin(String(serverUrl) + String(feed));
             http.addHeader("api-key", apiKey);
             http.addHeader("Content-Type", "application/x-www-form-urlencoded");

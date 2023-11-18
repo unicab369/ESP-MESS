@@ -1,3 +1,10 @@
+| Left |  Center  | Right |
+|:-----|:--------:|------:|
+| L0   | **bold** | $1600 |
+| L1   |  `code`  |   $12 |
+| L2   | _italic_ |    $1 |
+
+
 # E104-BT5011A
 
 ### Commands
@@ -76,31 +83,54 @@ AT+AUTH= 6 bytes max
 ### Commands
 AT+VER<br>
 AT+RST<br>
-AT+DISC<br>
-AT+STAT<br>
-AT+MAC<br>
 AT+BAUD<br>
-AT+SLEEP<br>
 AT+NAME<br>
-AT+SLEEP# (1 light sleep 2 deep sleep no broadcast)<br>
-AT+NAME<br>
-AT+STATEN# (1 power on to wake up, 0 power on sleep - connect wakeup -disconnect sleep)<br>
-AT+ADVIN# (# * 100ms)<br>
-AT+HOSTEN# (0 transparent, 3 Slate iBeacon)<br>
-AT+IBUUID # (32 bytes max?)<br>
-AT+MAJOR# (0000-FFFF)<br>
-AT+MINOR# (0000-FFFF)<br>
-AT+IBSING# (00-FF)<br>
-AT+ALED# (0 broadcast LED off, 1 broadcast LED indicator on)<br>
+AT+STAT<br>
+AT+DISC<br>
+AT+MAC<br>
 AT+DEFAULT<br>
-AT+ENLOG# (0 off, 1 on)<br>
-AT+MTU# (1 20 bytes, 2 128 bytes)<br>
-AT+BATT#
-AT+POWR#
 
-- Active current: average 682uA, max 1.6mA<br>
-- Sleeping current: average 2.61uA, max 445.50uA<br>
-- Trans. current BLE: average 4.09mA, max 10.00mA, dur 7.0ms<br>
+AT+HOSTEN(mode: 0 transparent, 3 Slave iBeacon)<br>
+AT+SLEEP(sleepMode: 1 light sleep, 2 deep sleep no broadcast)<br>
+AT+STARTEN(mode: 1 power on to wake up, 0 power on sleep/connect wakeup/disconnect sleep)<br>
+AT+ADVIN(delay: x[0-9]*100+100ms)<br>
+AT+POWR(NOT WORKING?)<br>
+AT+ENLOG(enable: 1 for enable, 0 for disable)<br>
+AT+ALED(enabled: 0 broadcast LED off, 1 broadcast LED indicator on)<br>
+AT+MTU(mode: 1 for 20 bytes, 2 for 128 bytes)<br>
+AT+BATT(0-99)<br>
+
+AT+IBUUID(32 bytes max?)<br>
+AT+MAJOR(0000-FFFF)<br>
+AT+MINOR(0000-FFFF)<br>
+AT+IBSING(00-FF)<br>
+
+### Observed Behaviors
+1. Deep Sleep no broadcast (mode 2): 
+   - many short spikes, max spikes use 10.65mA and last ~700uSec long.
+   - average current draw 9.10uA (advertise interval 100ms);
+   - average current draw 8.95uA (advertise interval 1000ms).
+
+2. Light Sleep (mode 1):
+   - many short spikes, broadcast spike average 2.95mA, max 10mA, duration ~9.5ms.
+   - average current draw 135uA (advertise interval 200ms).
+   - average current draw 60uA (advertise interval 500ms).
+   - average current draw 35uA (advertise interval 1000ms).
+
+3. Active (No Connection):
+   - broadcast spike average 3.8mA, max 10mA, duration ~6.4ms.
+   - average current draw 813uA (advertise interval 200ms).
+   - average current draw 753uA (advertise interval 500ms).
+   - average current draw 732uA (advertise interval 1000ms);
+
+4. Active (with Connection):
+   - broadcast spike average 9.40mA, max 15mA, duration ~4.3ms (adv interval 100ms).
+
+3. Others:
+   - required reset for changes to take place
+   - only 2 features UUID usable, one fir transparent transmission and the battery level
+   - the chip I have the firmware doesn't allow read and write on the IOs
+
 
 # JDY-25
 ### Commands
