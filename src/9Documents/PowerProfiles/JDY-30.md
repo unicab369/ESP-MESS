@@ -52,14 +52,14 @@ AT+IBSING(00-FF)<br>
    - the chip I have the firmware doesn't allow read and write on the IOs
 
 ### Figures
-![Alt text](JDY-23_Sleep2_NoBroadcast.png)
+![Alt text](images/JDY-23_Sleep2_NoBroadcast.png)
 Figure 1. Sleep Mode2 no broadcast.
 
-![Alt text](JDY-23_Sleep1.png)
+![Alt text](images/JDY-23_Sleep1.png)
 Figure 2. Sleep Mode1.
 
-![Alt text](JDY-23_Signal_SleepMode.png)
+![Alt text](images/JDY-23_Signal_SleepMode.png)
 Figure 3. Advertise signal in sleep mode.
 
-![Alt text](JDY-23_Connected.png)
+![Alt text](images/JDY-23_Connected.png)
 Figure 4. Connected state.
