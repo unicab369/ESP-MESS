@@ -31,24 +31,24 @@ AT+IBSING(00-FF)<br>
 ### Observed Behaviors
 1. Deep Sleep no broadcast (mode 2): 
    - many short spikes, max spikes use 10.65mA and last ~700uSec long.
-   - average current draw 9.10uA (advertise interval 100ms);
-   - average current draw 8.95uA (advertise interval 1000ms).
+   - beacon interval 100ms: average current draw 9.10uA.
+   - beacon interval 1000ms: average current draw 8.95uA.
 
 2. Light Sleep (mode 1):
    - many short spikes, broadcast spike average 2.95mA, max 10mA, duration ~9.5ms.
-   - average current draw 135uA (advertise interval 200ms).
-   - average current draw 60uA (advertise interval 500ms).
-   - average current draw 35uA (advertise interval 1000ms).
+   - beacon interval 200ms: average current draw 135uA.
+   - beacon interval 500ms: average current draw 60uA.
+   - beacon interval 1000ms: average current draw 35uA.
 
 3. Active (No Connection):
    - broadcast spike average 3.8mA, max 10mA, duration ~6.4ms.
-   - average current draw 813uA (advertise interval 200ms).
-   - average current draw 753uA (advertise interval 500ms).
-   - average current draw 732uA (advertise interval 1000ms);
+   - beacon interval 200ms: average current draw 813uA.
+   - beacon interval 500ms: average current draw 753uA.
+   - beacon interval 1000ms: average current draw 732uA.
 
 4. Active (with Connection):
    - broadcast spike average 9.40mA, max 15mA, duration ~4.3ms.
-   - average current draw 7.80mA (advertise interval 100ms).
+   - beacon interval 100ms: average current draw 7.80mA.
    
 3. Others:
    - required reset for changes to take place
@@ -63,7 +63,7 @@ Figure 1. Sleep Mode2 no broadcast.
 Figure 2. Sleep Mode1.
 
 ![Alt text](images/JDY-23_Signal_SleepMode.png)
-Figure 3. Advertise signal in sleep mode.
+Figure 3. Beacon signal in sleep mode.
 
 ![Alt text](images/JDY-23_Connected.png)
 Figure 4. Connected state.
