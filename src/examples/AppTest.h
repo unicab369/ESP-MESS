@@ -10,12 +10,12 @@
 // #define TEST_BEHAVIOR 1
 // #define TEST_PWM 1
 // #define TEST_AUDIO 1
-#define TEST_BLINK 1
+// #define TEST_BLINK 1
 // #define TEST_MICROPHONE 1
 // #define TEST_BLE 1
 // #define TEST_BLE_BEACON 1
 // #define TEST_BLE5 1
-// #define TEST_BLE_SCANNER 1
+#define TEST_BLE_SCANNER 1
 
 Loggable TestLog("Test"); 
 Mng_Config conf;
@@ -44,12 +44,12 @@ void testRun() {
    }
 
    void loop() {
-      TestLog.xLog("\nIM HERE 111");
+      TestLog.xLog("\nIM HERE 11122");
       uint8_t read = digitalRead(ledPin);
       digitalWrite(ledPin, !read);
       // digitalWrite(13, read);
       // digitalWrite(5, read);
-      delay(1000);
+      delay(500);
    }
 
 #elif TEST_BLE_SCANNER

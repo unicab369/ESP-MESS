@@ -189,7 +189,7 @@ class Mng_Storage: public Loggable {
 
          // stoBehavior.reloadData();
 
-         // littleFS.begin();
+         littleFS.begin();
          // Serial.println("\n\n***LittleFS test");
          // littleFS.test();
       }

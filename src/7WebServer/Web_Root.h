@@ -91,6 +91,61 @@ class Web_Root: public Web_Base {
         server->send(200, "text/css", HTTP_FORMS);
     };
 
+    void sendFileResponse(const char* filePath, const char* contentType) {
+        WiFiClient client = server->client();
+        File file = LittleFS.open(filePath, "r");
+        if (file) {
+            client.println("HTTP/1.1 200 OK");
+            client.printf("Content-Type: %s\r\n", contentType);
+            client.println("Connection: close");
+            client.println();
+            
+            while (file.available()) {
+                client.write(file.read());
+            }
+            file.close();
+        } else {
+            client.println("HTTP/1.1 404 Not Found");
+            client.println("Connection: close");
+            client.println();
+        }
+    }
+
+    std::function<void()> uPlotJs = [&]() {
+        // String content = readFileIntoString("/uPlot.iife.min.js");
+        // server->send(200, "application/javascript", UPLOT_JS);
+        WiFiClient client = server->client();
+        client.println("HTTP/1.1 200 OK");
+        client.printf("Content-Type: text/javascript\r\n");
+        client.println("Connection: close");
+        client.println(UPLOT_JS);
+    };
+
+    std::function<void()> uPlotCss = [&]() {
+        server->send(200, "text/css", UPLOT_CSS);
+        // sendFileResponse("/uPlot.min.css", "text/css");
+    };
+
+    std::function<void()> uPlotHtml = [&]() {
+        server->send(200, "text/html", UPLOT_HTML);
+        // sendFileResponse("/align-data.html", "text/html");
+    };
+
+    String readFileIntoString(const char* filePath) {
+        String content = "";
+
+        File file = LittleFS.open(filePath, "r");
+        if (file) {
+            while (file.available()) {
+                Serial.println("reading...");
+                content += (char)file.read();
+            }
+            file.close();
+        }
+
+        return content;
+    }
+
     public:
         Web_Root(): Web_Base("Web_Root") {}
 
@@ -108,6 +163,10 @@ class Web_Root: public Web_Base {
             devFile.begin(network, server);
             webOTA.begin(network, server);
             
+            server->on("/uPlot.iife.min.js", HTTP_GET, uPlotJs);
+            server->on("/uPlot.min.css", HTTP_GET, uPlotCss);
+            server->on("/testPlot", HTTP_GET, uPlotHtml);
+
             server->on("/root.js", HTTP_GET, handleJs);
             server->on("/button.css", HTTP_GET, pureCssButton);
             server->on("/forms.css", HTTP_GET, pureCssForm);
