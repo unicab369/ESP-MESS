@@ -65,6 +65,9 @@
         "iostream": "cpp",
         "mutex": "cpp",
         "stop_token": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "ch32v003fun.h": "c",
+        "ch32v_hal.inl": "c",
+        "stdio.h": "c"
     }
 }
