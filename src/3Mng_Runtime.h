@@ -66,6 +66,11 @@ class Mng_Runtime: public Loggable {
             float temp, hum, lux;
             device.i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
             // wServer.refreshReadings(temp, hum, lux);
+
+            if (runTime->isSecondInterval(5)) {
+                network.iotPlotter(temp, hum, lux, 0, 0);
+            }
+
         } else {
             //! RUNTIME: 25ms intervals
             device.runGroupTasks();

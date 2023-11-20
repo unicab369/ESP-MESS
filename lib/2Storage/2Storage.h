@@ -39,12 +39,10 @@ bool extractValues(const char* key, char* input, char *value1, char *value2) {
    char inputStr[240] = "";
    memcpy(inputStr, input, sizeof(inputStr));
    char *ref = strtok(inputStr, " ");
-   // Serial.print("\n*********KEY = "); Serial.println(key);
 
    if (strcmp(ref, key) == 0) {
       ref = strtok(NULL, " ");
       strcpy(value1, ref);
-      // Serial.print("\n*********VALUE = "); Serial.println(key);
 
       if (value2 != nullptr) {
          ref = strtok(NULL, " ");
@@ -112,18 +110,28 @@ class Dat_Plotter: public ExtractorInterface {
 
 class Dat_Settings: public ExtractorInterface {
    public:
-      bool xSerial = true;
-      bool espNow = true;
+      bool xSerialEnable = true;
+      bool espNowEnable = true;
+      bool slavePlotEnable = false;
+      bool selfPlotEnable = false;
       
       bool makeExtraction(char* input) override {
-         char value[2], value2[2];
+         char value[2], value2[2], value3[2], value4[2];
 
          if (extractValues("xSerial", input, value, NULL)) {
-            xSerial = strcmp("1", value) == 0;
+            xSerialEnable = strcmp("1", value) == 0;
             return true;
          }
          else if (extractValues("espNow", input, value2, NULL)) {
-            espNow = strchr(value2, '1');    //! search for char, strcmp doesn't work
+            espNowEnable = strchr(value2, '1');    //! search for char, strcmp doesn't work
+            return true;
+         }
+         else if (extractValues("slavePlot", input, value3, NULL)) {
+            slavePlotEnable = strchr(value3, '1');    //! search for char, strcmp doesn't work
+            return true;           
+         }
+         else if (extractValues("selfPlot", input, value4, NULL)) {
+            selfPlotEnable = strchr(value4, '1');    //! search for char, strcmp doesn't work
             return true;
          }
 
@@ -132,8 +140,10 @@ class Dat_Settings: public ExtractorInterface {
 
       void printValues() override {
          Loggable logger = Loggable("DevConf");
-         logger.xLogf("xSerial = %d", xSerial);
-         logger.xLogf("espNow = %d", espNow);
+         logger.xLogf("xSerial = %d", xSerialEnable);
+         logger.xLogf("espNow = %d", espNowEnable);
+         logger.xLogf("slavePlot = %d", slavePlotEnable);
+         logger.xLogf("selfPlot = %d", selfPlotEnable);
       }
 };
 
@@ -161,7 +171,7 @@ class Mng_Storage: public Loggable {
       EEPROM_Extractor<Dat_Cred> stoCred;             //! start 32 + len 104
       EEPROM_Extractor<Dat_Conf> stoConf;              //! start 144 + len 48
       EEPROM_Extractor<Dat_Plotter> stoPlotter;       //! start 200 + len 100
-      EEPROM_Extractor<Dat_Settings> stoSettings;     //! start 312 + len 4?
+      EEPROM_Extractor<Dat_Settings> stoSettings;     //! start 312 + len 10?
 
       // Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
       // Sto_Behavior stoBehavior;

@@ -55,8 +55,10 @@ class Web_Server: public Loggable {
             }
         }
 
+        // iotPlotter <apiKey> <feedId>
+        // selfPlot <enable>
         void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
-            return;
+            if (strlen(apiKey) < 32 || strlen(feed) < 10) return;
             
             http.begin(String(serverUrl) + String(feed));
             http.addHeader("api-key", apiKey);

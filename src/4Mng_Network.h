@@ -5,13 +5,11 @@ class Mng_Network {
     Net_Radio radio;
     Net_Lora lora;
 
-    void iotPlotter(uint32_t timeStamp, float temp, float hum, float lux, float volt, float mA) {
-        Dat_Plotter plotter = servWifi.device->storage.stoPlotter.value;
-        wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
-    }
+    Serv_Device *device() { return servWifi.device; }
     
     TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
-        iotPlotter(0, val1, val2, val3, val4, val5);
+        Serial.println("********IM HERE 2222");
+        iotPlotter(val1, val2, val3, val4, val5);
     };
 
     std::function<void(ReceivePacket2*)> onHandleTweet = [&](ReceivePacket2* packet) {
@@ -29,8 +27,23 @@ class Mng_Network {
         Serv_Network servWifi;
         
         void setup(Serv_Device* device) {
+            Serial.println("********IM HERE 1111");
+
             servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
             servWifi.setupNetwork(device);
+        }
+
+        //! iotPlotter
+        void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
+            Mng_Storage storage = servWifi.device->storage;
+            Dat_Settings settings = storage.stoSettings.value;
+            Dat_Plotter plotter = storage.stoPlotter.value;
+
+            Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
+
+            if (settings.selfPlotEnable) {
+                wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
+            }
         }
 
         void handleSingleClick() {
