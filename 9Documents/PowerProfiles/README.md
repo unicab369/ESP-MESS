@@ -78,3 +78,17 @@ AT+AUTH= 6 bytes max
 - Trans. current IBEACON -40dBM -128: average 1.60mA, max 3.10mA, dur 4.0ms<br>
 - Trans. current IBEACON -40dBM 127: average 1.90mA, max 4.50mA, dur 4.0ms<br>
 
+
+
+
+
+
+
+
+
+
+
+
+### add Personal Access Token (PAT)
+update path to include token in front of the repo path.
+https://<your_token>@github.com/username/repo.git

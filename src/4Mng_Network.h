@@ -8,7 +8,6 @@ class Mng_Network {
     Serv_Device *device() { return servWifi.device; }
     
     TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
-        Serial.println("********IM HERE 2222");
         iotPlotter(val1, val2, val3, val4, val5);
     };
 
@@ -27,8 +26,6 @@ class Mng_Network {
         Serv_Network servWifi;
         
         void setup(Serv_Device* device) {
-            Serial.println("********IM HERE 1111");
-
             servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
             servWifi.setupNetwork(device);
         }

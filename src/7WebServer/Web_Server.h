@@ -55,6 +55,7 @@ class Web_Server: public Loggable {
             }
         }
 
+        // cred <ssid> <password>
         // iotPlotter <apiKey> <feedId>
         // selfPlot <enable>
         void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
