@@ -68,12 +68,13 @@ void testRun() {
 
    void loop() {
       // put your main code here, to run repeatedly:
-      Serial.println("IM HERE zzz");
-      bluetooth.run();
+      // Serial.println("\nIM HERE zzz");
+      bluetooth.scanForDevice("98:89:13:0a:4e:36");
+      // bluetooth.run();
 
-      delay(1000);
-      uint8_t read = digitalRead(ledPin);
-      digitalWrite(ledPin, !read);
+      // delay(1000);
+      // uint8_t read = digitalRead(ledPin);
+      // digitalWrite(ledPin, !read);
    }
 
 #elif TEST_BLE5

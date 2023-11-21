@@ -16,4 +16,5 @@ https://github.com/AlexanderMandera/arduino-wch32v003/wiki/Additional-Installati
 pio run -e esp_mess_addon -t upload
 
 ### Unbrick device:
-pio run -e esp_mess_addon -t upload -u 
+ch32v003fun\minichlink> .\minichlink.exe -u
+

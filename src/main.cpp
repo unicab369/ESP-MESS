@@ -5,7 +5,7 @@
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
 
-// #define MODE_TEST 1
+#define MODE_TEST 1
 // #define MODE_SLEEP 1
 
 #ifdef MODE_TEST
@@ -20,6 +20,7 @@
   Serv_Device device;
   Net_Wifi wifi;
   TimeoutItem testTimer;       //* print time logger
+  int BROADCAST_CHANNEL = 2;
 
   std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
     Serial.println("IM HERE 3");
@@ -51,7 +52,7 @@
     // delay(20);   //! this is needed if wifi is not used
 
     wifi.setTxPower(20);
-    wifi.startAP(true, 8);
+    wifi.startAP(true, BROADCAST_CHANNEL);
     tweet.setup(&device, espNow.mac, &onTweet2);
     Serial.print("Channel = "); Serial.println(WiFi.channel());
     espNow.setup(WiFi.channel());
