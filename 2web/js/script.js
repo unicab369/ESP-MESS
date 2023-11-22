@@ -63,6 +63,33 @@
 //    cell.appendChild(select);
 // }
 
+function dataRequest() {
+   const data = generateTimestampsAndData(1)
+
+   fetch(url_conf, {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data),
+   })
+   .then(response =>{
+      if(!response.ok){
+         throw new Error(`Request failed with status: ${response.status}`)
+      }
+      return response.json()
+   })
+   .catch(error => {
+      console.error('Error:', error);
+   });
+}
+
+function dataRequestMock() {
+   return new Promise((resolve, reject) => {
+      setTimeout(() => {
+         resolve(generateTimestampsAndData(1))
+      }, 100)
+   })
+}
+
 function sendRequest() {
    const data = {
       key1: 'val1', key2: 'val2'

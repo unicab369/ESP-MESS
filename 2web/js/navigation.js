@@ -12,6 +12,10 @@ function navToDeviceConf() {
    window.location.href = 'PageBehaviors.html';
 }
 
+function navToGraphData() {
+   window.location.href = 'PageGraph.html';
+}
+
 function navBack() {
    window.history.back();
 }

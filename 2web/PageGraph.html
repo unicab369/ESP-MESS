@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Data</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link rel="stylesheet" href="./lib/uPlot/uPlot.min.css">
+	</head>
+	<body>
+		<script src="./lib/uPlot/uPlot.iife.min.js"></script>
+		<script src="./uPlotGraph/uPlotScript.js"></script>
+		<script src="./js/script.js"></script>
+		<script>
+			async function plotData() {
+       			 // Generate data for 1 hour
+
+				let data2 = await dataRequestMock();
+
+				console.log("running FETC")
+				if (data2.length > 0) {
+					u3.setData(data2);
+				}
+			}
+
+			
+			let uPlotOPtion = new uPlotOption('LUX', 'lux', 'blue', 1920, 600);
+			let opts = uPlotOPtion.getOptions();
+			let u3 = new uPlot(opts, [[],[]], document.body);
+			
+
+			plotData()
+
+			// Update data every 1 minute
+			let interval = setInterval(plotData, 10000);
+
+			// Clear the interval after 10 minutes to prevent memory leaks and unecessary operations.
+			setTimeout(() =>{
+				clearInterval(interval)
+			}, 600000);
+		</script>
+	</body>
+</html>
