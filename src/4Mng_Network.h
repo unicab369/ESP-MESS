@@ -36,7 +36,7 @@ class Mng_Network {
             Dat_Settings settings = storage.stoSettings.value;
             Dat_Plotter plotter = storage.stoPlotter.value;
 
-            Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
+            // Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
 
             if (settings.selfPlotEnable) {
                 wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);

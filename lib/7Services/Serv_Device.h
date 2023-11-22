@@ -40,7 +40,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
                         [&](BTN_Action action, BNT_Hold hold, uint32_t elapse) {
         switch (action) {
             case ACTION_SINGLE_CLICK: {
-                xSerial.println("Hellow there\n");
+                // xSerial.println("Hellow there\n");
                 addDisplayQueues("Single Click", 6);
                 // network.handleSingleClick();
                 if (onHandleSingleClick) (*onHandleSingleClick)();
