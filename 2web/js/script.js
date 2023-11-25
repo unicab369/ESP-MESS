@@ -82,13 +82,7 @@ function dataRequest() {
    });
 }
 
-function dataRequestMock() {
-   return new Promise((resolve, reject) => {
-      setTimeout(() => {
-         resolve(generateTimestampsAndData(1))
-      }, 100)
-   })
-}
+const dataGen = new DataGenerator();
 
 function sendRequest() {
    const data = {
