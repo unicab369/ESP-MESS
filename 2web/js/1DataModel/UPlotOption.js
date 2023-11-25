@@ -1,8 +1,12 @@
+function RecordOption(label, color) {
+   this.label = label
+   this.color = color
+}
+
 class uPlotOption {
-   constructor(title='setTitle', label = 'setLabel', strokeColor ='blue', width = 1920, height = 600) {
+   constructor(title, recordOptions, width, height) {
       this.title = title;
-      this.label = label;
-      this.strokeColor = strokeColor;
+      this.recordOptions = recordOptions
       this.width = width;
       this.height = height;
    }
@@ -23,17 +27,15 @@ class uPlotOption {
                label: "Label_X",
             },
             {
-               label: "Label_Y",
-               points: { show: true, size: 5 },
-               stroke: 'green',
-               width: 1,
+               points: { show: true, size: 1 }, width: 1,
+               label: this.recordOptions[0].label,
+               stroke: '#'+this.recordOptions[0].color,
             }
             ,
             {
-               label: "Label_Z",
-               points: { show: true, size: 5 },
-               stroke: 'red',
-               width: 1,
+               points: { show: true, size: 1 }, width: 1,
+               label: this.recordOptions[1].label,
+               stroke: '#'+this.recordOptions[1].color,
             }
          ]
       }
