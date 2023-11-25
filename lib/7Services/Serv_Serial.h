@@ -1,11 +1,13 @@
 #define MAX_DISPLAY_QUEUE1 8
 #define MAX_DISPLAY_QUEUE2 20
 
+
 class Serv_Serial: public Loggable {
     AppQueue<DispItem, MAX_DISPLAY_QUEUE1> dispQueue1;
     AppQueue<DispItem, MAX_DISPLAY_QUEUE2> dispQueue2;
 
     Disp_ST77 largeDisp;
+    Disp_Epaper epaper;
 
     public:
         Serv_I2C i2c1;
@@ -51,6 +53,7 @@ class Serv_Serial: public Loggable {
                 pinMode(conf->out3, OUTPUT);
                 digitalWrite(conf->out3, HIGH);
                 largeDisp.setup2(conf->out1, conf->out2, conf->rst0, conf->mosi0, conf->sck0);
+                epaper.setup();
             }
         }
 
@@ -64,6 +67,7 @@ class Serv_Serial: public Loggable {
             // // xLogf("TimeStr = %s", timeStr.c_str());
             // Serial.println(timeStr);
             // i2c1.as5600.run();
+            epaper.printLn();
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();

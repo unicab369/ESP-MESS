@@ -25,7 +25,7 @@ class Mng_Config: public Serv_IO {
                 // lora.loadReceiveCb([this](Lora_Packet *packet) {
                 //     Serial.println("LOra received"); 
                 //     packet->print();
-                //     // i2c.disp.printline("Lora: " + String(packet->data0), 5);
+                //     // i2c.disp.printline("Lora: " + String(packet->data0)xx, 5);
                 //     // digitalWrite(2, !digitalRead(2));
                 // });
 x
@@ -47,10 +47,13 @@ x
 
                 //! i2C Pins
                 sda0 = 33; scl0 = 32;
-                sda1 = 0; scl1 = 2;
+                // sda1 = 0; scl1 = 2;
 
                 //! xSerial
                 swRx = 25; swTx = 26;
+
+                //! SPI
+                miso1 = 19; mosi1 = 23; sck1 = 18;
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24
