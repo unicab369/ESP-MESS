@@ -82,8 +82,6 @@ function dataRequest() {
    });
 }
 
-const dataGen = new DataGenerator();
-
 function sendRequest() {
    const data = {
       key1: 'val1', key2: 'val2'
