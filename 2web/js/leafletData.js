@@ -1,13 +1,13 @@
-function generateNearbyCoordinates(coordinate, radiusInMiles, count) {
+function generateNearbyCoordinates(main_coordinate, radiusInMiles, numberofDevices) {
     
     // Convert latitude and longitude to radians
-    let lat = coordinate[0]*(Math.PI/180);
-    let lon = coordinate[1]*(Math.PI/180);
+    let lat = main_coordinate[0]*(Math.PI/180);
+    let lon = main_coordinate[1]*(Math.PI/180);
 
     
-    let coordinates = [];
+    let devices_coordinates = [];
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < numberofDevices; i++) {
         // Convert radius from miles to kilometers
         let radiusInKm = radiusInMiles * 1.60934;
         // Convert radius to radians
@@ -16,20 +16,20 @@ function generateNearbyCoordinates(coordinate, radiusInMiles, count) {
         // Generate a random bearing (direction)
         let bearing = Math.random() * 2 * Math.PI;
 
-        // Calculate new coordinates
+        // Calculate new devices_coordinates
         let newLat = Math.asin(Math.sin(lat) * Math.cos(radiusInRadians) + Math.cos(lat) * Math.sin(radiusInRadians) * Math.cos(bearing));
         let newLon = lon + Math.atan2(Math.sin(bearing) * Math.sin(radiusInRadians) * Math.cos(lat), Math.cos(radiusInRadians) - Math.sin(lat) * Math.sin(newLat));
 
-        // Convert coordinates from radians to degrees
+        // Convert devices_coordinates from radians to degrees
         newLat = newLat * (180 / Math.PI);
         newLon = newLon * (180 / Math.PI);
 
-        coordinates.push([newLat, newLon]);
+        devices_coordinates.push([newLat, newLon]);
     }
-    return coordinates;
+    return devices_coordinates;
 }
 
-class LeafletMap2 {
+class LeafletMapObject {
     constructor(options) {
         this.id = options.id;
         this.main_coordinate = options.main_coordinate;
@@ -84,8 +84,8 @@ class LeafletMap2 {
                 }
             },
             saveText:
-                '<i class="fa fa-download" aria-hidden="true" title="Save tiles"></i>',
-            rmText: '<i class="fa fa-trash" aria-hidden="true"  title="Remove tiles"></i>',
+                '<i class="download-icon" aria-hidden="true" title="Save tiles"></i>',
+            rmText: '<i class="trash-icon" aria-hidden="true"  title="Remove tiles"></i>',
         })
         control.addTo(this.map);
     }  

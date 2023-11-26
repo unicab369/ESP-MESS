@@ -3,13 +3,14 @@
 <html>
     <head>
         <title> Map </title>
-        <link rel="stylesheet" href="./leaflet/leaflet.css" />
-        <script src="./leaflet/leafletData.js"></script>
+        <link rel="stylesheet" href="./lib/leaflet/leaflet.css" />
+        <link rel="stylesheet" href="./icon/icon.css" />
+        <script src="./js/leafletData.js"></script>
 
-        <script src="./leaflet/leaflet.js"></script>
+        <script src="./lib/leaflet/leaflet.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
-        <script src="./leaflet/leaflet-offline.js"></script>
-        <script src="./leaflet/FileSaver.js"></script>
+        <script src="./lib/leaflet/leaflet-offline.js"></script>
+        <script src="./lib/leaflet/FileSaver.js"></script>
     </head>
     <body>
         <h1> This is Map </h1>
@@ -39,12 +40,17 @@
                 mapOptions: mapOptions, 
                 devices_coordinates: devices_coordinates, //Device Coordinates
                 zoom: 16};
+            
+            // Create LeafletMap2 object
+            const leafletMap2 = new LeafletMapObject(options);
 
-            const leafletMap2 = new LeafletMap2(options);
+            // Show Map
             leafletMap2.showMap();
         </script>
 
         <script>
+
+            //Save Data to Text File as a backup just incase the database is corrupted on client side.
             document.getElementById('saveFilesButton').addEventListener('click', function() {
                 let db;
                 let openRequest = indexedDB.open("leaflet.offline");
@@ -57,7 +63,10 @@
                     request.onsuccess = function(e) {
                         let data = JSON.stringify(e.target.result);
                         let blob = new Blob([data], {type: 'application/json'});
-                        saveAs(blob, "./image/data.txt")
+
+                        let date = new Date();
+                        let dateString = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+                        saveAs(blob, `${dateString}_data.txt`)
                     }
                 }
             })
