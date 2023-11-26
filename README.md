@@ -43,3 +43,6 @@ Next step is to refine the ESP-Now, LoRa, and then add support for BLE.
 
 ### What am I working on right now?
 Currently, I'm testing a few BLE modules. I'm trying to measure the power consumption of different devices and compare them with each other. This way I can pick one that I think is best suited for a low power device that can monitor multiple sensor nodes and can last on a battery for the minimum of 1 year.
+
+
+make all monitor

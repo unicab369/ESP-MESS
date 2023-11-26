@@ -53,21 +53,21 @@ class Serv_Serial: public Loggable {
                 pinMode(conf->out3, OUTPUT);
                 digitalWrite(conf->out3, HIGH);
                 largeDisp.setup2(conf->out1, conf->out2, conf->rst0, conf->mosi0, conf->sck0);
-                epaper.setup();
+                // epaper.setup();
             }
         }
 
         //! 1 Second Interval
         void render1s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2, std::function<void()> handleDisplayMode) {
-            // bool checkConn = i2c2.ch32v.checkConnection();
-            // xLogf("I2C1 Connection = %d", checkConn);
+            bool checkConn = i2c2.ch32v.checkConnection();
+            xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
             // rtc2.run();
             // String timeStr = i2c1.rtc.timeDisplay();
             // // xLogf("TimeStr = %s", timeStr.c_str());
             // Serial.println(timeStr);
             // i2c1.as5600.run();
-            epaper.printLn();
+            // epaper.printLn();
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();
