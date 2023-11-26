@@ -1,0 +1,15 @@
+.download-icon {
+    background-image: url('download-solid.svg');
+    background-size: contain;
+    display: inline-block;
+    height: 16px; /* Adjust as needed */
+    width: 16px; /* Adjust as needed */
+}
+
+.trash-icon {
+    background-image: url('trash-solid.svg');
+    background-size: contain;
+    display: inline-block;
+    height: 16px; /* Adjust as needed */
+    width: 16px; /* Adjust as needed */
+}
