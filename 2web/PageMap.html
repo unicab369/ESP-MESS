@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title> Map </title>
+        <link rel="stylesheet" href="./leaflet/leaflet.css" />
+        <script src="./leaflet/leafletData.js"></script>
+
+        <script src="./leaflet/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
+        <script src="./leaflet/leaflet-offline.js"></script>
+        <script src="./leaflet/FileSaver.js"></script>
+    </head>
+    <body>
+        <h1> This is Map </h1>
+
+        <button id="saveFilesButton">Save Files to Local</button>
+        <div id="map" style="width: 600px; height: 400px;">
+        </div>
+
+        <script>
+            // let main_coordinate = [37.78425807817066, -122.40636030396368]; // San Francisco
+            let main_coordinate = [41.116220, -85.140657]; // Fort Wayne
+
+            // Generate nearby Coordinates
+            let devices_coordinates = generateNearbyCoordinates(main_coordinate, 0.05, 5);
+
+            // map API https://leafletjs.com/reference.html#map-example
+            let mapOptions = {
+                zoomControl: false, 
+                dragging: false, 
+                keyboard: false, 
+                center: main_coordinate};
+            
+            // Manipulated map API to take in html "id"
+            let options = {
+                id: 'map', 
+                main_coordinate: main_coordinate, // Center Coordinate
+                mapOptions: mapOptions, 
+                devices_coordinates: devices_coordinates, //Device Coordinates
+                zoom: 16};
+
+            const leafletMap2 = new LeafletMap2(options);
+            leafletMap2.showMap();
+        </script>
+
+        <script>
+            document.getElementById('saveFilesButton').addEventListener('click', function() {
+                let db;
+                let openRequest = indexedDB.open("leaflet.offline");
+                openRequest.onsuccess = function(e) {
+                    db = e.target.result;
+                    let transaction = db.transaction('tileStore');
+                    let store = transaction.objectStore('tileStore');
+                    let request = store.getAll();
+
+                    request.onsuccess = function(e) {
+                        let data = JSON.stringify(e.target.result);
+                        let blob = new Blob([data], {type: 'application/json'});
+                        saveAs(blob, "./image/data.txt")
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>
