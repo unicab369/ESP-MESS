@@ -19,7 +19,7 @@
         <h1> This is Map </h1>
 
         <button id="saveFilesButton">Save Files to Local</button>
-        <div id="map" style="width: 600px; height: 400px;">
+        <div id="map" style="width: 1000px; height: 700px;">
         </div>
 
         <script>
@@ -31,8 +31,8 @@
 
             // map API https://leafletjs.com/reference.html#map-example
             let mapOptions = {
-                zoomControl: false, 
-                dragging: false, 
+                zoomControl: true, 
+                dragging: true, 
                 keyboard: false, 
                 center: main_coordinate};
             
@@ -42,7 +42,8 @@
                 main_coordinate: main_coordinate, // Center Coordinate
                 mapOptions: mapOptions, 
                 devices_coordinates: devices_coordinates, //Device Coordinates
-                zoom: 16};
+                zoom: 14
+            };
             
             // Create LeafletMap2 object
             const leafletMap2 = new LeafletMapObject(options);

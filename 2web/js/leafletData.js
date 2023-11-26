@@ -64,6 +64,24 @@ class LeafletMapObject {
                 .bindPopup(`Device ID${index + 1}`)
                 .openPopup();
         });
+
+        // var circle = L.circle([41.116220, -85.140657], {
+        //     color: 'red',
+        //     fillColor: '#f03',
+        //     fillOpacity: 0.5,
+        //     radius: 500
+        // }).addTo(this.map);
+
+        var poly1 = L.polygon([
+            [41.121143, -85.144377],
+            [41.120426, -85.133347],
+            [41.111572, -85.141099]
+        ], {
+            color: 'green',
+            fillColor: '#f03',
+            fillOpacity: 0.5,
+            radius: 500
+        }).addTo(this.map);
     }
 
     addMapControl(){
