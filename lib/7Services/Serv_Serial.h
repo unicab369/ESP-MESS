@@ -29,11 +29,14 @@ class Serv_Serial: public Loggable {
                 appClock.setup(&(i2c1.rtc));                    //! ORDER DOES MATTER
             }
 
+
             #ifdef ESP32
-                // pinMode(14, OUTPUT);
-                pinMode(36, INPUT);
-                pinMode(39, INPUT);
-                i2c2.setup(conf->scl1, conf->sda1, &Wire1);
+                if (conf->checkWire1()) {
+                    // pinMode(14, OUTPUT);
+                    pinMode(36, INPUT);
+                    pinMode(39, INPUT);
+                    i2c2.setup(conf->scl1, conf->sda1, &Wire1);
+                }
             #endif
 
             storage.setupStorage();
@@ -60,7 +63,7 @@ class Serv_Serial: public Loggable {
         //! 1 Second Interval
         void render1s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2, std::function<void()> handleDisplayMode) {
             bool checkConn = i2c2.ch32v.checkConnection();
-            xLogf("I2C1 Connection = %d", checkConn);
+            // xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
             // rtc2.run();
             // String timeStr = i2c1.rtc.timeDisplay();
@@ -173,7 +176,24 @@ class Serv_Serial: public Loggable {
                     addDisplayQueue2("sd write: " + String(writeTime) + "ms", 8);
                 });
             }
-        }   
+        }
+
+        bool handleConsoleCmd(char* inputStr) {
+            //# WARNING: strtok detroys the original string, perform operation on copied string
+            char clonedStr[128] = "";
+            memcpy(clonedStr, inputStr, sizeof(clonedStr));
+            char *ref = strtok(inputStr, " ");
+
+            //! check keys
+            //! SHT=0x44, SSD13=0x3D, BH17=0x23
+            if (strcmp(ref, "scani2c1") == 0) {
+                i2c1.scanAll();
+            } else if (strcmp(ref, "scani2c2") == 0) {
+                i2c2.scanAll();
+            }
+
+            return true;
+        }
 
         void tick() {
             i2c1.run();

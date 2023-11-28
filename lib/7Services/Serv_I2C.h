@@ -53,6 +53,7 @@ class Serv_I2C: public Loggable {
         PCA96Controller pca96;
         Mod_Ch32v003 ch32v;
         Mod_AS5600 as5600;
+        TwoWire *thisWire;
 
         bool isLoaded = false;
     
@@ -61,6 +62,7 @@ class Serv_I2C: public Loggable {
             xLogStatus(__func__, !error);
             if (error) return;
 
+            thisWire = wire;
             wire->begin(sda, scl);
             sensors.setup(wire);
             ch32v.setup(wire);
@@ -71,6 +73,26 @@ class Serv_I2C: public Loggable {
             disp.setup(wire);
             disp.printline("Hello World!", 0);
             isLoaded = true;
+        }
+
+        void scanAll() {
+            if (!isLoaded) return;
+            byte error, addr;
+            unsigned long ref = millis();
+
+            for (addr=2; addr<127; addr++) {
+                thisWire->beginTransmission(addr);
+                error = thisWire->endTransmission();
+
+                if (error == 0) {
+                    xLogf("Device found. Addr = 0x%02X", addr);
+                } else if (error == 4) {
+                    xLogf("Unknown Error. Addr = 0x%02X", addr);
+                }
+            }
+
+            unsigned long dif = millis() - ref;
+            xLogf("Scan Time = %lu", dif);
         }
         
         void switchDisplayMode() {

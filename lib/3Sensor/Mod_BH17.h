@@ -43,10 +43,10 @@ class Mod2_BH17: public SensorBase, public Lux_Interface {
 class Mod_Ch32v003: public SensorBase {
     public:
         //! addr 0xfa
-        Mod_Ch32v003(): SensorBase(0xfa) {}
+        Mod_Ch32v003(): SensorBase(0x78) {}
 
         uint16_t setup(TwoWire *wire) override {
-            uint16_t value = _setup(wire, BH17_CONT_LOW, 1);
+            uint16_t value = _setup(wire, BH17_POWER_ON, 1);
             return value;
         }
 

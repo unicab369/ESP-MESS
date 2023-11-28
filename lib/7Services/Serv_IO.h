@@ -40,6 +40,10 @@ class Serv_IO {
             return sda0 != 255 && scl0 != 255;
         }
 
+        bool checkWire1() {
+            return sda1 != 255 && scl1 != 255;
+        }
+
         void setupIOs() {
             led.setup(led1);
             led.uniformPluse1000ms();

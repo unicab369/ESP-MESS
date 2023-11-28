@@ -7,6 +7,12 @@
 
 #define EEPROM_SIZE 2000
 
+enum RESET_Type {
+   RESET_WIFI,
+   RESET_DEVICE,
+   RESET_NONE,
+};
+
 struct RTC_Data {
    unsigned long bootCount = 0;
 };
@@ -40,21 +46,21 @@ bool extractValues(const char* key, char* input, char *value1, char *value2) {
    memcpy(inputStr, input, sizeof(inputStr));
    char *ref = strtok(inputStr, " ");
 
-   if (strcmp(ref, key) == 0) {
-      ref = strtok(NULL, " ");
-      strcpy(value1, ref);
+   //! check key
+   if (strcmp(ref, key) != 0) return false;
+   
+   //! validate 1st value
+   ref = strtok(NULL, " ");
+   if (ref == nullptr || strlen(ref) < 1) return false;   
+   strcpy(value1, ref);
+   
+   //! validate 2nd value
+   ref = strtok(NULL, " ");
+   if (ref == nullptr || strlen(ref) < 1 || value2 == nullptr) return false;   
+   ref[strlen(ref)] = '\0';            //! add string terminator
+   strcpy(value2, ref);
 
-      if (value2 != nullptr) {
-         ref = strtok(NULL, " ");
-         ref[strlen(ref)] = '\0';  // add string terminator
-         strcpy(value2, ref);
-      }
-
-      return true;
-   }
-
-   // Serial.print("\n*********KEY222 = "); Serial.println(key);
-   return false;
+   return true;
 }
 
 //# WARNING: This object get stored in EEPROM
@@ -204,27 +210,25 @@ class Mng_Storage: public Loggable {
          // littleFS.test();
       }
 
-      bool handleConsoleStr(char* inputStr) {
+      RESET_Type handleConsoleCmd(char* inputStr) {
          xLogf("%s %s", __func__, inputStr);
          
          if (stoCred.extractToEEPROM(inputStr)) {
             xLog("cred extracted");
-            return true;
+            return RESET_WIFI;
          }
          else if(stoConf.extractToEEPROM(inputStr)) {
             xLog("conf extracted");
-            return true;
+            return RESET_WIFI;
          }
          else if (stoPlotter.extractToEEPROM(inputStr)) {
             xLog("iotPlotter extracted");
-            return true;
          }
          else if (stoSettings.extractToEEPROM(inputStr)) {
             xLog("setting extracted");
-            return true;
          }
 
-         return false;
+         return RESET_NONE;
       }
 
       void setupSDCard(uint8_t sdCS) {
