@@ -23,33 +23,14 @@
         </div>
 
         <script>
-            // let main_coordinate = [37.78425807817066, -122.40636030396368]; // San Francisco
-            let main_coordinate = [41.116220, -85.140657]; // Fort Wayne
-
-            // Generate nearby Coordinates
-            let devices_coordinates = generateNearbyCoordinates(main_coordinate, 0.05, 5);
-
-            // map API https://leafletjs.com/reference.html#map-example
-            let mapOptions = {
-                zoomControl: true, 
-                dragging: true, 
-                keyboard: false, 
-                center: main_coordinate};
-            
-            // Manipulated map API to take in html "id"
-            let options = {
-                id: 'map', 
-                main_coordinate: main_coordinate, // Center Coordinate
-                mapOptions: mapOptions, 
-                devices_coordinates: devices_coordinates, //Device Coordinates
-                zoom: 14
-            };
-            
             // Create LeafletMap2 object
-            const leafletMap2 = new LeafletMapObject(options);
+            const leafletMap2 = new LeafletMapObject();
 
             // Show Map
             leafletMap2.showMap();
+            leafletMap2.addMarkers();
+            leafletMap2.addPolygons();
+            // leafletMap2.addCircle();
         </script>
 
         <script>
