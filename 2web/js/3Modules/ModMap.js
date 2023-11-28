@@ -2,23 +2,23 @@ function generateNearbyCoordinates(center, radiusInMiles, numberofDevices) {
     // Convert latitude and longitude to radians
     let lat = center[0]*(Math.PI/180);
     let lon = center[1]*(Math.PI/180);
-    let devices_coordinates = [];
+    let output = [];
 
     for (let i = 0; i < numberofDevices; i++) {
         let radiusInKm = radiusInMiles * 1.60934;       // Convert radius from miles to kilometers
         let radiusInRadians = radiusInKm / 6371;        // Convert radius to radians
         let bearing = Math.random() * 2 * Math.PI;      // Generate a random bearing (direction)
 
-        // Calculate new devices_coordinates
+        //! Calculate new coordinates
         let newLat = Math.asin(Math.sin(lat) * Math.cos(radiusInRadians) + Math.cos(lat) * Math.sin(radiusInRadians) * Math.cos(bearing));
         let newLon = lon + Math.atan2(Math.sin(bearing) * Math.sin(radiusInRadians) * Math.cos(lat), Math.cos(radiusInRadians) - Math.sin(lat) * Math.sin(newLat));
 
-        // Convert devices_coordinates from radians to degrees
+        //! Convert coordinates from radians to degrees
         newLat = newLat * (180 / Math.PI);
         newLon = newLon * (180 / Math.PI);
-        devices_coordinates.push([newLat, newLon]);
+        output.push([newLat, newLon]);
     }
-    return devices_coordinates;
+    return output;
 }
 
 
@@ -26,7 +26,7 @@ function generateNearbyCoordinates(center, radiusInMiles, numberofDevices) {
 class LeafletMapObject {
     // let main_coordinate = [37.78425807817066, -122.40636030396368]; // San Francisco
 
-    constructor(id = 'map', center = [41.11536086134376, -85.13907697741708], zoom = 17) {
+    constructor(center = [41.11536086134376, -85.13907697741708], zoom = 17) {
         let mapOptions = {
             zoomControl: true, 
             dragging: true, 
@@ -34,7 +34,7 @@ class LeafletMapObject {
         }
 
         this.center = center
-        this.map = L.map(id, mapOptions).setView(center, zoom)
+        this.map = L.map('map', mapOptions).setView(center, zoom)
     }
 
     showMap(){
@@ -54,15 +54,30 @@ class LeafletMapObject {
         })
     }
 
+    addMarker(coordinate, label) {
+        return L.marker(coordinate).addTo(this.map).bindPopup(label).openPopup()
+    }
 
-    addMarkers() {
-        this.devices_coordinates = generateNearbyCoordinates(this.center, 0.05, 5);
+    generateCoordinates() {
+        //! Label device Locations with each coordinate
+        let devices_coordinates = generateNearbyCoordinates(this.center, 0.05, 5);
 
-        //Label device Locations with each coordinate
-        this.devices_coordinates.forEach((coordinate, index) => {
-            L.marker(coordinate).addTo(this.map)
-                .bindPopup(`Device ID${index + 1}`)
-                .openPopup()
+        devices_coordinates.forEach((coordinate, index) => {
+            this.addMarker(coordinate, `Device ID${index + 1}`)
+        });
+
+        // Define a custom icon for the markers
+        var dotIcon = L.divIcon({
+            className: 'dot-icon',
+            iconSize: [8, 8],  // Adjust the size of the dot
+            iconAnchor: [4, 4], // Center the dot
+        })
+
+        //! test locations
+        let test_coordnates = generateNearbyCoordinates(this.center, 0.05, 5);
+        
+        test_coordnates.forEach((point, index) => {
+            var marker = L.marker([point[0], point[1]], { icon: dotIcon }).addTo(this.map)
         });
     }
 
@@ -72,8 +87,6 @@ class LeafletMapObject {
             fillColor: fillColor,
             fillOpacity: 0.7,
         }).addTo(this.map)
-
-        // L.point(41.11709282130384, -85.14070916717945).addTo(this.map)
     }
 
     addCircle() {
@@ -83,28 +96,6 @@ class LeafletMapObject {
             fillOpacity: 0.5,
             radius: 500
         }).addTo(this.map)
-    }
-
-    addDots() {
-        // Define a custom icon for the markers
-        var dotIcon = L.divIcon({
-            className: 'dot-icon',
-            iconSize: [8, 8],  // Adjust the size of the dot
-            iconAnchor: [4, 4], // Center the dot
-        })
-        
-        let points = [
-            {lat: 41.11571828118311, lng: -85.13588633749958, popup: 'marker1'},
-            {lat: 41.1164728399848, lng: -85.135605643708, popup: 'marker2'}, 
-            {lat: 41.11721297203876, lng: -85.13648600150891, popup: 'marker3'}, 
-            {lat: 41.11738598871805, lng: -85.1380489555758, popup: 'marker4'}, 
-            {lat: 41.11735234662168, lng: -85.13999467390394, popup: 'marker5'}, 
-            {lat: 41.11722739011278, lng: -85.14102175800502, popup: 'marker6'}, 
-        ]
-
-        points.forEach((point) => {
-            var marker = L.marker([point.lat, point.lng], { icon: dotIcon }).addTo(this.map)
-        })
     }
 
     addMapControl(){
