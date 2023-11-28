@@ -16,6 +16,14 @@
         <script src="./lib/leaflet/FileSaver.js"></script>
     </head>
     <body>
+        <style>
+            /* Define the styling for the dot icon */
+            .dot-icon {
+              background-color:red; /* Adjust the color of the dot */
+              border-radius: 50%; /* Create a circular shape */
+            }
+        </style>
+        
         <h1> This is Map </h1>
 
         <button id="saveFilesButton">Save Files to Local</button>
@@ -27,8 +35,9 @@
             const leafletMap = new LeafletMapObject();
 
             // Show Map
-            leafletMap.showMap();
-            leafletMap.addMarkers();
+            leafletMap.showMap()
+            leafletMap.addMarkers()
+            leafletMap.addDots()
 
             leafletMap.addPoly([
                 [41.11424347875406, -85.141370068531], 

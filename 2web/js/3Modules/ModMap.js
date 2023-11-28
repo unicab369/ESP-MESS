@@ -31,10 +31,10 @@ class LeafletMapObject {
             zoomControl: true, 
             dragging: true, 
             keyboard: false, 
-        };
+        }
 
         this.center = center
-        this.map = L.map(id, mapOptions).setView(center, zoom);
+        this.map = L.map(id, mapOptions).setView(center, zoom)
     }
 
     showMap(){
@@ -46,11 +46,11 @@ class LeafletMapObject {
             // maxZoom: this.zoom,
         }).addTo(this.map)
 
-        this.addMapControl();
+        this.addMapControl()
         
         //Zoom Function for this.map
         this.map.on('zoomend', () =>{
-            this.map.setView(this.main_coordinate, this.map.getZoom());
+            this.map.setView(this.main_coordinate, this.map.getZoom())
         })
     }
 
@@ -62,7 +62,7 @@ class LeafletMapObject {
         this.devices_coordinates.forEach((coordinate, index) => {
             L.marker(coordinate).addTo(this.map)
                 .bindPopup(`Device ID${index + 1}`)
-                .openPopup();
+                .openPopup()
         });
     }
 
@@ -71,19 +71,9 @@ class LeafletMapObject {
             color: color,
             fillColor: fillColor,
             fillOpacity: 0.7,
-        }).addTo(this.map);
-    }
+        }).addTo(this.map)
 
-    addPolygons() {
-        var poly1 = L.polygon([
-            [41.121143, -85.144377],
-            [41.120426, -85.133347],
-            [41.111572, -85.141099]
-        ], {
-            color: 'green',
-            fillColor: '#8E44AD',
-            fillOpacity: 0.5,
-        }).addTo(this.map);
+        // L.point(41.11709282130384, -85.14070916717945).addTo(this.map)
     }
 
     addCircle() {
@@ -92,7 +82,29 @@ class LeafletMapObject {
             fillColor: '#16A085',
             fillOpacity: 0.5,
             radius: 500
-        }).addTo(this.map);
+        }).addTo(this.map)
+    }
+
+    addDots() {
+        // Define a custom icon for the markers
+        var dotIcon = L.divIcon({
+            className: 'dot-icon',
+            iconSize: [8, 8],  // Adjust the size of the dot
+            iconAnchor: [4, 4], // Center the dot
+        })
+        
+        let points = [
+            {lat: 41.11571828118311, lng: -85.13588633749958, popup: 'marker1'},
+            {lat: 41.1164728399848, lng: -85.135605643708, popup: 'marker2'}, 
+            {lat: 41.11721297203876, lng: -85.13648600150891, popup: 'marker3'}, 
+            {lat: 41.11738598871805, lng: -85.1380489555758, popup: 'marker4'}, 
+            {lat: 41.11735234662168, lng: -85.13999467390394, popup: 'marker5'}, 
+            {lat: 41.11722739011278, lng: -85.14102175800502, popup: 'marker6'}, 
+        ]
+
+        points.forEach((point) => {
+            var marker = L.marker([point.lat, point.lng], { icon: dotIcon }).addTo(this.map)
+        })
     }
 
     addMapControl(){
@@ -102,20 +114,20 @@ class LeafletMapObject {
             confirm(layer, successCallback) {
                 // eslint-disable-next-line no-alert
                 if (window.confirm(`Save ${layer._tilesforSave.length}`)) {
-                    successCallback();
+                    successCallback()
                 }
             },
             confirmRemoval(layer, successCallback) {
                 // eslint-disable-next-line no-alert
                 if (window.confirm('Remove all the tiles?')) {
-                    successCallback();
+                    successCallback()
                 }
             },
             saveText:
                 '<i class="download-icon" aria-hidden="true" title="Save tiles"></i>',
             rmText: '<i class="trash-icon" aria-hidden="true"  title="Remove tiles"></i>',
         })
-        control.addTo(this.map);
+        control.addTo(this.map)
     }  
 }
 
