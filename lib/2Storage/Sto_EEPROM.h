@@ -135,10 +135,12 @@ class ExtractorInterface {
 
 template <class T>
 class EEPROM_Extractor: public EEPROM_Value<T> {
+   Loggable logger = Loggable("Extractor"); 
+
    public:
       void loadEEPROM(uint16_t address) {
-         Serial.print(__func__); Serial.print(": "); Serial.print(address);
-         Serial.print(" len = "); Serial.println(sizeof(T));
+         const char* funStr = __func__;
+         logger.xLogf("%s addr=%u len=%zu", funStr, address, sizeof(T));
          
          EEPROM_Value<T>::loadData(address);
          T* extractor = &(this->value);
@@ -146,8 +148,9 @@ class EEPROM_Extractor: public EEPROM_Value<T> {
       }
 
       //! CRASHES if const char* key is removed. WHY???
-      bool extractToEEPROM(const char* key, char* input) {
-         Serial.print(__func__); Serial.print(": "); Serial.print(input);
+      bool extractToEEPROM(char* input) {
+         const char* funStr = __func__;
+         logger.xLogf("%s intput=%s", funStr, input);
          T* extractor = &(this->value);
 
          bool check = extractor->makeExtraction(input);

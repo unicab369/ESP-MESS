@@ -101,7 +101,7 @@
 
 #else
   Mng_Runtime runTime;
-  Disp_Epaper epaperz;
+  // Disp_Epaper epaperz;
 
   void setup() {
     Serial.begin(115200);

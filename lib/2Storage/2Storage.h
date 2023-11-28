@@ -21,7 +21,7 @@ struct DeviceStats {
    }
 };
 
-//! This object get stored in EEPROM
+//# WARNING: This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
 class Sto_Stat: public EEPROM_Value<DeviceStats>{
    public:
@@ -35,7 +35,7 @@ class Sto_Stat: public EEPROM_Value<DeviceStats>{
 };
 
 bool extractValues(const char* key, char* input, char *value1, char *value2) {
-   //! strtok detroys the original string, copy it before perform operation
+   //# WARNING: strtok detroys the original string, perform operation on copied string
    char inputStr[240] = "";
    memcpy(inputStr, input, sizeof(inputStr));
    char *ref = strtok(inputStr, " ");
@@ -57,7 +57,7 @@ bool extractValues(const char* key, char* input, char *value1, char *value2) {
    return false;
 }
 
-//! This object get stored in EEPROM
+//# WARNING: This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
 class Dat_Cred: public ExtractorInterface {
    public:
@@ -75,7 +75,7 @@ class Dat_Cred: public ExtractorInterface {
       }
 };
 
-//! This object get stored in EEPROM
+//# WARNING: This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
 class Dat_Conf: public ExtractorInterface {
    public:
@@ -204,21 +204,27 @@ class Mng_Storage: public Loggable {
          // littleFS.test();
       }
 
-      void handleConsoleStr(char* inputStr) {
+      bool handleConsoleStr(char* inputStr) {
          xLogf("%s %s", __func__, inputStr);
          
-         if (stoCred.extractToEEPROM("cred", inputStr)) {
+         if (stoCred.extractToEEPROM(inputStr)) {
             xLog("cred extracted");
+            return true;
          }
-         else if(stoConf.extractToEEPROM("conf", inputStr)) {
+         else if(stoConf.extractToEEPROM(inputStr)) {
             xLog("conf extracted");
+            return true;
          }
-         else if (stoPlotter.extractToEEPROM("iotPlotter", inputStr)) {
+         else if (stoPlotter.extractToEEPROM(inputStr)) {
             xLog("iotPlotter extracted");
+            return true;
          }
-         else if (stoSettings.extractToEEPROM("settings", inputStr)) {
+         else if (stoSettings.extractToEEPROM(inputStr)) {
             xLog("setting extracted");
+            return true;
          }
+
+         return false;
       }
 
       void setupSDCard(uint8_t sdCS) {
