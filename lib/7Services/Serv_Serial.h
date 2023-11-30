@@ -62,7 +62,7 @@ class Serv_Serial: public Loggable {
 
         //! 1 Second Interval
         void render1s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2, std::function<void()> handleDisplayMode) {
-            bool checkConn = i2c2.ch32v.checkConnection();
+            // bool checkConn = i2c2.ch32v.checkConnection();
             // xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
             // rtc2.run();
@@ -188,8 +188,17 @@ class Serv_Serial: public Loggable {
             //! SHT=0x44, SSD13=0x3D, BH17=0x23
             if (strcmp(ref, "scani2c1") == 0) {
                 i2c1.scanAll();
+                bool check = i2c1.ch32v.checkConnection();
+                xLogf("CHECK CONN = %u", check);
+                i2c1.ch32v.requestReadings(); 
+
             } else if (strcmp(ref, "scani2c2") == 0) {
                 i2c2.scanAll();
+                bool check = i2c2.ch32v.checkConnection();
+                xLogf("CHECK CONN = %u", check);
+                i2c2.ch32v.requestReadings();
+                // i2c2.disp.printline("ZZZZZZZZZZZZ", 0);
+                // i2c2.disp.printline("YYYYYYYYYYYY", 1);
             }
 
             return true;

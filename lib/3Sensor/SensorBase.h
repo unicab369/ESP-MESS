@@ -1,24 +1,17 @@
 class SensorBase {
-    TwoWire *wire;
     int address;
     int dataLen = 0;
 
-    void registerCmd(byte *cmd, byte len) {
-        if (len==0) { return; }
-        wire->beginTransmission(address);
-        for (byte i=0; i<len; i++) { wire->write(cmd[i]); }
-        wire->endTransmission();
-    }
-
     protected:
+        TwoWire *thisWire;
         SensorBase(int _addr): address(_addr) {}
 
         uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen) {
-            wire = _wire;
+            thisWire = _wire;
             registerCmd(cmd, cmdLen);
             delay(20);
-            wire->requestFrom(address, 1);
-            return wire->read();
+            thisWire->requestFrom(address, 1);
+            return thisWire->read();
         }
 
         bool _requestReadings(byte* cmd, byte cmdLen, unsigned long wait, byte _dataLen) {
@@ -36,18 +29,25 @@ class SensorBase {
         virtual void reset() { }
         
         bool checkConnection() {
-            Wire.beginTransmission(address);
-            byte err = Wire.endTransmission();
+            thisWire->beginTransmission(address);
+            byte err = thisWire->endTransmission();
             return err == 0;
+        }
+
+        void registerCmd(byte *cmd, byte len) {
+            if (len==0) { return; }
+            thisWire->beginTransmission(address);
+            for (byte i=0; i<len; i++) { thisWire->write(cmd[i]); }
+            thisWire->endTransmission();
         }
 
         bool collectReadings() {
             if (checkConnection()==false) return false;
-            wire->requestFrom(address, dataLen);
+            thisWire->requestFrom(address, dataLen);
             uint16_t buf[dataLen] = { 0 };
 
             for (byte i=0; i<dataLen; i++) {
-                buf[i] = wire->read();
+                buf[i] = thisWire->read();
             } 
 
             onReceiveData(buf);

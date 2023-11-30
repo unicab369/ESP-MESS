@@ -47,7 +47,7 @@ x
 
                 //! i2C Pins
                 sda0 = 33; scl0 = 32;
-                sda1 = 2; scl1 = 0;
+                sda1 = 17; scl1 = 4;
 
                 //! xSerial
                 swRx = 25; swTx = 26;

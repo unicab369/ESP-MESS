@@ -50,7 +50,25 @@ class Mod_Ch32v003: public SensorBase {
             return value;
         }
 
+        uint8_t value = 0;
+
         bool requestReadings() override {
-            return _requestReadings(0, 0, 10, 2);
+            thisWire->requestFrom(0x78, 10);
+            uint8_t buf[10] = { 0 };
+
+            Serial.println("***READ=");
+            for (int i=0; i<10; i++) {
+                buf[i] = thisWire->read();
+                Serial.printf("%u, ", buf[i]);
+            }
+            Serial.println();
+
+            thisWire->beginTransmission(0x78);
+            thisWire->write(0x00);          // register location?
+            thisWire->write(0x05);          // register new value?
+            int err = thisWire->endTransmission();
+            Serial.printf("\n*** SENSOR ERROR = %u", err);
+
+            return false;
         }
 };
