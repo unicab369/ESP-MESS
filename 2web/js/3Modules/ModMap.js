@@ -120,5 +120,35 @@ class LeafletMapObject {
         })
         control.addTo(this.map)
     }  
+
+    addDrawingTool(){
+        let drawnItems = new L.FeatureGroup().addTo(this.map);
+
+        let drawControl = new L.Control.Draw({
+            draw: {
+                polygon: {
+                    shapeOptions: {
+                        color: '#1ABC9C',
+                        fillOpacity: 0.8
+                    }
+                }
+            },
+            edit: {
+                featureGroup: drawnItems
+            }
+        })
+
+        this.map.addControl(drawControl);
+        this.map.on(L.Draw.Event.CREATED, function (e) {
+            let type = e.layerType,
+                layer = e.layer;
+
+            if (type === 'marker') {
+                layer.bindPopup('A popup!');
+            }
+
+            drawnItems.addLayer(layer);
+        })
+    }
 }
 
