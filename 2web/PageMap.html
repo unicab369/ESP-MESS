@@ -15,6 +15,12 @@
         <script src="./lib/leaflet/FileSaver.js"></script>
         <script src="./js/3Modules/ModMap.js"></script>
         <script src="./js/4Controllers/ZoneLayout.js"></script>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+        
+        
     </head>
     <body>
         <style>
@@ -31,11 +37,23 @@
         <div id="map" style="width: 1000px; height: 700px;">
         </div>
 
+        
+        
+        <button id="saveGeoJsonButton">Save GeoJSON</button>
+        <!-- This script needs to go after the button! -->
+        <script src="./js/4Controllers/SaveZoneGeoJSON.js"></script>
+
+        
+        
+        <input type="file" id="loadGeoJsonButton">
+        <!-- This script needs to go after the button! -->
+        <script src="./js/4Controllers/LoadZoneGeoJSON.js"></script>
+
+
         <script>
             const zoneLayout = new ZoneLayout()
-
             zoneLayout.setup()
-            zoneLayout.addZones()
+
         </script>
 
         <script>
