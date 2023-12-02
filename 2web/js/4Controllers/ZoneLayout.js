@@ -39,6 +39,7 @@ class ZoneLayout {
       this.leafletMap.showMap()
       this.leafletMap.generateCoordinates()
       // this.leafletMap.addDots()
+      this.leafletMap.addDrawingTool()
       this.leafletMap.addMarker([41.114233553848415, -85.14135853514709], "startPoint")
    }
 

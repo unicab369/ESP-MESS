@@ -120,5 +120,62 @@ class LeafletMapObject {
         })
         control.addTo(this.map)
     }  
+
+    addDrawingTool(){
+        // Add drawing tool
+        this.drawnItems = new L.FeatureGroup().addTo(this.map);
+
+        // Initialize the draw control and pass it the FeatureGroup of editable layers
+        let drawControl = new L.Control.Draw({
+            draw: {
+                polyline: false,
+                polygon: {
+                    shapeOptions: {
+                        color: '#1ABC9C',
+                        fillOpacity: 0.2
+                    }
+                },
+                rectangle: {
+                    shapeOptions: {
+                        color: '#1ABC9C',
+                        fillOpacity: 0.2
+                    }
+                },
+                circle: false,
+                circlemarker: false,
+                marker: false
+            },
+            edit: {
+                featureGroup: this.drawnItems
+            }
+        })
+
+        // Add drawing tool to map
+        this.map.addControl(drawControl);
+
+        // Add event listener to save drawn items to geoJSON
+        this.map.on(L.Draw.Event.CREATED, (e) => {
+            let type = e.layerType,
+                layer = e.layer;
+
+            if (type === 'polygon') {
+                let color = prompt("Enter the color for the shape:");
+                if (color) {
+                    layer.setStyle({
+                        color: color
+                    });
+                }
+            }
+
+            this.drawnItems.addLayer(layer);
+
+            console.log(this.drawnItems.toGeoJSON())
+        })
+    }
+
+    getDrawnItemsGeoJSON() {
+        // Return the geoJSON of the drawn items
+        return this.drawnItems.toGeoJSON();
+    }
 }
 
