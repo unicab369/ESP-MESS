@@ -16,7 +16,13 @@ function generateNearbyCoordinates(center, radiusInMiles, numberofDevices) {
         //! Convert coordinates from radians to degrees
         newLat = newLat * (180 / Math.PI);
         newLon = newLon * (180 / Math.PI);
-        output.push([newLat, newLon]);
+
+        // Create a device object
+        let device = {
+            device_name: "Device " + (i+1),
+            coordinate: [newLat, newLon]
+        }
+        output.push(device);
     }
     return output;
 }
@@ -35,7 +41,15 @@ class LeafletMapObject {
 
         this.center = center
         this.map = L.map('map', mapOptions).setView(center, zoom)
+        // Monitor devices on map
+        this.devices= new Map(); 
     }
+
+    setup() {
+        this.showMap()
+        this.addDrawingTool()
+        // this.drawnItems = new L.LayerGroup().addTo(this.map)/
+     }
 
     showMap(){
         this.urlTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -48,6 +62,9 @@ class LeafletMapObject {
 
         this.addMapControl()
         
+        // Adding coordinate control on map - need Leaflet.Coordinates-0.1.5.min.js
+		L.control.coordinates().addTo(this.map);
+
         //Zoom Function for this.map
         this.map.on('zoomend', () =>{
             this.map.setView(this.main_coordinate, this.map.getZoom())
@@ -58,13 +75,21 @@ class LeafletMapObject {
         return L.marker(coordinate).addTo(this.map).bindPopup(label).openPopup()
     }
 
-    generateCoordinates() {
-        //! Label device Locations with each coordinate
-        let devices_coordinates = generateNearbyCoordinates(this.center, 0.05, 5);
+    removeDevice(deviceName) {
+        // Check if the device exists in the map
+        if (this.devices.has(deviceName)) {
+            // Get the marker for the device
+            const marker = this.devices.get(deviceName);
 
-        devices_coordinates.forEach((coordinate, index) => {
-            this.addMarker(coordinate, `Device ID${index + 1}`)
-        });
+            // Remove the marker from the map
+            this.map.removeLayer(marker);
+
+            // Remove the device from the devices map
+            this.devices.delete(deviceName);
+        }
+    }
+
+    addDevices(device_info) {
 
         // Define a custom icon for the markers
         var dotIcon = L.divIcon({
@@ -73,12 +98,19 @@ class LeafletMapObject {
             iconAnchor: [4, 4], // Center the dot
         })
 
-        //! test locations
-        let test_coordnates = generateNearbyCoordinates(this.center, 0.05, 5);
-        
-        test_coordnates.forEach((point, index) => {
-            var marker = L.marker([point[0], point[1]], { icon: dotIcon }).addTo(this.map)
+        device_info.forEach((info, index) => {
+            // Create a marker for the device
+            var marker = L.marker(info.coordinate, {icon: dotIcon}).addTo(this.map).bindPopup(info.device_name).openPopup()
+
+            //Track added devices on map
+            this.devices.set(info.device_name, marker)
         });
+
+        
+    }
+
+    generateCoordinates() {
+        return generateNearbyCoordinates(this.center, 0.05, 5);
     }
 
     addPoly(coordinates, fillColor = '#8E44AD', color = 'green') {
@@ -168,14 +200,16 @@ class LeafletMapObject {
             }
 
             this.drawnItems.addLayer(layer);
-
-            console.log(this.drawnItems.toGeoJSON())
         })
     }
 
     getDrawnItemsGeoJSON() {
         // Return the geoJSON of the drawn items
         return this.drawnItems.toGeoJSON();
+    }
+
+    getDevicesArray(){
+        return Array.from(this.devices, ([device_name, coordinate]) => ({device_name, coordinate: coordinate._latlng}));
     }
 }
 
