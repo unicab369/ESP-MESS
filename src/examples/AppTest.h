@@ -36,21 +36,603 @@ void testRun() {
 }
 
 #ifdef TEST_BLINK
-   void setup() {
-      Serial.begin(115200);
-      AppPrint("\nIM HERE 000");
-      pinMode(ledPin, OUTPUT);
-      // pinMode(13, OUTPUT);
-      // pinMode(5, OUTPUT);
+   // void setup() {
+   //    Serial.begin(115200);
+   //    AppPrint("\nIM HERE 000");
+   //    pinMode(ledPin, OUTPUT);
+   //    // pinMode(13, OUTPUT);
+   //    // pinMode(5, OUTPUT);
+   // }
+
+   // void loop() {
+   //    TestLog.xLog("\nIM HERE 11122");
+   //    uint8_t read = digitalRead(ledPin);
+   //    digitalWrite(ledPin, !read);
+   //    // digitalWrite(13, read);
+   //    // digitalWrite(5, read);
+   //    delay(500);
+   // }
+
+   // #include <BMI160Gen.h>
+
+   // float convertRawGyro(int gRaw) {
+   //    // since we are using 250 degrees/seconds range
+   //    // -250 maps to a raw value of -32768
+   //    // +250 maps to a raw value of 32767
+
+   //    float g = (gRaw * 250.0) / 32768.0;
+   //    return g;
+   // }
+
+   // void setup() {
+   //    Serial.begin(115200); // initialize Serial communication
+   //    while (!Serial);    // wait for the serial port to open
+
+   //    Wire.begin(33, 32);
+
+   //    // initialize device
+   //    Serial.println("Initializing IMU device...");
+   //    // BMI160.begin(BMI160GenClass::SPI_MODE, /* SS pin# = */10);
+   //    BMI160.begin(BMI160GenClass::I2C_MODE);
+   //    uint8_t dev_id = BMI160.getDeviceID();
+   //    Serial.print("DEVICE ID: ");
+   //    Serial.println(dev_id, HEX);
+
+   //       // Set the accelerometer range to 250 degrees/second
+   //    BMI160.setGyroRange(250);
+   //    Serial.println("Initializing IMU device...done.");
+   // }
+
+   // void loop() {
+   //    int gxRaw, gyRaw, gzRaw;         // raw gyro values
+   //    float gx, gy, gz;
+
+   //    // read raw gyro measurements from device
+   //    BMI160.readGyro(gxRaw, gyRaw, gzRaw);
+
+   //    // convert the raw gyro data to degrees/second
+   //    gx = convertRawGyro(gxRaw);
+   //    gy = convertRawGyro(gyRaw);
+   //    gz = convertRawGyro(gzRaw);
+
+   //    // display tab-separated gyro x/y/z values
+   //    Serial.print("g:\t");
+   //    Serial.print(gx);
+   //    Serial.print("\t");
+   //    Serial.print(gy);
+   //    Serial.print("\t");
+   //    Serial.print(gz);
+   //    Serial.println();
+
+   //    delay(500);
+   // }
+
+
+   // #include <DFRobot_BMI160.h>
+
+   // DFRobot_BMI160 bmi160;
+   // const int8_t i2c_addr = 0x68;
+   
+   // void setup(){
+   //    Serial.begin(115200);
+   //    Wire.begin(33, 32);
+   //    delay(100);
+      
+   //    //init the hardware bmin160  
+   //    if (bmi160.softReset() != BMI160_OK){
+   //       Serial.println("reset false");
+   //       while(1);
+   //    }
+      
+   //    //set and init the bmi160 i2c address
+   //    if (bmi160.I2cInit(i2c_addr) != BMI160_OK){
+   //       Serial.println("init false");
+   //       while(1);
+   //    }
+   // }
+
+   // void loop(){  
+   //    int i = 0;
+   //    int rslt;
+   //    int16_t accelGyro[6]={0}; 
+      
+   //    //get both accel and gyro data from bmi160
+   //    //parameter accelGyro is the pointer to store the data
+   //    rslt = bmi160.getAccelGyroData(accelGyro);
+   //    if(rslt == 0){
+   //       for(i=0;i<6;i++){
+   //          if (i<3){
+   //          //the first three are gyro data
+   //          Serial.print(accelGyro[i]*3.14/180.0);Serial.print("\t");
+   //          }else{
+   //          //the following three data are accel data
+   //          Serial.print(accelGyro[i]/16384.0);Serial.print("\t");
+   //          }
+   //       }
+   //       Serial.println();
+   //    }else{
+   //       Serial.println("err");
+   //    }
+   //    delay(100);
+   //    /*
+   //       * //only read accel data from bmi160
+   //       * int16_t onlyAccel[3]={0};
+   //       * bmi160.getAccelData(onlyAccel);
+   //       */
+
+   //    /*
+   //       * ////only read gyro data from bmi160
+   //       * int16_t onlyGyro[3]={0};
+   //       * bmi160.getGyroData(onlyGyro);
+   //       */
+   // }
+
+   // #include <Adafruit_Sensor.h>
+   // #include <Adafruit_ADXL343.h>
+
+   // /* Create two sensor objects and assign unique IDs */
+   // Adafruit_ADXL343 accel1 = Adafruit_ADXL343(12345);
+
+   // void setup(void) {
+   //    Serial.begin(115200);
+   //    while (!Serial);
+
+   //    Serial.println("Two Accelerometers on one Arduino"); Serial.println("");
+   //    Wire.begin(33, 32);
+
+   //    /* Initialise the first sensors, this uses the default address */
+   //    if(!accel1.begin()) {
+   //       /* There was a problem detecting the ADXL343 ... check your connections */
+   //       Serial.println("Ooops, no ADXL343 nr1 detected ... Check your wiring!");
+   //       while(1);
+   //    }
+      
+   //    /* Set the range and data rate to whatever is appropriate for your project */
+   //    /* See the sensortest example for more details */
+   //    accel1.setRange(ADXL343_RANGE_2_G);
+   //    accel1.setDataRate(ADXL343_DATARATE_1600_HZ);
+
+   //    /* Display some basic information on these sensors */
+   //    accel1.printSensorDetails();
+   //    Serial.println("");
+   // }
+
+   // void loop(void) {
+   //    /* Get new sensor events */
+   //    sensors_event_t event1;
+   //    sensors_event_t event2;
+   //    accel1.getEvent(&event1);
+
+   //    /* Display the results (acceleration is measured in m/s^2) */
+   //    Serial.print(event1.acceleration.x); Serial.print(",");
+   //    Serial.print(event1.acceleration.y); Serial.print(",");
+   //    Serial.print(event1.acceleration.z); Serial.println(".");
+   // }
+
+   // #include "SparkFun_MMA8452Q.h"    // Click here to get the library: http://librarymanager/All#SparkFun_MMA8452Q
+
+   // MMA8452Q accel;                   // create instance of the MMA8452 class
+
+   // void setup() {
+   //    Serial.begin(115200);
+   //    Serial.println("MMA8452Q Orientation Test Code!");
+   //    Wire.begin(33, 32);
+
+   //    if (accel.begin(Wire, 0x1C) == false) {
+   //       Serial.println("Not Connected. Please check connections and read the hookup guide.");
+   //       while (1);
+   //    }
+   // }
+
+   // void loop() {
+   //    if (accel.available()) {      // Wait for new data from accelerometer
+   //       // Orientation of board (Right, Left, Down, Up);
+   //       if (accel.isRight() == true) {
+   //          Serial.println("Right");
+   //       }
+   //       else if (accel.isLeft() == true) {
+   //          Serial.println("Left");
+   //       }
+   //       else if (accel.isUp() == true) {
+   //          Serial.println("Up");
+   //       }
+   //       else if (accel.isDown() == true) {
+   //          Serial.println("Down");
+   //       }
+   //       else if (accel.isFlat() == true) {
+   //          Serial.println("Flat");
+   //       }
+   //    }
+   // }
+
+   // #include <Adafruit_LIS3DH.h>
+   // #include <Adafruit_Sensor.h>
+
+   // // software SPI
+   // //Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS, LIS3DH_MOSI, LIS3DH_MISO, LIS3DH_CLK);
+   // // hardware SPI
+   // //Adafruit_LIS3DH lis = Adafruit_LIS3DH(LIS3DH_CS);
+   // // I2C
+   // Adafruit_LIS3DH lis = Adafruit_LIS3DH();
+
+   // void setup(void) {
+   //    Serial.begin(115200);
+   //    while (!Serial) delay(10);     // will pause Zero, Leonardo, etc until serial console opens
+
+   //    Serial.println("LIS3DH test!");
+   //    Wire.begin(33, 32);
+
+   //    if (! lis.begin(0x19)) {   // change this to 0x19 for alternative i2c address
+   //       Serial.println("Couldnt start");
+   //       while (1) yield();
+   //    }
+   //    Serial.println("LIS3DH found!");
+
+   //    // lis.setRange(LIS3DH_RANGE_4_G);   // 2, 4, 8 or 16 G!
+
+   //    Serial.print("Range = "); Serial.print(2 << lis.getRange());
+   //    Serial.println("G");
+
+   //    // lis.setDataRate(LIS3DH_DATARATE_50_HZ);
+   //    Serial.print("Data rate set to: ");
+   //    switch (lis.getDataRate()) {
+   //       case LIS3DH_DATARATE_1_HZ: Serial.println("1 Hz"); break;
+   //       case LIS3DH_DATARATE_10_HZ: Serial.println("10 Hz"); break;
+   //       case LIS3DH_DATARATE_25_HZ: Serial.println("25 Hz"); break;
+   //       case LIS3DH_DATARATE_50_HZ: Serial.println("50 Hz"); break;
+   //       case LIS3DH_DATARATE_100_HZ: Serial.println("100 Hz"); break;
+   //       case LIS3DH_DATARATE_200_HZ: Serial.println("200 Hz"); break;
+   //       case LIS3DH_DATARATE_400_HZ: Serial.println("400 Hz"); break;
+
+   //       case LIS3DH_DATARATE_POWERDOWN: Serial.println("Powered Down"); break;
+   //       case LIS3DH_DATARATE_LOWPOWER_5KHZ: Serial.println("5 Khz Low Power"); break;
+   //       case LIS3DH_DATARATE_LOWPOWER_1K6HZ: Serial.println("16 Khz Low Power"); break;
+   //    }
+   // }
+
+   // void loop() {
+   //    lis.read();      // get X Y and Z data at once
+   //    // Then print out the raw data
+   //    Serial.print("X:  "); Serial.print(lis.x);
+   //    Serial.print("  \tY:  "); Serial.print(lis.y);
+   //    Serial.print("  \tZ:  "); Serial.print(lis.z);
+
+   //    /* Or....get a new sensor event, normalized */
+   //    sensors_event_t event;
+   //    lis.getEvent(&event);
+
+   //    /* Display the results (acceleration is measured in m/s^2) */
+   //    Serial.print("\t\tX: "); Serial.print(event.acceleration.x);
+   //    Serial.print(" \tY: "); Serial.print(event.acceleration.y);
+   //    Serial.print(" \tZ: "); Serial.print(event.acceleration.z);
+   //    Serial.println(" m/s^2 ");
+
+   //    Serial.println();
+   //    delay(200);
+   // }
+
+   // #include <MPU9250_WE.h>
+   // #include <Wire.h>
+   // #define MPU9250_ADDR 0x68
+
+   // /* There are several ways to create your MPU9250 object:
+   // * MPU9250_WE myMPU9250 = MPU9250_WE()              -> uses Wire / I2C Address = 0x68
+   // * MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR)  -> uses Wire / MPU9250_ADDR
+   // * MPU9250_WE myMPU9250 = MPU9250_WE(&wire2)        -> uses the TwoWire object wire2 / MPU9250_ADDR
+   // * MPU9250_WE myMPU9250 = MPU9250_WE(&wire2, MPU9250_ADDR) -> all together
+   // * Successfully tested with two I2C busses on an ESP32
+   // */
+   // MPU9250_WE myMPU9250 = MPU9250_WE(MPU9250_ADDR);
+
+   // void setup() {
+   //    Serial.begin(115200);
+   //    Wire.begin(33, 32);
+
+   //    if(!myMPU9250.init()){
+   //       Serial.println("MPU9250 does not respond");
+   //    }
+   //    else{
+   //       Serial.println("MPU9250 is connected");
+   //    }
+
+   //    /*  This is a more accurate method for calibration than the autoOffset. You have to 
+   //       *  determine the minimum and maximum raw acceleration values of the axes determined 
+   //       *  in the range +/- 2 g. 
+   //       *  You call the function as follows: setAccOffsets(xMin,xMax,yMin,yMax,zMin,zMax);
+   //       *  Use either autoOffset or setAccOffsets, not both.
+   //       */
+   //    //myMPU9250.setAccOffsets(-14240.0, 18220.0, -17280.0, 15590.0, -20930.0, 12080.0);
+
+   //    /*  The gyroscope data is not zero, even if don't move the MPU9250. 
+   //       *  To start at zero, you can apply offset values. These are the gyroscope raw values you obtain
+   //       *  using the +/- 250 degrees/s range. 
+   //       *  Use either autoOffset or setGyrOffsets, not both.
+   //       */
+   //    //myMPU9250.setGyrOffsets(45.0, 145.0, -105.0);
+
+   //    /*  You can enable or disable the digital low pass filter (DLPF). If you disable the DLPF, you 
+   //       *  need to select the bandwidth, which can be either 8800 or 3600 Hz. 8800 Hz has a shorter delay,
+   //       *  but higher noise level. If DLPF is disabled, the output rate is 32 kHz.
+   //       *  MPU9250_BW_WO_DLPF_3600 
+   //       *  MPU9250_BW_WO_DLPF_8800
+   //       */
+   //    myMPU9250.enableGyrDLPF();
+   //    //myMPU9250.disableGyrDLPF(MPU9250_BW_WO_DLPF_8800); // bandwidth without DLPF
+      
+   //    /*  Digital Low Pass Filter for the gyroscope must be enabled to choose the level. 
+   //       *  MPU9250_DPLF_0, MPU9250_DPLF_2, ...... MPU9250_DPLF_7 
+   //       *  
+   //       *  DLPF    Bandwidth [Hz]   Delay [ms]   Output Rate [kHz]
+   //       *    0         250            0.97             8
+   //       *    1         184            2.9              1
+   //       *    2          92            3.9              1
+   //       *    3          41            5.9              1
+   //       *    4          20            9.9              1
+   //       *    5          10           17.85             1
+   //       *    6           5           33.48             1
+   //       *    7        3600            0.17             8
+   //       *    
+   //       *    You achieve lowest noise using level 6  
+   //       */
+   //    myMPU9250.setGyrDLPF(MPU9250_DLPF_6);  // lowest noise
+      
+   //    /*  MPU9250_GYRO_RANGE_250       250 degrees per second (default)
+   //       *  MPU9250_GYRO_RANGE_500       500 degrees per second
+   //       *  MPU9250_GYRO_RANGE_1000     1000 degrees per second
+   //       *  MPU9250_GYRO_RANGE_2000     2000 degrees per second
+   //       */
+   //    myMPU9250.setGyrRange(MPU9250_GYRO_RANGE_250);
+
+   //    /*  MPU9250_ACC_RANGE_2G      2 g   
+   //       *  MPU9250_ACC_RANGE_4G      4 g
+   //       *  MPU9250_ACC_RANGE_8G      8 g   
+   //       *  MPU9250_ACC_RANGE_16G    16 g
+   //       */
+   //    myMPU9250.setAccRange(MPU9250_ACC_RANGE_2G);
+
+   //    /*  Enable/disable the digital low pass filter for the accelerometer 
+   //       *  If disabled the bandwidth is 1.13 kHz, delay is 0.75 ms, output rate is 4 kHz
+   //       */
+   //    myMPU9250.enableAccDLPF(true);
+
+   //    /*  Digital low pass filter (DLPF) for the accelerometer, if enabled 
+   //       *  MPU9250_DPLF_0, MPU9250_DPLF_2, ...... MPU9250_DPLF_7 
+   //       *   DLPF     Bandwidth [Hz]      Delay [ms]    Output rate [kHz]
+   //       *     0           460               1.94           1
+   //       *     1           184               5.80           1
+   //       *     2            92               7.80           1
+   //       *     3            41              11.80           1
+   //       *     4            20              19.80           1
+   //       *     5            10              35.70           1
+   //       *     6             5              66.96           1
+   //       *     7           460               1.94           1
+   //       */
+   //    myMPU9250.setAccDLPF(MPU9250_DLPF_6);  // lowest noise
+
+   //    Serial.print("Turn your MPU9250 slowly(!) in all directions to determine ");
+   //    Serial.println(" the min/max raw acceleration values.");
+   //    Serial.println("For the gyroscope offsets just note the gyro raw values for the unmoved sensor");
+   //    delay(1000);
+   // }
+
+   // void loop() {
+   //    xyzFloat accRaw;
+   //    xyzFloat gyrRaw;
+   //    xyzFloat corrAccRaw;
+   //    xyzFloat corrGyrRaw;
+   //    accRaw = myMPU9250.getAccRawValues();
+   //    gyrRaw = myMPU9250.getGyrRawValues();
+   //    corrAccRaw = myMPU9250.getCorrectedAccRawValues();
+   //    corrGyrRaw = myMPU9250.getCorrectedGyrRawValues();
+      
+   //    Serial.println("Acceleration raw values without offset:");
+   //    Serial.print(accRaw.x);
+   //    Serial.print("   ");
+   //    Serial.print(accRaw.y);
+   //    Serial.print("   ");
+   //    Serial.println(accRaw.z);
+
+   //    Serial.println("Gyroscope raw values without offset:");
+   //    Serial.print(gyrRaw.x);
+   //    Serial.print("   ");
+   //    Serial.print(gyrRaw.y);
+   //    Serial.print("   ");
+   //    Serial.println(gyrRaw.z);
+
+   //    Serial.println("Acceleration raw values with offset:");
+   //    Serial.print(corrAccRaw.x);
+   //    Serial.print("   ");
+   //    Serial.print(corrAccRaw.y);
+   //    Serial.print("   ");
+   //    Serial.println(corrAccRaw.z);
+
+   //    Serial.println("Gyroscope raw values with offset:");
+   //    Serial.print(corrGyrRaw.x);
+   //    Serial.print("   ");
+   //    Serial.print(corrGyrRaw.y);
+   //    Serial.print("   ");
+   //    Serial.println(corrGyrRaw.z);
+   //    delay(100);
+   // }
+
+   // #include <SensirionI2CScd4x.h>
+
+   // SensirionI2CScd4x scd4x;
+
+   // void printUint16Hex(uint16_t value) {
+   //    Serial.print(value < 4096 ? "0" : "");
+   //    Serial.print(value < 256 ? "0" : "");
+   //    Serial.print(value < 16 ? "0" : "");
+   //    Serial.print(value, HEX);
+   // }
+
+   // void printSerialNumber(uint16_t serial0, uint16_t serial1, uint16_t serial2) {
+   //    Serial.print("Serial: 0x");
+   //    printUint16Hex(serial0);
+   //    printUint16Hex(serial1);
+   //    printUint16Hex(serial2);
+   //    Serial.println();
+   // }
+
+   // void setup() {
+   //    Serial.begin(115200);
+   //    Wire.begin(33, 32);
+
+   //    uint16_t error;
+   //    char errorMessage[256];
+
+   //    scd4x.begin(Wire);
+
+   //    // stop potentially previously started measurement
+   //    error = scd4x.stopPeriodicMeasurement();
+   //    if (error) {
+   //       Serial.print("Error trying to execute stopPeriodicMeasurement(): ");
+   //       errorToString(error, errorMessage, 256);
+   //       Serial.println(errorMessage);
+   //    }
+
+   //    uint16_t serial0;
+   //    uint16_t serial1;
+   //    uint16_t serial2;
+   //    error = scd4x.getSerialNumber(serial0, serial1, serial2);
+   //    if (error) {
+   //       Serial.print("Error trying to execute getSerialNumber(): ");
+   //       errorToString(error, errorMessage, 256);
+   //       Serial.println(errorMessage);
+   //    } else {
+   //       printSerialNumber(serial0, serial1, serial2);
+   //    }
+
+   //    // Start Measurement
+   //    error = scd4x.startPeriodicMeasurement();
+   //    if (error) {
+   //       Serial.print("Error trying to execute startPeriodicMeasurement(): ");
+   //       errorToString(error, errorMessage, 256);
+   //       Serial.println(errorMessage);
+   //    }
+
+   //    Serial.println("Waiting for first measurement... (5 sec)");
+   // }
+
+   // void loop() {
+   //    uint16_t error;
+   //    char errorMessage[256];
+
+   //    delay(100);
+
+   //    // Read Measurement
+   //    uint16_t co2 = 0;
+   //    float temperature = 0.0f;
+   //    float humidity = 0.0f;
+   //    bool isDataReady = false;
+   //    error = scd4x.getDataReadyFlag(isDataReady);
+   //    if (error) {
+   //       Serial.print("Error trying to execute getDataReadyFlag(): ");
+   //       errorToString(error, errorMessage, 256);
+   //       Serial.println(errorMessage);
+   //       return;
+   //    }
+   //    if (!isDataReady) {
+   //       return;
+   //    }
+   //    error = scd4x.readMeasurement(co2, temperature, humidity);
+   //    if (error) {
+   //       Serial.print("Error trying to execute readMeasurement(): ");
+   //       errorToString(error, errorMessage, 256);
+   //       Serial.println(errorMessage);
+   //    } else if (co2 == 0) {
+   //       Serial.println("Invalid sample detected, skipping.");
+   //    } else {
+   //       Serial.print("Co2:");
+   //       Serial.print(co2);
+   //       Serial.print("\t");
+   //       Serial.print("Temperature:");
+   //       Serial.print(temperature);
+   //       Serial.print("\t");
+   //       Serial.print("Humidity:");
+   //       Serial.println(humidity);
+   //    }
+   // }
+
+   #include "INA226.h"
+
+   INA226 INA(0x40);
+
+   void measure(uint8_t count) {
+      // delay(3000);
+      Serial.println("\nBUS\tSHUNT\tCURRENT\tPOWER");
+      Serial.println(" V\t mV\t mA\t mW");
+      for (int i = 0; i < count; i++)
+      {
+         Serial.print(INA.getBusVoltage(), 3);
+         Serial.print("\t");
+         Serial.print(INA.getShuntVoltage_mV(), 3);
+         Serial.print("\t");
+         Serial.print(INA.getCurrent_mA(), 3);
+         Serial.print("\t");
+         Serial.print(INA.getPower_mW(), 3);
+         Serial.println();
+         delay(500);
+      }
    }
 
+
+   void printConfig() {
+      Serial.print("LSB:\t");
+      Serial.println(INA.getCurrentLSB(), 10);
+      Serial.print("LSB_uA:\t");
+      Serial.println(INA.getCurrentLSB_uA(), 3);
+      Serial.print("shunt:\t");
+      Serial.println(INA.getShunt(), 3);
+      Serial.print("maxCur:\t");
+      Serial.println(INA.getMaxCurrent(), 3);
+      Serial.println();
+   }
+
+   void setup() {
+      Serial.begin(115200);
+      Serial.println(__FILE__);
+
+      Wire.begin(33, 32);
+      if (!INA.begin() )
+      {
+         Serial.println("could not connect. Fix and Reboot");
+      }
+
+      Serial.println();
+      Serial.print("MAN:\t");
+      Serial.println(INA.getManufacturerID(), HEX);
+      Serial.print("DIE:\t");
+      Serial.println(INA.getDieID(), HEX);
+      Serial.println();
+      delay(100);
+
+
+      INA.setMaxCurrentShunt(1, 0.002);
+      Serial.println("normalized = true (default)");
+      printConfig();
+
+      INA.setMaxCurrentShunt(1, 0.002, false);
+      Serial.println("normalized = false");
+      printConfig();
+
+
+      INA.setMaxCurrentShunt(15, 0.002);
+      Serial.println("normalized = true (default)");
+      printConfig();
+
+      INA.setMaxCurrentShunt(15, 0.002, false);
+      Serial.println("normalized = false");
+      printConfig();
+   }
+
+
    void loop() {
-      TestLog.xLog("\nIM HERE 11122");
-      uint8_t read = digitalRead(ledPin);
-      digitalWrite(ledPin, !read);
-      // digitalWrite(13, read);
-      // digitalWrite(5, read);
-      delay(500);
+      INA.setMaxCurrentShunt(1, 0.002);
+      measure(20);
+
+      INA.setMaxCurrentShunt(1, 0.002, false);
+      measure(20);
    }
 
 #elif TEST_BLE_SCANNER
