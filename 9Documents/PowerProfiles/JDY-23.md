@@ -4,6 +4,8 @@
 https://fcc.report/FCC-ID/2AXM8-JDY-23/4936741.pdf
 
 ### Commands
+default Baudrate: 9600. Line ending: \r\n
+
 AT+VER<br>
 AT+RST<br>
 AT+BAUD<br>

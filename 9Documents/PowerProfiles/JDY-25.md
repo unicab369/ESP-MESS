@@ -5,6 +5,8 @@ https://github.com/Edragon/JDY-MESH/tree/main/JDY-25M/HDK-EN
 
 ### Commands
 #### Basics
+default Baudrate: 9600. Line ending: \r\n
+
 - AT<br>
 - AT+RESET<br>
 - AT+VERSION<br>
