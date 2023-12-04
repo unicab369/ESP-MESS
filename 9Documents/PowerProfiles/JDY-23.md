@@ -6,29 +6,29 @@ https://fcc.report/FCC-ID/2AXM8-JDY-23/4936741.pdf
 ### Commands
 default Baudrate: 9600. Line ending: \r\n
 
-AT+VER<br>
-AT+RST<br>
-AT+BAUD<br>
-AT+NAME<br>
-AT+STAT<br>
-AT+DISC<br>
-AT+MAC<br>
-AT+DEFAULT<br>
+- AT+VER<br>
+- AT+RST<br>
+- AT+BAUD<br>
+- AT+NAME<br>
+- AT+STAT<br>
+- AT+DISC<br>
+- AT+MAC<br>
+- AT+DEFAULT<br>
 
-AT+HOSTEN(mode: 0 transparent, 3 Slave iBeacon)<br>
-AT+SLEEP(sleepMode: 1 light sleep, 2 deep sleep no broadcast)<br>
-AT+STARTEN(mode: 1 power on to wake up, 0 power on sleep/connect wakeup/disconnect sleep)<br>
-AT+ADVIN(delay: x[0-9]*100+100ms)<br>
-AT+POWR(NOT WORKING?)<br>
-AT+ENLOG(enable: 1 for enable, 0 for disable)<br>
-AT+ALED(enabled: 0 broadcast LED off, 1 broadcast LED indicator on)<br>
-AT+MTU(mode: 1 for 20 bytes, 2 for 128 bytes)<br>
-AT+BATT(0-99)<br>
-
-AT+IBUUID(32 bytes max?)<br>
-AT+MAJOR(0000-FFFF)<br>
-AT+MINOR(0000-FFFF)<br>
-AT+IBSING(00-FF)<br>
+- AT+HOSTEN(mode: 0 transparent, 3 Slave iBeacon)<br>
+- AT+SLEEP(sleepMode: 1 light sleep, 2 deep sleep no broadcast)<br>
+- AT+STARTEN(mode: 1 power on to wake up, 0 power on sleep/connect wakeup/disconnect sleep)<br>
+- AT+ADVIN(delay: x[0-9]*100+100ms)<br>
+- AT+POWR(NOT WORKING?)<br>
+- AT+ENLOG(enable: 1 for enable, 0 for disable)<br>
+- AT+ALED(enabled: 0 broadcast LED off, 1 broadcast LED indicator on)<br>
+- AT+MTU(mode: 1 for 20 bytes, 2 for 128 bytes)<br>
+- AT+BATT(0-99)<br>
+ 
+- AT+IBUUID(32 bytes max?)<br>
+- AT+MAJOR(0000-FFFF)<br>
+- AT+MINOR(0000-FFFF)<br>
+- AT+IBSING(00-FF)<br>
 
 ### Observed Behaviors
 1. Deep Sleep no broadcast (mode 2): 
