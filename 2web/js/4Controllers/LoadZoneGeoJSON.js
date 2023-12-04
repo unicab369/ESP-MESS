@@ -1,10 +1,10 @@
 // Add event listener to button to trigger file input click event
-document.getElementById('loadGeoJsonButtonLabel').addEventListener('click', function() {
-    document.getElementById('loadGeoJsonButton').click();
+document.getElementById('loadZoneLabel').addEventListener('click', function() {
+    document.getElementById('loadZoneButton').click();
 });
 
 
-document.getElementById('loadGeoJsonButton').addEventListener('change', function(e) {
+document.getElementById('loadZoneButton').addEventListener('change', function(e) {
     //Get the file from the input
     let file = e.target.files[0];
     if (!file) {
@@ -26,7 +26,7 @@ document.getElementById('loadGeoJsonButton').addEventListener('change', function
         });
 
         geoJsonLayer.eachLayer(function(layer){
-            zoneLayout.leafletMap.drawnItems.addLayer(layer);
+            map.drawnItems.addLayer(layer);
         
         })
     };

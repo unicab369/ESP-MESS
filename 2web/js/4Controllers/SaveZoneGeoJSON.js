@@ -4,7 +4,7 @@ document.getElementById('saveGeoJsonButton').addEventListener('click', function(
         features: []
     }
 
-    zoneLayout.leafletMap.drawnItems.eachLayer(function(layer) {
+    map.drawnItems.eachLayer(function(layer) {
         //Can onlly access the layer's properties if it is a GeoJSON layer via leafletMap Object
         let feature = layer.toGeoJSON();
         feature.properties.color = layer.options.color;
