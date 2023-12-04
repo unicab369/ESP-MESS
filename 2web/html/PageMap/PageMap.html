@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title> Map </title>
+        <!-- <link rel="stylesheet" href="./lib/leaflet/leaflet.css" />
+        <script src="./lib/leaflet/leaflet.js"></script> -->
+
+        <!-- Leaflet CDN library -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+        <link rel="stylesheet" href="./icon/icon.css" />
+
+        <script src="/2web/js/3Modules/ModMap.js"></script>
+        <script src="/2web/js/4Controllers/ZoneLayout.js"></script>
+
+            <!-- Leaflet Drawing Tool -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
+        <!-- Leaflet Offline Library for Saving and Loading GeoLocation after drawing on map -->
+        <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
+        <script src="/2web/lib/leaflet/leaflet-offline.js"></script>
+        <script src="/2web/lib/leaflet/FileSaver.js"></script>
+        
+        <!-- Adding Coordinate Label on bottom right of leaflet Map -->
+        <script type="text/javascript" src="/2web/lib/leaflet/Leaflet.Coordinates-0.1.5.min.js"></script>
+        <link rel="stylesheet" href="/2web/lib/leaflet/Leaflet.Coordinates-0.1.5.css"/>
+
+    </head>
+    <br>
+        <style>
+            /* Define the styling for the dot icon */
+            .dot-icon {
+              background-color:red; /* Adjust the color of the dot */
+              border-radius: 50%; /* Create a circular shape */
+            }
+        </style>
+        
+        <h1> This is Map </h1>
+
+        <button id="saveFilesButton">Save Files to Local</button>
+        <div id="map" style="width: 1000px; height: 700px;">
+        </div>
+
+        
+        <script>
+
+            const map = new LeafletMapObject()
+            map.setup()
+            // const devices = [
+            //     {device_name: "tri1", coordinate:[41.11510565817224, -85.13817815319553]},
+            //     {device_name: "tri2", coordinate:[41.11569528818022, -85.13822516045099]}]
+            // map.addDevices(devices)
+            // console.log(map.devices)
+            // console.log(map.generateCoordinates())
+            // map.removeDevice("tri1")
+            // map.removeDevice("tri2")
+
+        </script>
+        
+        <!-- Adding Zone Layout -->
+        <button id="saveGeoJsonButton">Save Zone</button>
+
+        <!-- Load Zone GeoJson File -->
+        <button id="loadZoneLabel">Load Zone File:</button>
+        <span id="selectedFileName"> No File Selected</span>
+        <input type="file" id="loadZoneButton" style="display: none">
+
+        <!-- This script needs to go after the button! -->
+        <script src="./PageMap+Function.js"></script>
+
+        <br><br>
+
+        <!-- Load Devices GeoJson File -->
+        <button id="loadDevicesButtonLabel">Load Devices GeoJson File:</button>
+        <span id="selectedDevicesFile"> No File Selected</span>
+        <input type="file" id="loadDevicesButton" style="display: none">
+        <!-- This script needs to go after the button! -->
+        <script src="./js/4Controllers/LoadDevicesGeoJSON.js"></script>
+
+        <!-- Adding New Devices -->
+        <form id="deviceForm">
+            <label for="deviceName">Device Name:</label>
+            <input type="text" id="deviceName" name="deviceName"><br>
+            <label for="longitude">Longitude:</label>
+            <input type="decimal" id="longitude" name="longitude"><br>
+            <label for="latitude">Latitude:</label>
+            <input type="decimal" id="latitude" name="latitude"><br>
+            <input type="submit" value="Add Device/s">
+        </form>
+        <ul id="deviceList"></ul>
+
+        <!-- Save New Devices with Locations -->
+        <button id="SaveDevicesGeoJSON">Save Devices Coordinates</button>
+        <script src="./js/4Controllers/SaveDevicesGeoJSON.js"></script>
+
+        <script>
+            document.getElementById('deviceForm').addEventListener('submit', function(e) {
+                // Prevent the form from submitting normally
+                e.preventDefault();
+
+                // Get the device data from the form
+                var deviceName = document.getElementById('deviceName').value;
+                var longitude = document.getElementById('longitude').value;
+                var latitude = document.getElementById('latitude').value;
+
+                // Create a new list item
+                var listItem = document.createElement('li');
+                listItem.textContent = `Device Name: ${deviceName}, Longitude: ${longitude}, Latitude: ${latitude}`;
+
+                // Add the list item to the list
+                document.getElementById('deviceList').appendChild(listItem);
+
+                    // Add the device to the map
+                // map.addDevices([[latitude, longitude]], deviceName);
+                map.addDevices(
+                    [{device_name: deviceName, coordinate:[latitude, longitude]},]
+                )
+
+                // Clear the form
+                e.target.reset();
+            });
+        </script>
+        <script>
+            //Save Data to Text File as a backup just incase the database is corrupted on client side.
+            document.getElementById('saveFilesButton').addEventListener('click', function() {
+                let db;
+                let openRequest = indexedDB.open("leaflet.offline");
+                openRequest.onsuccess = function(e) {
+                    db = e.target.result;
+                    let transaction = db.transaction('tileStore');
+                    let store = transaction.objectStore('tileStore');
+                    let request = store.getAll();
+
+                    request.onsuccess = function(e) {
+                        let data = JSON.stringify(e.target.result);
+                        let blob = new Blob([data], {type: 'application/json'});
+
+                        let date = new Date();
+                        let dateString = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`;
+                        saveAs(blob, `${dateString}_data.txt`)
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>
