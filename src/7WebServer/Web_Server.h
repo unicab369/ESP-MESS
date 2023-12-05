@@ -61,19 +61,19 @@ class Web_Server: public Loggable {
         void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
             if (strlen(apiKey) < 32 || strlen(feed) < 10) return;
             
-            // http.begin(String(serverUrl) + String(feed));
-            // http.addHeader("api-key", apiKey);
-            // http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+            http.begin(String(serverUrl) + String(feed));
+            http.addHeader("api-key", apiKey);
+            http.addHeader("Content-Type", "application/x-www-form-urlencoded");
             
-            // String postData = "{\"data\":{\"Temp\": [{\"value\":" + String(temp) + 
-            //                     "}], \"Hum\":[{\"value\":" + String(hum) + 
-            //                     "}], \"Lux\":[{\"value\":" + String(lux) + 
-            //                     "}], \"Volt\":[{\"value\":" + String(volt) +
-            //                     "}], \"mA\":[{\"value\":" + String(mA) + "}] }}";
-            // // String postData = "{\"data\":{\"Temperature\":[{\"value\":25.05},{\"value\":25.99,\"epoch\":1516195980},{\"value\":24.99,\"epoch\":1516195280}],\"ANY_GRAPH_NAME_HERE\":[{\"value\":123}]}}";
-            // // postData += String(temp) + "}], \"ANY_GRAPH_NAME_HERE\":[{\"value\":123}]}}"
-            // int responseCode = http.POST(postData);
-            // xLogf("responseCode: %d", responseCode);
+            String postData = "{\"data\":{\"Temp\": [{\"value\":" + String(temp) + 
+                                "}], \"Hum\":[{\"value\":" + String(hum) + 
+                                "}], \"Lux\":[{\"value\":" + String(lux) + 
+                                "}], \"Volt\":[{\"value\":" + String(volt) +
+                                "}], \"mA\":[{\"value\":" + String(mA) + "}] }}";
+            // String postData = "{\"data\":{\"Temperature\":[{\"value\":25.05},{\"value\":25.99,\"epoch\":1516195980},{\"value\":24.99,\"epoch\":1516195280}],\"ANY_GRAPH_NAME_HERE\":[{\"value\":123}]}}";
+            // postData += String(temp) + "}], \"ANY_GRAPH_NAME_HERE\":[{\"value\":123}]}}"
+            int responseCode = http.POST(postData);
+            xLogf("responseCode: %d", responseCode);
         }
         
         void refreshReadings(int temp, int hum, int lux) {

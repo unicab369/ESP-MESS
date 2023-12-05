@@ -5,7 +5,7 @@
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
 
-#define MODE_TEST 1
+// #define MODE_TEST 1
 // #define MODE_SLEEP 1
 // # define CH32V 1
 

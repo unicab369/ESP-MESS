@@ -41,7 +41,7 @@ class Serv_Serial: public Loggable {
 
             storage.setupStorage();
 
-            if (conf->checkHSPIPins() && conf->out3 != 255) {
+            if (conf->checkHSPIPins()) {
                 MY_ESP.printSPIPins();
 
                 appTimer0.logElapse("LogTime until Storage");

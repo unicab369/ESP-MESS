@@ -51,14 +51,18 @@ bool extractValues(const char* key, char* input, char *value1, char *value2) {
    
    //! validate 1st value
    ref = strtok(NULL, " ");
-   if (ref == nullptr || strlen(ref) < 1) return false;   
-   strcpy(value1, ref);
+   // if (ref == nullptr || strlen(ref) < 1) return false;   
+   if (ref != nullptr && strlen(ref)>0) {
+      strcpy(value1, ref);
+   }
    
    //! validate 2nd value
    ref = strtok(NULL, " ");
-   if (ref == nullptr || strlen(ref) < 1 || value2 == nullptr) return false;   
-   ref[strlen(ref)] = '\0';            //! add string terminator
-   strcpy(value2, ref);
+   // if (ref == nullptr || strlen(ref) < 1 || value2 == nullptr) return false;   
+   if (ref != nullptr && strlen(ref) > 0 && value2 !=nullptr) {
+      ref[strlen(ref)] = '\0';            //! add string terminator
+      strcpy(value2, ref);
+   }
 
    return true;
 }
