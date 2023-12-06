@@ -53,10 +53,10 @@ x
                 swRx = 25; swTx = 26;
 
                 //! Display (out1=cs, out2=ao)
-                rst0 = 5; out1 = 17; out2 = 14;
+                rst0 = 5; out1 = 12; out2 = 14;
 
                 //! SPI
-                sck0 = 18; miso0 = 19; mosi0 = 23; 
+                sck0 = 18; miso0 = 19; mosi0 = 23;
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24
