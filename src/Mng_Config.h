@@ -47,16 +47,18 @@ x
 
                 //! i2C Pins
                 sda0 = 33; scl0 = 32;
-                sda1 = 2; scl1 = 4;
+                // sda1 = 2; scl1 = 4;
 
                 //! xSerial
                 swRx = 25; swTx = 26;
 
-                //! Display (out1=cs, out2=ao)
-                rst0 = 5; out1 = 12; out2 = 14;
+                //! Display (out0=ST7735_CS, out2=Epaper_CS)
+                out0 = 12; out1 = 2;
 
                 //! SPI
                 sck0 = 18; miso0 = 19; mosi0 = 23;
+                rst0 = 5; ao0 = 14;
+
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24

@@ -55,7 +55,7 @@ class Serv_Serial: public Loggable {
 
                 pinMode(conf->out3, OUTPUT);
                 digitalWrite(conf->out3, HIGH);
-                largeDisp.setup2(conf->out1, conf->out2, conf->rst0, conf->mosi0, conf->sck0);
+                largeDisp.setup2(conf->out0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0);
                 // epaper.setup();
             }
         }

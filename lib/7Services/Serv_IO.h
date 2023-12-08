@@ -13,8 +13,8 @@ class Serv_IO {
         uint8_t sda1 = 255; uint8_t scl1 = 255;
 
         //! SPI lines
-        uint8_t mosi0 = 255, miso0 = 255, sck0 = 255, rst0 = 255;
-        uint8_t out0 = 255, out1 = 255, out2 = 255, out3 = 255;
+        uint8_t mosi0 = 255, miso0 = 255, sck0 = 255, rst0 = 255, ao0 = 255;
+        uint8_t out0 = 255, out1 = 255, out3 = 255;
 
         uint8_t mosi1 = 255, miso1 = 255, sck1 = 255, rst1 = 255;
 
