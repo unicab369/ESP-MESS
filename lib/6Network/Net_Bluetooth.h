@@ -26,6 +26,10 @@ class Net_Bluetooth {
    BLERemoteCharacteristic* pRemoteCharacteristic;
    BLEAdvertisedDevice* myDevice;
    
+   void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
+    // Process the received data
+   }
+
    public:
       void setup() {
          BLEDevice::init("");
@@ -37,6 +41,64 @@ class Net_Bluetooth {
          // pBLEScan->start(0, true);
       }
 
+      void connectToDevice(const char* targetName, bool filter = true) {
+         BLEScanResults foundDevices = pBLEScan->start(1, true);
+
+         for (int i=0; i<foundDevices.getCount(); i++) {
+            BLEAdvertisedDevice device = foundDevices.getDevice(i);
+            BLEAddress addr = device.getAddress();
+            const char* name = device.getName().c_str();
+            const char* servUUID = device.getServiceUUID().toString().c_str();
+            const char *servData = device.getServiceDataUUID().toString().c_str();
+
+            if (!filter) {
+               Serial.printf("\nName = %s", name);
+               Serial.printf("\nservUUID = %s", servUUID);
+               Serial.printf("\nservDataUUID = %s", servData);
+               Serial.println();
+            }
+
+            std::string nameStr = name;
+            if (nameStr.find("JDY-") != std::string::npos) {
+               BLEClient* pClient = BLEDevice::createClient();
+               myDevice = new BLEAdvertisedDevice(device);
+               bool check = pClient->connect(myDevice);
+
+               // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
+               // // Print the UUIDs of all services
+               // for (auto const& service : *services) {
+               //    BLERemoteService* pRemoteService = service.second;
+               //    Serial.print("\n______Service:");
+               //    Serial.println(pRemoteService->getUUID().toString().c_str());
+               //    std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
+
+               //    Serial.println("\nList of all Characteristics:");
+               //    for (auto const& characteristic : *characteristics) {
+               //          Serial.println(characteristic.second->getUUID().toString().c_str());
+               //    }
+               // }
+
+               BLERemoteService* pRemoteService = pClient->getService("0000ffe0-0000-1000-8000-00805f9b34fb");
+               Serial.println("\nList of all Characteristics:");
+               std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
+               for (auto const& characteristic : *characteristics) {
+                     Serial.println(characteristic.second->getUUID().toString().c_str());
+               }
+
+               BLERemoteCharacteristic* pRemoteCharacteristic = pRemoteService->getCharacteristic("0000ffe1-0000-1000-8000-00805f9b34fb");
+               const char* readValue = pRemoteCharacteristic->readValue().c_str();
+               
+               Serial.printf("\n***READ = %s", readValue); 
+               for (int i=0; i<strlen(readValue); i++) {
+                  Serial.printf("%02X ", readValue[i]);
+               }
+               Serial.println();
+               
+               pClient->disconnect();
+            }
+         }
+      }
+      
       void scanForDevice(const char* target) {
          BLEScanResults foundDevices = pBLEScan->start(1, true);
 

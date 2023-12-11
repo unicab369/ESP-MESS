@@ -7,7 +7,7 @@ class Serv_Serial: public Loggable {
     AppQueue<DispItem, MAX_DISPLAY_QUEUE2> dispQueue2;
 
     Disp_ST77 largeDisp;
-    Disp_Epaper epaper;
+    // Disp_Epaper epaper;
 
     public:
         Serv_I2C i2c1;
@@ -33,8 +33,8 @@ class Serv_Serial: public Loggable {
             #ifdef ESP32
                 if (conf->checkWire1()) {
                     // pinMode(14, OUTPUT);
-                    pinMode(36, INPUT);
-                    pinMode(39, INPUT);
+                    // pinMode(36, INPUT);
+                    // pinMode(39, INPUT);
                     i2c2.setup(conf->scl1, conf->sda1, &Wire1);
                 }
             #endif

@@ -37,6 +37,9 @@ x
 
             #elif CONFIG_IDF_TARGET_ESP32C3
                 Serial.println("IM HERE zzz 333");
+                led1 = 12;
+                btn1 = 6;
+                sda0 = 4; scl0 = 5;
             
             #elif ESP_MESS_V3
                 led1 = 22;
@@ -47,18 +50,17 @@ x
 
                 //! i2C Pins
                 sda0 = 33; scl0 = 32;
-                // sda1 = 2; scl1 = 4;
+                // sda1 = 4; scl1 = 2;
 
                 //! xSerial
                 swRx = 25; swTx = 26;
 
                 //! Display (out0=ST7735_CS, out2=Epaper_CS)
-                out0 = 12; out1 = 2;
+                // out0 = 12; out1 = 2;
 
                 //! SPI
                 sck0 = 18; miso0 = 19; mosi0 = 23;
                 rst0 = 5; ao0 = 14;
-
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24

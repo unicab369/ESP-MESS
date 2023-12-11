@@ -11,28 +11,28 @@
 // #define TEST_BEHAVIOR 1
 // #define TEST_PWM 1
 // #define TEST_AUDIO 1
-#define TEST_BLINK 1
+// #define TEST_BLINK 1
 // #define TEST_MICROPHONE 1
 // #define TEST_BLE 1
 // #define TEST_BLE_BEACON 1
 // #define TEST_BLE5 1
-// #define TEST_BLE_SCANNER 1
+#define TEST_BLE_SCANNER 1
 
-Loggable TestLog("Test"); 
-Mng_Config conf;
-MyButton button1;
-RotaryEncoder rotary;
-SerialControl serial;
+// Loggable TestLog("Test"); 
+// Mng_Config conf;
+// MyButton button1;
+// RotaryEncoder rotary;
+// SerialControl serial;
 
 void testSetup() {
-   conf.setup();
-   Wire.begin(conf.sda0, conf.scl0);
+   // conf.setup();
+   // Wire.begin(conf.sda0, conf.scl0);
 }
 
 void testRun() {
-   button1.run();
-   rotary.run();
-   serial.run();
+   // button1.run();
+   // rotary.run();
+   // serial.run();
 }
 
 #ifdef TEST_BLINK
@@ -643,21 +643,18 @@ void testRun() {
    void setup() {
       Serial.begin(115200);
       Serial.println("Scanning...");
-      AppPrint("IM HERE 000");
       pinMode(ledPin, OUTPUT);
+      digitalWrite(ledPin, HIGH);
 
       bluetooth.setup();
    }
 
    void loop() {
       // put your main code here, to run repeatedly:
-      // Serial.println("\nIM HERE zzz");
-      bluetooth.scanForDevice("98:89:13:0a:4e:36");
+      Serial.println("\nIM HERE zzz");
+      // bluetooth.scanForDevice("98:89:13:0a:4e:36");
       // bluetooth.run();
-
-      // delay(1000);
-      // uint8_t read = digitalRead(ledPin);
-      // digitalWrite(ledPin, !read);
+      bluetooth.connectToDevice("JDY-");
    }
 
 #elif TEST_BLE5

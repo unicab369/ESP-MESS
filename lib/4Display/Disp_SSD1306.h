@@ -32,7 +32,7 @@ static const unsigned char PROGMEM logo_bmp[] =
 
 class Disp_SSD13062 {
     Adafruit_SSD1306 disp;
-    TimeoutItem timer;       //* print time logger
+    // TimeoutItem timer;       //* print time logger
     bool isLoaded = false;
 
     public:

@@ -2,36 +2,17 @@
 #include <functional>
 #include <Wire.h>
 #include <SPI.h>
-#include <0Foundation.h>
-#include "3Mng_Runtime.h"
 
 // #define MODE_TEST 1
 // #define MODE_SLEEP 1
-// # define CH32V 1
+
+#ifndef MODE_TEST
+  #include <0Foundation.h>
+  #include "3Mng_Runtime.h"
+#endif
 
 #ifdef MODE_TEST
   #include "examples/AppTest.h"
-
-#elif defined(CH32V)
-  void setup() {
-    Serial.begin(9600);
-  }
-
-  void loop() {
-    Serial.print("IM HEREzzzzz");
-    delay(1000);
-    // if(Serial.available()) {
-    //     Serial.print("I have received: ");
-
-    //     while(Serial.available()) {
-    //         char c = Serial.read();
-    //         Serial.print(c);
-    //     }
-
-    //     Serial.println();
-    // }
-    // delay(500);
-  }
 
 #elif defined(MODE_SLEEP)
   #include <Adafruit_INA219.h>
@@ -105,7 +86,7 @@
 
   void setup() {
     Serial.begin(115200);
-    // SPI.begin(18, 19, 23, 12);
+    // SPI.begin(18, 19, 23, 2);
     // epaperz.setup();
 
     runTime.setupRunTime();
@@ -124,7 +105,7 @@
       }, "loopCore1", 5000, NULL, 1, NULL, 1);
     #else
       for(;;) {
-        //! should not be called for ESP32
+        //! should not be called for ESP32 duo cores
         runTime.runJob1();
         runTime.runJob2();
       }
@@ -133,7 +114,6 @@
 
   void loop() {
     //! should not be called
-    // epaperz.printLn();
-    // delay(1000);
+    // epaperz.test();
   }
 #endif

@@ -1,8 +1,8 @@
 #include "4Mng_Network.h"
 
-#ifndef ESP32 
+// #ifndef ESP32 
     #include <Ticker.h>
-#endif 
+// #endif 
 
 //! timerCallback is static sto asyncTimer1 cannot be an instance of Mng_Runtime
 AsyncTimer asyncTimer1;
@@ -25,14 +25,14 @@ class Mng_Runtime: public Loggable {
 
             if (runTime->isSecondInterval(5)) {
                 char hostName[22];
-                strcpy(hostName, network.servWifi.getHostName());
+                strcpy(hostName, network.getHostName());
                 device.render5s_Interval(hostName);
 
             } else if (runTime->isSecondInterval(3)) { 
                 device.render3s_Interval(&asyncTimer1, &asyncTimer2);
 
             } else if (runTime->isSecondInterval(2)) {
-                device.render2s_Interval(network.servWifi.wifi.localIp());
+                device.render2s_Interval(network.getNetworkId());
                 // network.handle_2secInterval();
 
                 // //! Enable Rotary on 2nd second to prevent automatic trigger at the start
@@ -90,7 +90,7 @@ class Mng_Runtime: public Loggable {
     };
 
     std::function<void()> onHandleResetWifi = [&]() {
-        network.servWifi.resetWifi();        //! Reset Wifi
+        network.resetWifi();
     };
 
     std::function<void(RotaryDirection state, uint8_t counter)> onHandleRotary = 
@@ -98,7 +98,7 @@ class Mng_Runtime: public Loggable {
         network.handleRotary(state, counter);      // network message
     };
 
-    #ifdef ESP32
+    #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
         static void onRefreshInterval(void* parameter) {
             RunTimeModel *param = (RunTimeModel*)parameter;
 
@@ -139,7 +139,7 @@ class Mng_Runtime: public Loggable {
             asyncTimer1.setup(&runtimeCb1);
             asyncTimer2.setup(&runtimeCb2);
 
-            #ifdef ESP32
+            #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
                 //! create task that run every 25ms on both cores
                 xTaskCreatePinnedToCore(Mng_Runtime::onRefreshInterval, "myTask1", 1000, &(asyncTimer1.model), 1, NULL, 0);
                 xTaskCreatePinnedToCore(Mng_Runtime::onRefreshInterval, "myTask2", 1000, &(asyncTimer2.model), 1, NULL, 1);
@@ -158,7 +158,7 @@ class Mng_Runtime: public Loggable {
             network.run();
             device.runMainTask2();
 
-            #ifdef ESP32
+            #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
                 asyncTimer2.run();
             #endif
         }
