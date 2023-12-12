@@ -21,13 +21,20 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
    }
 };
 
+bool bleBlock = false;
+
 class Net_Bluetooth {
    BLEScan *pBLEScan;
    BLERemoteCharacteristic* pRemoteCharacteristic;
+   BLERemoteCharacteristic* pCharacteristic;
    BLEAdvertisedDevice* myDevice;
-   
-   void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
-    // Process the received data
+   BLEClient* pClient;
+
+   static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
+      Serial.print("\nNOTIFY CALLBACK:");
+      Serial.println((char*)pData);
+      bleBlock = false;
+      AppPrintHeap();
    }
 
    public:
@@ -41,7 +48,15 @@ class Net_Bluetooth {
          // pBLEScan->start(0, true);
       }
 
-      void connectToDevice(const char* targetName, bool filter = true) {
+      void connectToDevice(const char* targetName, bool filter = false) {
+         while (bleBlock) {
+            delay(10);
+         }
+         if (pClient != nullptr && pClient->isConnected()) {
+            pClient->disconnect();
+            delete pClient;
+         }
+
          BLEScanResults foundDevices = pBLEScan->start(1, true);
 
          for (int i=0; i<foundDevices.getCount(); i++) {
@@ -59,43 +74,38 @@ class Net_Bluetooth {
             }
 
             std::string nameStr = name;
-            if (nameStr.find("JDY-") != std::string::npos) {
-               BLEClient* pClient = BLEDevice::createClient();
-               myDevice = new BLEAdvertisedDevice(device);
-               bool check = pClient->connect(myDevice);
+            std::string nameSub = nameStr.substr(0, 4);
+            if (strcmp(nameSub.c_str(), "JDY-") != 0) continue;
 
-               // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
-               // // Print the UUIDs of all services
-               // for (auto const& service : *services) {
-               //    BLERemoteService* pRemoteService = service.second;
-               //    Serial.print("\n______Service:");
-               //    Serial.println(pRemoteService->getUUID().toString().c_str());
-               //    std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
+            unsigned long dif;
+            unsigned long ref = millis();
 
-               //    Serial.println("\nList of all Characteristics:");
-               //    for (auto const& characteristic : *characteristics) {
-               //          Serial.println(characteristic.second->getUUID().toString().c_str());
-               //    }
-               // }
+            myDevice = new BLEAdvertisedDevice(device);
+            pClient = BLEDevice::createClient();
+            if (pClient->connect(myDevice) == false) continue;
 
-               BLERemoteService* pRemoteService = pClient->getService("0000ffe0-0000-1000-8000-00805f9b34fb");
-               Serial.println("\nList of all Characteristics:");
-               std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
-               for (auto const& characteristic : *characteristics) {
-                     Serial.println(characteristic.second->getUUID().toString().c_str());
-               }
+            // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
+            // // Print the UUIDs of all services
+            // for (auto const& service : *services) {
+            //    BLERemoteService* pRemoteService = service.second;
+            //    Serial.print("\n______Service:");
+            //    Serial.println(pRemoteService->getUUID().toString().c_str());
+            //    std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
 
-               BLERemoteCharacteristic* pRemoteCharacteristic = pRemoteService->getCharacteristic("0000ffe1-0000-1000-8000-00805f9b34fb");
-               const char* readValue = pRemoteCharacteristic->readValue().c_str();
-               
-               Serial.printf("\n***READ = %s", readValue); 
-               for (int i=0; i<strlen(readValue); i++) {
-                  Serial.printf("%02X ", readValue[i]);
-               }
-               Serial.println();
-               
-               pClient->disconnect();
-            }
+            //    Serial.println("\nList of all Characteristics:");
+            //    for (auto const& characteristic : *characteristics) {
+            //          Serial.println(characteristic.second->getUUID().toString().c_str());
+            //    }
+            // }
+
+            bleBlock = true;
+            BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
+            BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
+            BLERemoteService* pService = pClient->getService(serviceId);
+            pCharacteristic = pService->getCharacteristic(characteristicId);
+            pCharacteristic->registerForNotify(notifyCallback);
+            delete myDevice;
+            break;
          }
       }
       

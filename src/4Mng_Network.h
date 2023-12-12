@@ -1,11 +1,14 @@
 #ifdef CONFIG_IDF_TARGET_ESP32C3
+    #include <Net_Bluetooth.h>
     class Mng_Network {
+        Net_Bluetooth bluetooth;
+
         public:
             const char* getHostName()   { return "hostName"; }
             const char* getNetworkId()  { return "netId"; }
 
             void setup(Serv_Device* device) {
-
+                bluetooth.setup();
             }
 
             //! iotPlotter
@@ -49,7 +52,9 @@
             }
 
             void run() { 
-
+                // bluetooth.scanForDevice("98:89:13:0a:4e:36");
+                // bluetooth.run();
+                bluetooth.connectToDevice("JDY-", true);
             }
     };
 #else

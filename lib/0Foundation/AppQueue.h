@@ -12,7 +12,7 @@ class AppQueue {
 
             void sendQueue(T *item) {
                 if (xQueueSend(queue, item, 0) == pdTRUE) return;
-                AppPrint("[Queue] Full");
+                // AppPrint("[Queue] Full");
                 // T *itemToPop;          // Pop if full
                 // getQueue(itemToPop);
                 // xQueueSend(queue, item, 0);     // attempt to write again
