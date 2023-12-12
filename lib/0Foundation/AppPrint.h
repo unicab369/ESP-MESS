@@ -19,7 +19,7 @@ void AppPrint(const char* key, String value) {
 
 void AppPrint(const char* key, uint64_t value) {
    char val[22];
-   sprintf(val, "%lu", value);
+   sprintf(val, "%lu\n", value);
    AppPrint(key, val);
 }
 
