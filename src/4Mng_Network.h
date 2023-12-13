@@ -86,7 +86,7 @@
             Serv_Network servWifi;
             
             const char* getHostName()   { servWifi.getHostName(); }
-            const char* getNetworkId()  { return servWifi.wifi.localIp(); }
+            const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
 
             void setup(Serv_Device* device) {
                 servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
