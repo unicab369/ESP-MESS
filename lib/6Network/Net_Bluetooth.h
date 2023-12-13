@@ -51,7 +51,7 @@ class Net_Bluetooth {
          // pBLEScan->setInterval(500);
          // pBLEScan->setWindow(99); // less or equal setInterval value
          // pBLEScan->start(0, true);
-         resetCnt2 = 5;
+         resetCnt2 = 100;
       }
 
       void scanDevices() {
@@ -60,6 +60,16 @@ class Net_Bluetooth {
       
       void connectToDevice(const char* targetName, bool filter = false) {
          // Serial.println("\nSTART SCAN ..."); AppPrintHeap();
+         if (bleBlock) {
+            resetCnt2--;
+            if (resetCnt2<0) {
+               resetCnt2 = 100;
+               bleBlock = false;
+            }
+            Serial.println("IM HERE zzz");
+            return;
+         }
+
          if (myDevice != nullptr) {
             pClient->disconnect();
             delete myDevice;
