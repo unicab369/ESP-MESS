@@ -82,21 +82,21 @@
 
 #else
   Mng_Runtime runTime;
-  Net_Bluetooth bluetooth;
-  Disp_SSD13062 disp;
-  int counter = 0;
+  // Net_Bluetooth bluetooth;
+  // Disp_SSD13062 disp;
+  // int counter = 0;
   // Disp_Epaper epaperz;
 
   void setup() {
     Serial.begin(115200);
-    // SPI.begin(18, 19, 23, 2);
-    // epaperz.setup();
+    runTime.setupRunTime();
 
-    // runTime.setupRunTime();
-    bluetooth.setup();
-    Wire.begin(4, 5);
-    disp.setup(&Wire);
-    pinMode(12, OUTPUT);
+    // // SPI.begin(18, 19, 23, 2);
+    // // epaperz.setup();
+    // bluetooth.setup();
+    // Wire.begin(4, 5);
+    // disp.setup(&Wire);
+    // pinMode(12, OUTPUT);
 
     #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
       xTaskCreatePinnedToCore([](void *pvParam) {
@@ -113,14 +113,14 @@
     #else
       for(;;) {
         //! should not be called for ESP32 duo cores
-        // runTime.runJob1();
-        // runTime.runJob2();
-        bluetooth.connectToDevice("JDY-", true);
-        String output = "count="+String(counter);
-        disp.printline(myChar, 0);
-        disp.printline(output, 1);
-        digitalWrite(12, !digitalRead(12));
-        counter++;
+        runTime.runJob1();
+        runTime.runJob2();
+        // bluetooth.connectToDevice("JDY-", true);
+        // String output = "count="+String(counter);
+        // disp.printline(myChar, 0);
+        // disp.printline(output, 1);
+        // digitalWrite(12, !digitalRead(12));
+        // counter++;
       }
     #endif
   } 

@@ -51,7 +51,7 @@ class Serv_IO {
 
             // buzzer.setup(conf->buzzer1);
             ws2812.setup(ws2812p);
-            // xSerial.setup(swRx, swTx);
+            xSerial.setup(swRx, swTx);
 
             irSwitch.load(irSwitchp);
             edgeDetector.setup(pir1);

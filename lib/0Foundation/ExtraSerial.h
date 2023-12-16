@@ -76,7 +76,17 @@ class Mod_GPS: private Loggable {
 
             void run() {
                 if (!didLoad || !Serial1.available()) return;
-                gps.handleData(Serial1.read());
+                uint8_t buff[16] = { 0 };
+                Serial1.readBytesUntil('\n', buff, sizeof(buff));
+
+                Serial.println("IM HERE zzzz");
+                for (int i=0; i<sizeof(buff); i++) {
+                    Serial.printf("%02X ", buff[i]);
+                    // Serial.print(buff[i]); Serial.print(" ");
+                }
+
+                Serial.println("***END");
+                // gps.handleData(Serial1.read());
                 // if (gps.handleData(Serial1.read())) {
                     // String receivedData = Serial1.readStringUntil('\n'); // Read the incoming message
                     // Serial.println("Received: " + receivedData); // Print the received message

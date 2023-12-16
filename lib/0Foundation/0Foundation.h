@@ -22,7 +22,7 @@ TimerItem appTimer0;
 #include "2Storage.h"
 #include "SerialControl.h"
 
-#include "Serv_SPI.h"
+// #include "Serv_SPI.h"
 #include "4Display.h"
 
 #include <7Services.h>
