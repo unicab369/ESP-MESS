@@ -1,5 +1,51 @@
 #include <TinyGPSPlus.h>
 
+class DataCollector {
+    protected:
+        uint8_t buff[32] = { 0 };
+        uint8_t idx = 0;
+
+        void resetBuffer() {
+            idx=0;
+            memset(buff, 0, sizeof(buff));
+        }
+
+        void printReceivedData(const uint8_t *data, uint8_t len) {
+            Serial.println();
+            for (int i=0; i<idx; i++) Serial.printf("%02X ", data[i]);
+            if (callback!=nullptr) (*callback)(data);
+        }
+
+    public:
+        std::function<void(const uint8_t*)> *callback;
+
+        void addData(uint8_t value) {
+            buff[idx++] = value;
+            if (idx>sizeof(buff)) resetBuffer();
+        }
+
+        void completeData() {
+            printReceivedData(buff, sizeof(buff));
+            resetBuffer();
+        }
+};
+
+class DataInterpreter: public DataCollector {
+    public:
+        void makeData() {
+            uint16_t key = (buff[1]<<8) | buff[0];
+            uint8_t addr[4] = { buff[2], buff[3], buff[4], buff[5] };
+            uint16_t val1 = (buff[7]<<8) | buff[6];
+            uint16_t val2 = (buff[9]<<8) | buff[8];
+            uint16_t val3 = (buff[11]<<8) | buff[10];
+            uint16_t val4 = (buff[13]<<8) | buff[12];
+
+            Serial.printf("\n temp=%lu", val1);
+            Serial.printf("\n hum=%lu", val2);
+            Serial.printf("\n lux=%lu", val3);
+            Serial.printf("\n volt=%lu", val4);
+        }
+};
 
 class Mod_GPS: private Loggable {
     void displayInfo() {
@@ -68,6 +114,9 @@ class Mod_GPS: private Loggable {
         bool didLoad = false;
 
         public:
+            DataInterpreter interpreter;
+            std::function<void(const uint8_t*)> *callback;
+
             void setup(int8_t rx, int8_t tx) {
                 if (rx == 255 || tx == 255) return;
                 Serial1.begin(9600, SERIAL_8N1, rx, tx);
@@ -76,16 +125,23 @@ class Mod_GPS: private Loggable {
 
             void run() {
                 if (!didLoad || !Serial1.available()) return;
-                uint8_t buff[32] = { 0 };
-                Serial1.readBytesUntil('\n', buff, sizeof(buff));
+                Serial.println("\nxSerial Received");
 
-                Serial.println("IM HERE zzzz");
-                for (int i=0; i<sizeof(buff); i++) {
-                    Serial.printf("%02X ", buff[i]);
-                    // Serial.print(buff[i]); Serial.print(" ");
+                while(Serial1.available()>0) {
+                    uint8_t read = Serial1.read();
+
+                    //! check for 0x0D (Carriage Return)
+                    if (read == 0x0D) {
+                        //! check for 0x0A (Line Feed)
+                        if (Serial1.peek() == 0x0A) {
+                            Serial1.read();  // read and store Carriage Return
+                            interpreter.makeData();
+                            interpreter.completeData();
+                        }
+                    } else {
+                        interpreter.addData(read);
+                    }
                 }
-
-                Serial.println("***END");
                 // gps.handleData(Serial1.read());
                 // if (gps.handleData(Serial1.read())) {
                     // String receivedData = Serial1.readStringUntil('\n'); // Read the incoming message
