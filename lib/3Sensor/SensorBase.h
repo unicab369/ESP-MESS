@@ -74,3 +74,20 @@ class Lux_Interface {
         void setLux(float _lux) { lux = _lux; }
         float getLux() { return lux; }
 };
+
+class Current_Interface {
+    float busVoltage = -1;
+    float mA = -1;
+
+    public:
+        void setBusVoltage(float value) { busVoltage = value; }
+        void setCurrent(float value) { mA = value; }
+
+        float getBusVoltage() { return busVoltage; }
+        float getmA() { return mA; }
+
+        void reset() {
+            busVoltage = -1;
+            mA = -1;
+        }
+};

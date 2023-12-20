@@ -22,6 +22,7 @@ class I2CInterface {
 #include "SensorBase.h"
 #include "Mod_SHT.h"
 #include "Mod_BH17.h"
+#include "Mod_INA219.h"
 #include "Mod_VL53L0X.h"
 #include "Mod_MPU6050.h"
 
@@ -31,25 +32,25 @@ class Serv_Sensor {
     public:
         Mod2_SHT3 sht;
         Mod2_BH17 bh17;
+        Mod_INA219 ina219;
         bool isLoaded = false;
 
         void setup(TwoWire *wire) {
             sensors[0] = &sht;
             sensors[1] = &bh17;
-            for (int i=0; i<2; i++) { sensors[i]->setup(wire); }
+            for (int i=0; i<2; i++) sensors[i]->setup(wire);
+            // ina219.setup(wire);
             isLoaded = true;
         }
 
         void requestReadings() {
-            for (int i=0; i<2; i++) {
-                sensors[i]->requestReadings();
-            }
+            for (int i=0; i<2; i++) sensors[i]->requestReadings();
+            // ina219.requestReadings();
         }
 
         void collectReadings() {
-            for (int i=0; i<2; i++) {
-                sensors[i]->collectReadings();
-            }
+            for (int i=0; i<2; i++) sensors[i]->collectReadings();
+            // ina219.collectReadings();
         }
 };
 

@@ -76,7 +76,7 @@ class Mod_GPS: private Loggable {
 
             void run() {
                 if (!didLoad || !Serial1.available()) return;
-                uint8_t buff[16] = { 0 };
+                uint8_t buff[32] = { 0 };
                 Serial1.readBytesUntil('\n', buff, sizeof(buff));
 
                 Serial.println("IM HERE zzzz");
