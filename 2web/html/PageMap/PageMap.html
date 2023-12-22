@@ -10,10 +10,10 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-        <link rel="stylesheet" href="./icon/icon.css" />
+        <!-- <link rel="stylesheet" href="./icon/icon.css" /> -->
 
-        <script src="/2web/js/3Modules/ModMap.js"></script>
-        <script src="/2web/js/4Controllers/ZoneLayout.js"></script>
+        <script src="../../js/3Modules/ModMap.js"></script>
+        <script src="../../js/4Controllers/ZoneLayout.js"></script>
 
             <!-- Leaflet Drawing Tool -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
@@ -21,12 +21,12 @@
 
         <!-- Leaflet Offline Library for Saving and Loading GeoLocation after drawing on map -->
         <script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
-        <script src="/2web/lib/leaflet/leaflet-offline.js"></script>
-        <script src="/2web/lib/leaflet/FileSaver.js"></script>
+        <script src="../../lib/leaflet/leaflet-offline.js"></script>
+        <script src="../../lib/leaflet/FileSaver.js"></script>
         
         <!-- Adding Coordinate Label on bottom right of leaflet Map -->
-        <script type="text/javascript" src="/2web/lib/leaflet/Leaflet.Coordinates-0.1.5.min.js"></script>
-        <link rel="stylesheet" href="/2web/lib/leaflet/Leaflet.Coordinates-0.1.5.css"/>
+        <script type="text/javascript" src="../../lib/leaflet/Leaflet.Coordinates-0.1.5.min.js"></script>
+        <link rel="stylesheet" href="../../lib/leaflet/Leaflet.Coordinates-0.1.5.css"/>
 
     </head>
     <br>
@@ -94,7 +94,9 @@
 
         <!-- Save New Devices with Locations -->
         <button id="SaveDevicesGeoJSON">Save Devices Coordinates</button>
-        <script src="./js/4Controllers/SaveDevicesGeoJSON.js"></script>
+        <!-- <script src="../../js/4Controllers/SaveDevicesGeoJSON.js"></script> -->
+        <!-- This script needs to go after the button! -->
+        <script src="./PageMap.js"></script>
 
         <script>
             document.getElementById('deviceForm').addEventListener('submit', function(e) {
