@@ -1,4 +1,4 @@
-21982904852575812
+21986313178528546
 A_SensorNode
 BuzzerSmall
 
@@ -13,6 +13,13 @@ CR2450
 0
 2
 2
+A_SensorNode
+E104-BT07
+
+
+0
+22
+22
 A_SensorNode
 ESP12Base
 
@@ -80646,6 +80653,13 @@ Potentiometer vertical Vishay T73YP
 0
 3
 3
+R3528RGB
+LED_LL-R3528RGBC-008-B
+
+
+0
+4
+4
 RF
 Skyworks_SKY13575_639LF
 http://www.skyworksinc.com/uploads/documents/SKY13575_639LF_203270D.pdf
