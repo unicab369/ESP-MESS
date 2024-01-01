@@ -1,7 +1,7 @@
 
 // #define TTGO_LORA32 true
 // #define DEV_KMC_70011 1
-#define ESP_MESS_V3 1
+// #define ESP_MESS_V3 1
 
 class Mng_Config: public Serv_IO {
     public:
@@ -81,7 +81,7 @@ x
 
                 // ws2812p = 12;
                 led1 = 22;
-                btn1 = 34;
+                // btn1 = 34;
                 // buzzer1 = 14;
                 // rotaryA = 13; rotaryB = 15;
                 // pir1 = 36;
@@ -96,11 +96,11 @@ x
                 sck0 = 18; mosi0 = 23; miso0 = 19; rst0 = 2;
                 
                 //! large display: CS low enable
-                
+                ao0 = 26;       // display AO
+                cs0 = 27;       // display CS
+
                 out0 = 5;        // sdCard CS
-                out1 = 27;       // display CS
-                out2 = 26;       // display AO
-                out3 = 25;       // display backlight
+                // out3 = 25;       // display backlight
 
             #else
                 // xLogSection("DIRECTIVE = ESP8266");

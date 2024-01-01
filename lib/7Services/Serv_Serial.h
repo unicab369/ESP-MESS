@@ -7,7 +7,7 @@ class Serv_Serial: public Loggable {
     AppQueue<DispItem, MAX_DISPLAY_QUEUE2> dispQueue2;
 
     Disp_ST77 largeDisp;
-    // Disp_Epaper epaper;
+    Disp_Epaper epaper;
 
     public:
         Serv_I2C i2c1;
@@ -53,10 +53,8 @@ class Serv_Serial: public Loggable {
                 #endif
                 storage.setupSDCard(conf->out0);
 
-                pinMode(conf->out3, OUTPUT);
-                digitalWrite(conf->out3, HIGH);
-                largeDisp.setup2(conf->out0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0);
-                // epaper.setup();
+                largeDisp.setup2(conf->cs0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0);
+                epaper.setup();
             }
         }
 
@@ -75,11 +73,11 @@ class Serv_Serial: public Loggable {
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();
 
-                addDisplayQueue1(appClock.getDisplay(), 1);         //* LINE 1   
-                addDisplayQueue1(aTimer1->record(), 2);             //* LINE 2
-                addDisplayQueue1(aTimer2->record(), 3);             //* LINE 3
-                addDisplayQueue1(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
-                // i2c2.sen
+                addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1   
+                addDisplayQueues(aTimer1->record(), 2);             //* LINE 2
+                addDisplayQueues(aTimer2->record(), 3);             //* LINE 3
+                addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+                epaper.printLn();
 
             } else if (i2c1.dispMode == DISPLAY_2ND) {
                 handleDisplayMode();
@@ -92,9 +90,9 @@ class Serv_Serial: public Loggable {
             sprintf(sdSize, "sd = %u MB", storage.sd1.getCardSize());
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                addDisplayQueue1(hostName, 0);     //! Oled Mini LINE 0  
-                addDisplayQueue1(sdSize, 4);       //! Oled Mini LINE 4  
-                addDisplayQueue1("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
+                addDisplayQueues(hostName, 0);     //! Oled Mini LINE 0  
+                addDisplayQueues(sdSize, 4);       //! Oled Mini LINE 4  
+                addDisplayQueues("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
             }
         }
 
@@ -105,7 +103,7 @@ class Serv_Serial: public Loggable {
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 // showLadderId(); // line0
-                addDisplayQueue1(String(output), 4);   //! Oled Mini LINE 4
+                addDisplayQueues(String(output), 4);   //! Oled Mini LINE 4
             }
             addDisplayQueue2(output, 4);               //* LINE 4
         }
@@ -121,8 +119,8 @@ class Serv_Serial: public Loggable {
 
             //! Oled Mini
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                addDisplayQueue1(networkInfo, 0);      //! Oled Mini LINE 0
-                addDisplayQueue1(heapInfo, 4);   //! Oled Mini LINE 4        
+                addDisplayQueues(networkInfo, 0);      //! Oled Mini LINE 0
+                addDisplayQueues(heapInfo, 4);   //! Oled Mini LINE 4        
             }
             addDisplayQueue2(networkInfo, 0);          //* LINE 0
             addDisplayQueue2(heapInfo, 4);               //* LINE 4 
