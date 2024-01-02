@@ -1,26 +1,25 @@
 {
   "board": {
-    "active_layer": 49,
+    "active_layer": 0,
     "active_layer_preset": "",
-    "auto_track_width": true,
+    "auto_track_width": false,
     "hidden_netclasses": [],
     "hidden_nets": [],
     "high_contrast_mode": 0,
     "net_color_mode": 1,
     "opacity": {
-      "images": 0.6100000143051147,
-      "pads": 0.7300000190734863,
-      "tracks": 0.49000000953674316,
-      "vias": 0.8899999856948853,
-      "zones": 0.6600000262260437
+      "images": 1.0,
+      "pads": 1.0,
+      "tracks": 1.0,
+      "vias": 1.0,
+      "zones": 1.0
     },
-    "ratsnest_display_mode": 0,
     "selection_filter": {
       "dimensions": true,
       "footprints": true,
       "graphics": true,
       "keepouts": true,
-      "lockedItems": true,
+      "lockedItems": false,
       "otherItems": true,
       "pads": true,
       "text": true,
@@ -34,15 +33,17 @@
       2,
       3,
       4,
+      5,
       8,
       9,
       10,
       11,
       12,
       13,
-      14,
       15,
       16,
+      17,
+      18,
       19,
       20,
       21,
@@ -59,13 +60,15 @@
       33,
       34,
       35,
-      36
+      36,
+      39,
+      40
     ],
-    "visible_layers": "002f33d_80000001",
+    "visible_layers": "002fffc_80000001",
     "zone_display_mode": 0
   },
   "meta": {
-    "filename": "sensor_node.kicad_prl",
+    "filename": "panelized.kicad_prl",
     "version": 3
   },
   "project": {
