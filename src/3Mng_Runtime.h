@@ -37,9 +37,8 @@ class Mng_Runtime: public Loggable {
 
                 // //! Enable Rotary on 2nd second to prevent automatic trigger at the start
                 device.rotary.isEnabled = true;
-            } else {
-                //! RUNTIME (exclusive): 1 second interval
             }
+            
             //! Reset sensors reading every second
             device.addStoreQueue();
 

@@ -19,11 +19,12 @@ class SerialControl: public Loggable {
             (*onParseString)(inputString);
 
             //! clear the character one by one, just printing an emptyString wont do it
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 124; i++) {
+               inputString[i] = 0;
                Serial.print(' ');
                Serial.print('\b');
             }
-            strcpy(inputString, "");
+
             position = 0;
             Serial.print("");
             Serial.print("\r");

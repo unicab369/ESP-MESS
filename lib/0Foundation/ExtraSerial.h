@@ -13,6 +13,7 @@ class DataCollector {
         void printReceivedData(const uint8_t *data, uint8_t len) {
             Serial.println();
             for (int i=0; i<idx; i++) Serial.printf("%02X ", data[i]);
+            Serial.println();
             if (callback!=nullptr) (*callback)(data);
         }
 
@@ -40,10 +41,8 @@ class DataInterpreter: public DataCollector {
             uint16_t val3 = (buff[11]<<8) | buff[10];
             uint16_t val4 = (buff[13]<<8) | buff[12];
 
-            Serial.printf("\n temp=%lu", val1);
-            Serial.printf("\n hum=%lu", val2);
-            Serial.printf("\n lux=%lu", val3);
-            Serial.printf("\n volt=%lu", val4);
+            Serial.printf("\ntemp=%lu | hum=%lu | lux=%lu | volt=%lu", val1, val2, val3, val4);
+            completeData();
         }
 };
 
@@ -109,13 +108,14 @@ class Mod_GPS: private Loggable {
 };
 
 #ifdef ESP32
-    class ExtraSerial {
+    class ExtraSerial: private Loggable {
         Mod_GPS gps;
         bool didLoad = false;
 
         public:
             DataInterpreter interpreter;
             std::function<void(const uint8_t*)> *callback;
+            ExtraSerial(): Loggable("xSerial") {}
 
             void setup(int8_t rx, int8_t tx) {
                 if (rx == 255 || tx == 255) return;
@@ -125,7 +125,7 @@ class Mod_GPS: private Loggable {
 
             void run() {
                 if (!didLoad || !Serial1.available()) return;
-                Serial.println("\nxSerial Received");
+                xLog(__func__);
 
                 while(Serial1.available()>0) {
                     uint8_t read = Serial1.read();
@@ -136,7 +136,6 @@ class Mod_GPS: private Loggable {
                         if (Serial1.peek() == 0x0A) {
                             Serial1.read();  // read and store Carriage Return
                             interpreter.makeData();
-                            interpreter.completeData();
                         }
                     } else {
                         interpreter.addData(read);

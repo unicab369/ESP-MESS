@@ -51,10 +51,10 @@ class Serv_Serial: public Loggable {
                 #else
                     SPI.begin();
                 #endif
-                storage.setupSDCard(conf->out0);
+                storage.setupSDCard(conf->cs1);
 
                 largeDisp.setup2(conf->cs0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0);
-                epaper.setup();
+                // epaper.setup();
             }
         }
 
@@ -77,7 +77,8 @@ class Serv_Serial: public Loggable {
                 addDisplayQueues(aTimer1->record(), 2);             //* LINE 2
                 addDisplayQueues(aTimer2->record(), 3);             //* LINE 3
                 addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
-                epaper.printLn();
+
+                // epaper.printLn();
 
             } else if (i2c1.dispMode == DISPLAY_2ND) {
                 handleDisplayMode();

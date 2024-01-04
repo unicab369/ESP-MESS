@@ -1,7 +1,7 @@
 
 // #define TTGO_LORA32 true
 // #define DEV_KMC_70011 1
-// #define ESP_MESS_V3 1
+#define ESP_MESS_V3 1
 
 class Mng_Config: public Serv_IO {
     public:
@@ -59,8 +59,10 @@ x
                 // out0 = 12; out1 = 2;
 
                 //! SPI
-                sck0 = 18; miso0 = 19; mosi0 = 23;
-                rst0 = 5; ao0 = 14;
+                sck0 = 18; miso0 = 19; mosi0 = 23; rst0 = 2; 
+                
+                ao0 = 14;
+                cs1 = 5;        // sdCard CS
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24
@@ -81,7 +83,7 @@ x
 
                 // ws2812p = 12;
                 led1 = 22;
-                // btn1 = 34;
+                btn1 = 34;
                 // buzzer1 = 14;
                 // rotaryA = 13; rotaryB = 15;
                 // pir1 = 36;
@@ -99,7 +101,7 @@ x
                 ao0 = 26;       // display AO
                 cs0 = 27;       // display CS
 
-                out0 = 5;        // sdCard CS
+                cs1 = 5;        // sdCard CS
                 // out3 = 25;       // display backlight
 
             #else

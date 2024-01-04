@@ -157,7 +157,7 @@ class Dat_Settings: public ExtractorInterface {
       }
 };
 
-#define MAX_VALUE_QUEUE 10
+#define MAX_VALUE_QUEUE 15
 
 struct StoringValue {
    char value[32];
@@ -193,6 +193,8 @@ class Mng_Storage: public Loggable {
 
       Mng_Storage(): Loggable("Mng_Sto") {}
 
+      int valX = 0;
+
       void setupStorage() {
          xLogSection(__func__);
 
@@ -215,9 +217,15 @@ class Mng_Storage: public Loggable {
       }
 
       RESET_Type handleConsoleCmd(char* inputStr) {
-         xLogf("%s %s", __func__, inputStr);
+         // xLogf("%s %s", __func__, inputStr);
          
-         if (stoCred.extractToEEPROM(inputStr)) {
+         if (strcmp(inputStr, "ping") == 0) {
+            Serial.println("What is thy bidding my Master?");
+         }
+         else if (strcmp(inputStr, "getSens") == 0) {
+            Serial.println(valX++);
+         }
+         else if (stoCred.extractToEEPROM(inputStr)) {
             xLog("cred extracted");
             return RESET_WIFI;
          }
@@ -238,7 +246,7 @@ class Mng_Storage: public Loggable {
       void setupSDCard(uint8_t sdCS) {
          if (sdCS == 255) return;
          sd1.begin(sdCS);
-         // sd1.test();
+         sd1.test();
       }
 
       void loadStoragePath(String dateTimeStr) {
