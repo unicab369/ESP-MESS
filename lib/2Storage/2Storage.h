@@ -159,13 +159,30 @@ class Dat_Settings: public ExtractorInterface {
 
 #define MAX_VALUE_QUEUE 15
 
-struct StoringValue {
-   char value[32];
+enum DataStoreType {
+   DATA_SENSOR1,
+   DATA_SENSOR2,
+};
+
+class DataStoreItem {
+   DataStoreType type = DATA_SENSOR1;
+
+   public:
+      char id[20] = "invalid";
+      uint32_t timeStamp;
+      float val1, val2, val3, val4, val5;
+
+      String formatForStorage() {
+         char output[48];
+         sprintf(output, "%d %.2f %.2f %.2f %.2f %.2f %lu\n", type,
+               val1, val2, val3, val4, val5, timeStamp);
+         return String(output);
+      }
 };
 
 class Mng_Storage: public Loggable {
    RTC_Data rtc_data;
-   AppQueue<StoringValue, MAX_VALUE_QUEUE> valueQueue;
+   AppQueue<DataStoreItem, MAX_VALUE_QUEUE> dataStoreQueue;
 
    // void saveBootCount() {
    //     rtc_storage.write(65, &rtc_data, sizeof(rtc_data));
@@ -246,7 +263,7 @@ class Mng_Storage: public Loggable {
       void setupSDCard(uint8_t sdCS) {
          if (sdCS == 255) return;
          sd1.begin(sdCS);
-         sd1.test();
+         // sd1.test();
       }
 
       void loadStoragePath(String dateTimeStr) {
@@ -259,22 +276,23 @@ class Mng_Storage: public Loggable {
          sd1.makeFile(sensorDataPath);
       }
 
-      void addStoreTempHumLuxQueue(float temp, float hum, float lux, time_t timeStamp) {
+      void storeItem(DataStoreItem *item) {
          char output[32];
-         sprintf(output, "%.2f %.2f %.2f %ld\n", temp, hum, lux, (long)timeStamp);
-
-         StoringValue storeValue;
-         strcpy(storeValue.value, output);
-         valueQueue.sendQueue(&storeValue);
+         sprintf(output, "%.2f %.2f %.2f %.2f %.2f %ld\n", item->val1, item->val2, 
+               item->val3, item->val4, item->val5, (long)item->timeStamp);
+         dataStoreQueue.sendQueue(item);
       }
 
       void handleValueQueue(std::function<void(uint32_t)> onComplete) {
-         StoringValue item;
-         if (!valueQueue.getQueue(&item)) return;
+         DataStoreItem item;
+         if (!dataStoreQueue.getQueue(&item)) return;
          // AppPrint("StoreValue", item.value);
 
          uint32_t timeRef = millis();
-         sd1.appendFile(sensorDataPath, item.value);
+         String output = item.formatForStorage();
+         Serial.println("Storing data");
+         Serial.println(output);
+         sd1.appendFile(sensorDataPath, output.c_str());
          onComplete(millis()-timeRef);
       }
 

@@ -399,7 +399,9 @@
     }
   },
   "libraries": {
-    "pinned_footprint_libs": [],
+    "pinned_footprint_libs": [
+      "A_SensorNode"
+    ],
     "pinned_symbol_libs": []
   },
   "meta": {
@@ -696,6 +698,10 @@
     [
       "af3a10dd-48b4-4881-8409-82af1b899ed6",
       ""
+    ],
+    [
+      "58c6afdd-a784-450a-91ee-12802e6498d5",
+      "ESP12"
     ]
   ],
   "text_variables": {}

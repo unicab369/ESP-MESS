@@ -149,12 +149,23 @@ class Serv_Serial: public Loggable {
             addDisplayQueue2(str, line);
         }
 
+        void addDataStoreQueue(DataStoreItem *item) {
+            if (!storage.isValidPath()) return;
+            storage.storeItem(item);
+        }
+
         //! store and reset sensors readings
         void addStoreQueue() {
             if (!storage.isValidPath()) return;
             float temp, hum, lux;
             i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
-            // storage.addStoreTempHumLuxQueue(temp, hum, lux, appClock.getTimeNow());
+
+            DataStoreItem item;
+            item.val1 = temp;
+            item.val2 = hum;
+            item.val3 = lux;
+            item.timeStamp = appClock.getTimeNow();
+            storage.storeItem(&item);
         }
 
         //! Handle Qeueues
