@@ -34,9 +34,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 1.0,
-          "height": 1.7,
-          "width": 1.7
+          "drill": 0.0,
+          "height": 0.6,
+          "width": 0.6
         },
         "silk_line_width": 0.15,
         "silk_text_italic": false,
@@ -111,7 +111,7 @@
       },
       "rules": {
         "max_error": 0.005,
-        "min_clearance": 0.0,
+        "min_clearance": 0.15,
         "min_connection": 0.0,
         "min_copper_edge_clearance": 0.0,
         "min_hole_clearance": 0.25,
@@ -123,7 +123,7 @@
         "min_text_height": 0.7999999999999999,
         "min_text_thickness": 0.08,
         "min_through_hole_diameter": 0.3,
-        "min_track_width": 0.15,
+        "min_track_width": 0.13,
         "min_via_annular_width": 0.049999999999999996,
         "min_via_diameter": 0.39999999999999997,
         "solder_mask_to_copper_clearance": 0.0,
@@ -422,9 +422,9 @@
         "name": "Default",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.2,
-        "via_diameter": 0.8,
-        "via_drill": 0.4,
+        "track_width": 0.13,
+        "via_diameter": 0.5,
+        "via_drill": 0.3,
         "wire_width": 6
       },
       {
@@ -439,9 +439,9 @@
         "name": "MyPrint",
         "pcb_color": "rgba(0, 0, 0, 0.000)",
         "schematic_color": "rgba(0, 0, 0, 0.000)",
-        "track_width": 0.15,
-        "via_diameter": 0.8,
-        "via_drill": 0.4,
+        "track_width": 0.13,
+        "via_diameter": 0.5,
+        "via_drill": 0.3,
         "wire_width": 6
       }
     ],
@@ -698,6 +698,10 @@
     [
       "af3a10dd-48b4-4881-8409-82af1b899ed6",
       ""
+    ],
+    [
+      "04574b90-7dc9-46ea-b981-00c4b7ef8597",
+      "Extra"
     ],
     [
       "58c6afdd-a784-450a-91ee-12802e6498d5",

@@ -1,4 +1,4 @@
-21999952467186439
+22001657208796991
 A_SensorNode
 ButtonSwitch12mm_SMD
 
@@ -27,6 +27,13 @@ E104-BT07
 0
 22
 22
+A_SensorNode
+E220-900MM
+
+
+0
+20
+20
 A_SensorNode
 ESP12Base
 
