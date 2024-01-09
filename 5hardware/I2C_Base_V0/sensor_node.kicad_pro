@@ -685,7 +685,7 @@
     },
     "net_format_name": "",
     "page_layout_descr_file": "",
-    "plot_directory": "",
+    "plot_directory": "./",
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",
     "spice_model_current_sheet_as_root": true,
@@ -698,10 +698,6 @@
     [
       "af3a10dd-48b4-4881-8409-82af1b899ed6",
       ""
-    ],
-    [
-      "04574b90-7dc9-46ea-b981-00c4b7ef8597",
-      "Extra"
     ],
     [
       "58c6afdd-a784-450a-91ee-12802e6498d5",

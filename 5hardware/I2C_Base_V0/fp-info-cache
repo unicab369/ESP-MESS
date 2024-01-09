@@ -1,4 +1,4 @@
-22001657208796991
+22003362054696314
 A_SensorNode
 ButtonSwitch12mm_SMD
 
@@ -55,6 +55,13 @@ ESP32-WROOM-32D2
 0
 60
 39
+A_SensorNode
+JDY-41
+
+
+0
+0
+0
 A_SensorNode
 JDY-Base
 
@@ -53638,8 +53645,8 @@ MODULE_ESP32-C3-WROOM-02-H4
 
 
 0
-39
-39
+31
+19
 ESP32-footprints-Lib
 ESP32
 
