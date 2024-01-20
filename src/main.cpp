@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-// #define MODE_TEST 1
+#define MODE_TEST 1
 // #define MODE_SLEEP 1
 
 #ifndef MODE_TEST

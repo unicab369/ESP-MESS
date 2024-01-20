@@ -21,11 +21,23 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
    }
 };
 
-bool bleBlock = false;
+class MyBLEClientCallbacks : public BLEClientCallbacks {
+public:
+   void onConnect(BLEClient* pClient) {
+      // Handle connection event
+      Serial.println("Connected to BLE server");
+   }
+
+   void onDisconnect(BLEClient* pClient) {
+      // Handle disconnection event
+      Serial.println("Disconnected from BLE server");
+      delete pClient;
+   }
+};
+
+bool isBLEConnected = false;
 BLEAdvertisedDevice* myDevice;
 BLEClient* pClient;
-unsigned long timeRef2 = 0;
-int resetCnt2 = 0;
 char myChar[16] = "";
 
 class Net_Bluetooth {
@@ -36,10 +48,7 @@ class Net_Bluetooth {
    static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
       Serial.print("\nNOTIFY CALLBACK:"); Serial.println((char*)pData);
       strcpy(myChar, (char*)pData);
-      unsigned long dif = millis() - timeRef2;
-      Serial.printf("TIME DIF = %lu", dif);
-      AppPrintHeap();
-      bleBlock = false;
+      Serial.println(myChar);
    }
 
    public:
@@ -51,24 +60,11 @@ class Net_Bluetooth {
          // pBLEScan->setInterval(500);
          // pBLEScan->setWindow(99); // less or equal setInterval value
          // pBLEScan->start(0, true);
-         resetCnt2 = 100;
-      }
-
-      void scanDevices() {
-
       }
       
-      void connectToDevice(const char* targetName, bool filter = false) {
+      void connectToDevice(const char* target, bool filter = false) {
+         if (isBLEConnected) return;
          // Serial.println("\nSTART SCAN ..."); AppPrintHeap();
-         if (bleBlock) {
-            resetCnt2--;
-            if (resetCnt2<0) {
-               resetCnt2 = 100;
-               bleBlock = false;
-            }
-            Serial.println("IM HERE zzz");
-            return;
-         }
 
          if (myDevice != nullptr) {
             pClient->disconnect();
@@ -94,13 +90,18 @@ class Net_Bluetooth {
 
             std::string nameStr = name;
             std::string nameSub = nameStr.substr(0, 4);
-            if (strcmp(nameSub.c_str(), targetName) != 0) continue;
+
+            BLEAddress *targetAddr = new BLEAddress(target);
+            if (!addr.equals(*targetAddr)) continue;
+            // if (strcmp(nameSub.c_str(), target) != 0) continue;
 
             unsigned long dif;
             unsigned long ref = millis();
 
             myDevice = new BLEAdvertisedDevice(device);
             pClient = BLEDevice::createClient();
+            pClient->setClientCallbacks(new MyBLEClientCallbacks());
+
             if (pClient->connect(myDevice) == false) continue;
             if (pClient->isConnected() == false) continue;
 
@@ -123,9 +124,8 @@ class Net_Bluetooth {
             BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
             BLERemoteService* pService = pClient->getService(serviceId);
             pCharacteristic = pService->getCharacteristic(characteristicId);
-            timeRef2 = millis();
             pCharacteristic->registerForNotify(notifyCallback);
-            bleBlock = true;
+            isBLEConnected = true;
             break;
          }
       }
