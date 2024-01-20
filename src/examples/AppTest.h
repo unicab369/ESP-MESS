@@ -650,11 +650,12 @@ void testRun() {
    }
 
    void loop() {
-      // put your main code here, to run repeatedly:
-      Serial.println("\nIM HERE zzz");
       // bluetooth.scanForDevice("98:89:13:0a:4e:36");
       // bluetooth.run();
-      bluetooth.connectToDevice("JDY-");
+
+      //+MAC:9889130A699B
+      // bluetooth.scanForDevice2("JDY-");
+      bluetooth.scanForDevice2("98:89:13:0a:69:9b");
    }
 
 #elif TEST_BLE5
