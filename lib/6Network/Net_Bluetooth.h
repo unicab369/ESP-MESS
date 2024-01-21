@@ -8,6 +8,11 @@
 
 #define ENDIAN_CHANGE_U16(x) ((((x)&0xFF00) >> 8) + (((x)&0xFF) << 8))
 
+bool isBLEConnected = false;
+BLEAdvertisedDevice* myDevice;
+BLEClient* pClient;
+char myChar[16] = "";
+
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
    void onResult(BLEAdvertisedDevice advertisedDevice) {
       // Serial.printf("Advertised Device: %s \n", advertisedDevice.toString().c_str());
@@ -21,35 +26,49 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
    }
 };
 
+void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
+   Serial.print("\nNOTIFY CALLBACK:"); Serial.println((char*)pData);
+   strcpy(myChar, (char*)pData);
+   digitalWrite(ledPin, HIGH);
+   Serial.println(myChar);
+}
+
 class MyBLEClientCallbacks : public BLEClientCallbacks {
 public:
    void onConnect(BLEClient* pClient) {
       // Handle connection event
       Serial.println("Connected to BLE server");
+      digitalWrite(ledPin2, HIGH);
+
+      if (pClient->isConnected()) {
+            Serial.println("===>>>CONNECTED");
+            BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
+            BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
+            BLERemoteService* pService = pClient->getService(serviceId);
+
+            if (pService != nullptr) {
+               Serial.println("IM HERE 1");
+               BLERemoteCharacteristic* pCharacteristic = pService->getCharacteristic(characteristicId);
+
+               if (pCharacteristic != nullptr) {
+                  Serial.println("IM HERE 2");
+                  pCharacteristic->registerForNotify(notifyCallback);
+               }  
+            }
+      }
    }
 
    void onDisconnect(BLEClient* pClient) {
       // Handle disconnection event
       Serial.println("Disconnected from BLE server");
       delete pClient;
+      digitalWrite(ledPin2, LOW);
    }
 };
 
-bool isBLEConnected = false;
-BLEAdvertisedDevice* myDevice;
-BLEClient* pClient;
-char myChar[16] = "";
-
 class Net_Bluetooth {
    BLEScan *pBLEScan;
-   BLERemoteCharacteristic* pRemoteCharacteristic;
-   BLERemoteCharacteristic* pCharacteristic;
-
-   static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
-      Serial.print("\nNOTIFY CALLBACK:"); Serial.println((char*)pData);
-      strcpy(myChar, (char*)pData);
-      Serial.println(myChar);
-   }
+   MyBLEClientCallbacks *clientCb = new MyBLEClientCallbacks();
 
    public:
       void setup() {
@@ -60,18 +79,20 @@ class Net_Bluetooth {
          // pBLEScan->setInterval(500);
          // pBLEScan->setWindow(99); // less or equal setInterval value
          // pBLEScan->start(0, true);
+         pinMode(42, INPUT_PULLUP);
+         pinMode(ledPin2, OUTPUT);
       }
       
-      void connectToDevice(const char* target, bool filter = false) {
+      void scanForDevice2(const char* target, bool filter = false) {
          if (isBLEConnected) return;
          // Serial.println("\nSTART SCAN ..."); AppPrintHeap();
 
-         if (myDevice != nullptr) {
-            pClient->disconnect();
-            delete myDevice;
-            delete pClient;
-            Serial.println("\n===>>>DELETED***");
-         }
+         // if (myDevice != nullptr) {
+         //    pClient->disconnect();
+         //    delete myDevice;
+         //    delete pClient;
+         //    Serial.println("\n===>>>DELETED***");
+         // }
 
          BLEScanResults foundDevices = pBLEScan->start(1, true);
          for (int i=0; i<foundDevices.getCount(); i++) {
@@ -82,10 +103,11 @@ class Net_Bluetooth {
             const char *servData = device.getServiceDataUUID().toString().c_str();
 
             if (!filter) {
-               Serial.printf("\nName = %s", name);
-               Serial.printf("\nservUUID = %s", servUUID);
-               Serial.printf("\nservDataUUID = %s", servData);
-               Serial.println();
+               digitalWrite(ledPin, !digitalRead(ledPin));
+               // Serial.printf("\nName = %s", name);
+               // Serial.printf("\nservUUID = %s", servUUID);
+               // Serial.printf("\nservDataUUID = %s", servData);
+               // Serial.println();
             }
 
             std::string nameStr = name;
@@ -100,10 +122,11 @@ class Net_Bluetooth {
 
             myDevice = new BLEAdvertisedDevice(device);
             pClient = BLEDevice::createClient();
-            pClient->setClientCallbacks(new MyBLEClientCallbacks());
+            pClient->setClientCallbacks(clientCb);
 
             if (pClient->connect(myDevice) == false) continue;
             if (pClient->isConnected() == false) continue;
+            pBLEScan->stop();
 
             // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
             // // Print the UUIDs of all services
@@ -118,13 +141,7 @@ class Net_Bluetooth {
             //          Serial.println(characteristic.second->getUUID().toString().c_str());
             //    }
             // }
-
-            Serial.println("===>>>CONNECTED");
-            BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
-            BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
-            BLERemoteService* pService = pClient->getService(serviceId);
-            pCharacteristic = pService->getCharacteristic(characteristicId);
-            pCharacteristic->registerForNotify(notifyCallback);
+            
             isBLEConnected = true;
             break;
          }

@@ -1,10 +1,16 @@
 #ifdef CONFIG_IDF_TARGET_ESP32C3
    uint8_t ledPin = 12;
+   uint8_t ledPin2 = 255;
+#elif CONFIG_IDF_TARGET_ESP32S3 
+   uint8_t ledPin = 47;
+   uint8_t ledPin2 = 48;
 #elif defined(ESP32)
    // uint8_t ledPin = 22;
    uint8_t ledPin = 1;
+   uint8_t ledPin2 = 255;
 #else
    uint8_t ledPin = 2;
+   uint8_t ledPin2 = 255;
 #endif
 
 // #define TEST_PCA96 1
@@ -644,15 +650,17 @@ void testRun() {
       Serial.begin(115200);
       Serial.println("Scanning...");
       pinMode(ledPin, OUTPUT);
-      digitalWrite(ledPin, HIGH);
 
+      digitalWrite(ledPin, HIGH);
+      delay(200);
+      digitalWrite(ledPin, LOW);
       bluetooth.setup();
    }
 
    void loop() {
       // put your main code here, to run repeatedly:
       // bluetooth.run();
-      bluetooth.connectToDevice("98:89:13:0a:69:9b");
+      bluetooth.scanForDevice2("98:89:13:0a:69:9b");
    }
 
 #elif TEST_BLE5
