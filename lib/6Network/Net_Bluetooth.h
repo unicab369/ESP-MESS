@@ -33,6 +33,41 @@ void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* 
    Serial.println(myChar);
 }
 
+void getServices(bool listAll = false) {
+   if (listAll) {
+      std::map<std::string, BLERemoteService*> *services = pClient->getServices();
+
+      // Print the UUIDs of all services
+      for (auto const& service : *services) {
+         BLERemoteService* pRemoteService = service.second;
+         if (pRemoteService == nullptr) continue;
+         
+         Serial.print("\n***Service:");
+         Serial.println(pRemoteService->getUUID().toString().c_str());
+         std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
+
+         Serial.println("\nList of all Characteristics:");
+         for (auto const& characteristic : *characteristics) {
+            BLERemoteCharacteristic *const charistic = characteristic.second;
+            if (charistic == nullptr) continue;
+            Serial.println(characteristic.second->getUUID().toString().c_str());
+         }
+      }
+   }
+
+   BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
+   BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
+   BLERemoteService* pService = pClient->getService(serviceId);
+
+   if (pService != nullptr) {
+      BLERemoteCharacteristic* pCharacteristic = pService->getCharacteristic(characteristicId);
+
+      if (pCharacteristic != nullptr) {
+         pCharacteristic->registerForNotify(notifyCallback);
+      }  
+   }
+}
+
 class MyBLEClientCallbacks : public BLEClientCallbacks {
 public:
    void onConnect(BLEClient* pClient) {
@@ -41,20 +76,14 @@ public:
       digitalWrite(ledPin2, HIGH);
 
       if (pClient->isConnected()) {
-            Serial.println("===>>>CONNECTED");
-            BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
-            BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
-            BLERemoteService* pService = pClient->getService(serviceId);
+            Serial.println("\n===>>>CONNECTED");
+            std::map<std::string, BLERemoteService*> *services = pClient->getServices();
 
-            if (pService != nullptr) {
-               Serial.println("IM HERE 1");
-               BLERemoteCharacteristic* pCharacteristic = pService->getCharacteristic(characteristicId);
+            Serial.print("NULL = "); Serial.println(services == nullptr);
+            Serial.print("Size = "); Serial.println(services->size());
 
-               if (pCharacteristic != nullptr) {
-                  Serial.println("IM HERE 2");
-                  pCharacteristic->registerForNotify(notifyCallback);
-               }  
-            }
+            // Print the UUIDs of all services
+            getServices();
       }
    }
 
@@ -79,71 +108,97 @@ class Net_Bluetooth {
          // pBLEScan->setInterval(500);
          // pBLEScan->setWindow(99); // less or equal setInterval value
          // pBLEScan->start(0, true);
-         pinMode(42, INPUT_PULLUP);
          pinMode(ledPin2, OUTPUT);
       }
       
       void scanForDevice2(const char* target, bool filter = false) {
          if (isBLEConnected) return;
          // Serial.println("\nSTART SCAN ..."); AppPrintHeap();
-
-         // if (myDevice != nullptr) {
-         //    pClient->disconnect();
-         //    delete myDevice;
-         //    delete pClient;
-         //    Serial.println("\n===>>>DELETED***");
-         // }
-
          BLEScanResults foundDevices = pBLEScan->start(1, true);
+
          for (int i=0; i<foundDevices.getCount(); i++) {
             BLEAdvertisedDevice device = foundDevices.getDevice(i);
-            BLEAddress addr = device.getAddress();
+            const char* addr = device.getAddress().toString().c_str();
             const char* name = device.getName().c_str();
-            const char* servUUID = device.getServiceUUID().toString().c_str();
-            const char *servData = device.getServiceDataUUID().toString().c_str();
+            const char* servId = device.getServiceUUID().toString().c_str();
+            const char* servDataId = device.getServiceDataUUID().toString().c_str();
 
             if (!filter) {
                digitalWrite(ledPin, !digitalRead(ledPin));
-               // Serial.printf("\nName = %s", name);
-               // Serial.printf("\nservUUID = %s", servUUID);
-               // Serial.printf("\nservDataUUID = %s", servData);
-               // Serial.println();
+               Serial.printf("\nName = %s", name);
+               Serial.print("\nAddr = "); Serial.println(addr);
+               Serial.print("servUUID = "); Serial.println(servId);
+               Serial.print("servDataUUID = "); Serial.println(servDataId);
+
+               Serial.print("Raw Manufacturer Data: ");
+               std::string manufacturerData = device.getManufacturerData();
+               for (int i = 0; i < manufacturerData.length(); i++) {
+                     Serial.print(manufacturerData[i], HEX);
+                     Serial.print(" ");
+               }
+
+               Serial.println();
+
+               std::string nullStr = "<NULL>";
+               bool check1 = strcmp(servId, nullStr.c_str()) != 0;
+
+               // std::string blkList = "Fencelight";      // Fencelight
+               // bool check3 = strcmp(name, blkList.c_str()) != 0;
+               // if (!check3) continue;
+
+               // blkList = "bf:27:cc:17:5a:11";                  // TY
+               // check3 = strcmp(addr, blkList.c_str()) != 0;
+               // if (!check3) continue;
+
+               // blkList = "THWL";
+               // check3 = strcmp(name, blkList.c_str()) != 0;
+               // if (!check3) continue;
+
+               // blkList = "TY";
+               // check3 = strcmp(name, blkList.c_str()) != 0;
+               // if (!check3) continue;
+
+               BLEAddress compAddr = BLEAddress("98:89:13:0a:69:9b");
+               BLEAddress compAddr2 = BLEAddress("b7:7b:08:10:c9:b1");
+               bool check4 = device.getAddress().equals(compAddr) || device.getAddress().equals(compAddr2);
+
+               // 0000ffe0-0000-1000-8000-00805f9b34fb
+               // bool check4 = strcmp(name, compAddr.c_str()) == 0;
+
+               pClient = BLEDevice::createClient();
+               // pClient->setClientCallbacks(clientCb);
+
+               if (check1 && check4 && pClient->connect(&device)) {
+                  Serial.println("Connected to the device");
+                  getServices();
+
+                  // // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
+
+                  // Serial.println("IM HERE YYYYYY");
+                  // BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
+                  // // BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
+                  // BLERemoteService* pService = pClient->getService(serviceId);
+
+                  // // if (pService != nullptr) {
+                  // //    Serial.println("IM HERE 1");
+                  // // //    BLERemoteCharacteristic* pCharacteristic = pService->getCharacteristic(characteristicId);
+
+                  // // //    if (pCharacteristic != nullptr) {
+                  // // //       Serial.println("IM HERE 2");
+                  // // //       pCharacteristic->registerForNotify(notifyCallback);
+                  // // //    }  
+                  // // }
+
+                  // Disconnect from the device
+                  // pClient->disconnect();
+                  // Serial.println("Disconnected from the device");
+
+                  isBLEConnected = true;
+                  // pBLEScan->stop();
+                  // pBLEScan->clearResults();
+                  break;
+               }
             }
-
-            std::string nameStr = name;
-            std::string nameSub = nameStr.substr(0, 4);
-
-            BLEAddress *targetAddr = new BLEAddress(target);
-            if (!addr.equals(*targetAddr)) continue;
-            // if (strcmp(nameSub.c_str(), target) != 0) continue;
-
-            unsigned long dif;
-            unsigned long ref = millis();
-
-            myDevice = new BLEAdvertisedDevice(device);
-            pClient = BLEDevice::createClient();
-            pClient->setClientCallbacks(clientCb);
-
-            if (pClient->connect(myDevice) == false) continue;
-            if (pClient->isConnected() == false) continue;
-            pBLEScan->stop();
-
-            // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
-            // // Print the UUIDs of all services
-            // for (auto const& service : *services) {
-            //    BLERemoteService* pRemoteService = service.second;
-            //    Serial.print("\n______Service:");
-            //    Serial.println(pRemoteService->getUUID().toString().c_str());
-            //    std::map<std::string, BLERemoteCharacteristic*>* characteristics = pRemoteService->getCharacteristics();
-
-            //    Serial.println("\nList of all Characteristics:");
-            //    for (auto const& characteristic : *characteristics) {
-            //          Serial.println(characteristic.second->getUUID().toString().c_str());
-            //    }
-            // }
-            
-            isBLEConnected = true;
-            break;
          }
       }
       
@@ -189,80 +244,5 @@ class Net_Bluetooth {
                pClient->disconnect();
             }
          }
-      }
-
-         // 98:89:13:0a:4e:36
-      void run() {
-         BLEScanResults foundDevices = pBLEScan->start(1);
-         Serial.print("Devices found: ");
-         Serial.println(foundDevices.getCount());
-         Serial.println("Scan done!");
-         Serial.println("--------------");
-
-         for (int i=0; i<foundDevices.getCount(); i++) {
-            BLEAdvertisedDevice device = foundDevices.getDevice(i);
-            uint8_t* payload = device.getPayload();
-
-            Serial.print("\nName = ") + Serial.println(device.getName().c_str());
-            Serial.print("servUUID = ") + Serial.println(device.getServiceUUID().toString().c_str());
-            Serial.print("servDataUUID = ") + Serial.println(device.getServiceDataUUID().toString().c_str());
-            BLEAddress addr = device.getAddress();
-            BLEAddress compareAddr = BLEAddress("98:89:13:0a:4e:36");
-
-            bool compare = addr.equals(compareAddr);
-            Serial.print("****Compare = "); Serial.println(compare);
-
-            if (addr.equals(compareAddr)) {
-               Serial.print("addr = "); Serial.println(device.getAddress().toString().c_str());
-               Serial.print("Payload = "); Serial.println(payload[0]);
-
-               std::string strManufacturerData = device.getManufacturerData();
-
-               uint8_t cManufacturerData[100];
-               strManufacturerData.copy((char *)cManufacturerData, strManufacturerData.length(), 0);
-
-               if (strManufacturerData.length() == 25 && cManufacturerData[0] == 0x4C && cManufacturerData[1] == 0x00) {
-                  Serial.println("Found an iBeacon!");
-                  BLEBeacon oBeacon = BLEBeacon();
-                  oBeacon.setData(strManufacturerData);
-                  Serial.printf("iBeacon Frame\n");
-                  Serial.printf("ID: %04X Major: %d Minor: %d UUID: %s Power: %d\n", oBeacon.getManufacturerId(), ENDIAN_CHANGE_U16(oBeacon.getMajor()), ENDIAN_CHANGE_U16(oBeacon.getMinor()), oBeacon.getProximityUUID().toString().c_str(), oBeacon.getSignalPower());
-               } else {
-                  Serial.println("Found another manufacturers beacon!");
-                  Serial.printf("strManufacturerData: %d ", strManufacturerData.length());
-                  for (int i = 0; i < strManufacturerData.length(); i++)
-                  {
-                     Serial.printf("%X", cManufacturerData[i]);
-                  }
-                  Serial.printf("\n");
-               }
-            }
-
-            // Serial.print("addr = "); Serial.println(device.getAddress().toString().c_str());
-            // Serial.print("Payload = "); Serial.println(payload[0]);
-
-            // std::string strManufacturerData = device.getManufacturerData();
-
-            // uint8_t cManufacturerData[100];
-            // strManufacturerData.copy((char *)cManufacturerData, strManufacturerData.length(), 0);
-
-            // if (strManufacturerData.length() == 25 && cManufacturerData[0] == 0x4C && cManufacturerData[1] == 0x00) {
-            //    Serial.println("Found an iBeacon!");
-            //    BLEBeacon oBeacon = BLEBeacon();
-            //    oBeacon.setData(strManufacturerData);
-            //    Serial.printf("iBeacon Frame\n");
-            //    Serial.printf("ID: %04X Major: %d Minor: %d UUID: %s Power: %d\n", oBeacon.getManufacturerId(), ENDIAN_CHANGE_U16(oBeacon.getMajor()), ENDIAN_CHANGE_U16(oBeacon.getMinor()), oBeacon.getProximityUUID().toString().c_str(), oBeacon.getSignalPower());
-            // } else {
-            //    Serial.println("Found another manufacturers beacon!");
-            //    Serial.printf("strManufacturerData: %d ", strManufacturerData.length());
-            //    for (int i = 0; i < strManufacturerData.length(); i++)
-            //    {
-            //       Serial.printf("%X", cManufacturerData[i]);
-            //    }
-            //    Serial.printf("\n");
-            // }
-         }
-
-         pBLEScan->clearResults(); // delete results fromBLEScan buffer to release memory
       }
 };

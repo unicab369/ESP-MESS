@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-#define MODE_TEST 1
+// #define MODE_TEST 1
 // #define MODE_SLEEP 1
 
 #ifndef MODE_TEST
@@ -34,14 +34,32 @@
 
   Adafruit_INA219 ina219;
 
+  void logSensors() {
+    // collect readings
+    sht.collectReadings();
+    bh17.collectReadings();
+    float temp = sht.getTemp();
+    float hum = sht.getHum();
+    float lux = bh17.getLux();
+    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
+
+    float busvoltage = ina219.getBusVoltage_V();
+    float current_mA = ina219.getCurrent_mA();
+    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+
+    // send readings
+    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
+  }
+
   void setup() {
-    // pinMode(13, OUTPUT);
+    pinMode(12, OUTPUT);
     // digitalWrite(13, HIGH);
     Serial.begin(115200);
+    Serial.print("SLEEP TEST");
 
     // setup i2C
-    // Wire.begin(4, 5);
-    Wire.begin(33, 32);
+    Wire.begin(4, 5);
+    // Wire.begin(33, 32);
     sht.setup(&Wire);
     bh17.setup(&Wire);
 
@@ -61,27 +79,17 @@
     Serial.print("Channel = "); Serial.println(WiFi.channel());
     espNow.setup(WiFi.channel());
 
-    // collect readings
-    sht.collectReadings();
-    bh17.collectReadings();
-    float temp = sht.getTemp();
-    float hum = sht.getHum();
-    float lux = bh17.getLux();
-    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
-
-    float busvoltage = ina219.getBusVoltage_V();
-    float current_mA = ina219.getCurrent_mA();
-    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
-
-    // send readings
-    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
+    logSensors();
     // ESP.deepSleep(3e6);
+    delay(1000);
+    digitalWrite(12, HIGH);
   }
 
   void loop() {
-    float busvoltage = ina219.getBusVoltage_V();
-    float current_mA = ina219.getCurrent_mA();
-    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+    // float busvoltage = ina219.getBusVoltage_V();
+    // float current_mA = ina219.getCurrent_mA();
+    // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+    logSensors();
     delay(2000);
   }
 

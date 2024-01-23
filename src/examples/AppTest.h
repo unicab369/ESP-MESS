@@ -1,6 +1,6 @@
 #ifdef CONFIG_IDF_TARGET_ESP32C3
    uint8_t ledPin = 12;
-   uint8_t ledPin2 = 255;
+   uint8_t ledPin2 = 13;
 #elif CONFIG_IDF_TARGET_ESP32S3 
    uint8_t ledPin = 47;
    uint8_t ledPin2 = 48;
