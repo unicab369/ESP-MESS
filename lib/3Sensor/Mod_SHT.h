@@ -24,7 +24,7 @@ class Mod2_SHT3: public SensorBase, public TempHum_Interface {
         Mod2_SHT3(): SensorBase(0x44), TempHum_Interface() {}
 
         uint16_t setup(TwoWire *wire) override {
-            uint16_t value = _setup(wire, SHT_RESET_CMD, 2);
+            uint16_t value = _setup(wire, SHT_RESET_CMD, 2, 0);
             return value;
         }
         

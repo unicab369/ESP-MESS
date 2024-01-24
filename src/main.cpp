@@ -4,7 +4,7 @@
 #include <SPI.h>
 
 // #define MODE_TEST 1
-// #define MODE_SLEEP 1
+#define MODE_SLEEP 1
 
 #ifndef MODE_TEST
   #include <0Foundation.h>
@@ -23,7 +23,7 @@
   Serv_Device device;
   Net_Wifi wifi;
   TimeoutItem testTimer;       //* print time logger
-  int BROADCAST_CHANNEL = 2;
+  int BROADCAST_CHANNEL = 10;
 
   std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
     Serial.println("IM HERE 3");
@@ -52,17 +52,20 @@
   }
 
   void setup() {
+    unsigned long timeRef = millis();
+
     pinMode(12, OUTPUT);
     // digitalWrite(13, HIGH);
     Serial.begin(115200);
-    Serial.print("SLEEP TEST");
 
     // setup i2C
-    Wire.begin(4, 5);
+    // Wire.begin(4, 5);
     // Wire.begin(33, 32);
+    Wire.begin(9, 8);
     sht.setup(&Wire);
     bh17.setup(&Wire);
 
+    Serial.print("SLEEP TEST");
     if(!ina219.begin()){
       Serial.println("INA219 not connected!");
     }
@@ -73,24 +76,27 @@
     bh17.requestReadings();
     // delay(20);   //! this is needed if wifi is not used
 
-    wifi.setTxPower(20);
+    wifi.setTxPower(0);
     wifi.startAP(true, BROADCAST_CHANNEL);
     tweet.setup(&device, espNow.mac, &onTweet2);
+
     Serial.print("Channel = "); Serial.println(WiFi.channel());
     espNow.setup(WiFi.channel());
 
+    Serial.printf("\nTImeDIf = %lu", millis()-timeRef);
     logSensors();
     // ESP.deepSleep(3e6);
-    delay(1000);
+    
+    delay(1);
     digitalWrite(12, HIGH);
   }
 
   void loop() {
-    // float busvoltage = ina219.getBusVoltage_V();
-    // float current_mA = ina219.getCurrent_mA();
-    // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
-    logSensors();
-    delay(2000);
+    // // float busvoltage = ina219.getBusVoltage_V();
+    // // float current_mA = ina219.getCurrent_mA();
+    // // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+    // logSensors();
+    // delay(2000);
   }
 
 #else

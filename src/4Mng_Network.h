@@ -54,7 +54,7 @@
             void run() { 
                 // bluetooth.scanForDevice("98:89:13:0a:4e:36");
                 // bluetooth.run();
-                bluetooth.connectToDevice("JDY-", true);
+                // bluetooth.connectToDevice("JDY-", true);
             }
     };
 #else

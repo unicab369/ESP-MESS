@@ -29,7 +29,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) {
    Serial.print("\nNOTIFY CALLBACK:"); Serial.println((char*)pData);
    strcpy(myChar, (char*)pData);
-   digitalWrite(ledPin, HIGH);
+   // digitalWrite(ledPin, HIGH);
    Serial.println(myChar);
 }
 
@@ -73,7 +73,7 @@ public:
    void onConnect(BLEClient* pClient) {
       // Handle connection event
       Serial.println("Connected to BLE server");
-      digitalWrite(ledPin2, HIGH);
+      // digitalWrite(ledPin2, HIGH);
 
       if (pClient->isConnected()) {
             Serial.println("\n===>>>CONNECTED");
@@ -91,7 +91,7 @@ public:
       // Handle disconnection event
       Serial.println("Disconnected from BLE server");
       delete pClient;
-      digitalWrite(ledPin2, LOW);
+      // digitalWrite(ledPin2, LOW);
    }
 };
 
@@ -108,7 +108,7 @@ class Net_Bluetooth {
          // pBLEScan->setInterval(500);
          // pBLEScan->setWindow(99); // less or equal setInterval value
          // pBLEScan->start(0, true);
-         pinMode(ledPin2, OUTPUT);
+         // pinMode(ledPin2, OUTPUT);
       }
       
       void scanForDevice2(const char* target, bool filter = false) {
@@ -124,7 +124,7 @@ class Net_Bluetooth {
             const char* servDataId = device.getServiceDataUUID().toString().c_str();
 
             if (!filter) {
-               digitalWrite(ledPin, !digitalRead(ledPin));
+               // digitalWrite(ledPin, !digitalRead(ledPin));
                Serial.printf("\nName = %s", name);
                Serial.print("\nAddr = "); Serial.println(addr);
                Serial.print("servUUID = "); Serial.println(servId);

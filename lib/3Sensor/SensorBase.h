@@ -6,10 +6,10 @@ class SensorBase {
         TwoWire *thisWire;
         SensorBase(int _addr): address(_addr) {}
 
-        uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen) {
+        uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen, int delayMs = 20) {
             thisWire = _wire;
             registerCmd(cmd, cmdLen);
-            delay(20);
+            delay(delayMs);
             thisWire->requestFrom(address, 1);
             return thisWire->read();
         }
