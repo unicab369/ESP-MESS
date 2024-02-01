@@ -654,7 +654,7 @@ void testRun() {
       digitalWrite(ledPin, HIGH);
       delay(200);
       digitalWrite(ledPin, LOW);
-      bluetooth.setup();
+      bluetooth.setu p();
    }
 
    void loop() {

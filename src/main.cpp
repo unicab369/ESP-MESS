@@ -3,8 +3,8 @@
 #include <Wire.h>
 #include <SPI.h>
 
-// #define MODE_TEST 1
-#define MODE_SLEEP 1
+#define MODE_TEST 1
+// #define MODE_SLEEP 1
 
 #ifndef MODE_TEST
   #include <0Foundation.h>
@@ -35,33 +35,35 @@
   Adafruit_INA219 ina219;
 
   void logSensors() {
-    // collect readings
-    sht.collectReadings();
-    bh17.collectReadings();
-    float temp = sht.getTemp();
-    float hum = sht.getHum();
-    float lux = bh17.getLux();
+    float temp = 0, hum = 0, lux = 0, busvoltage = 0, current_mA = 0;
+
+    // // collect readings
+    // sht.collectReadings();
+    // bh17.collectReadings();
+    // temp = sht.getTemp();
+    // hum = sht.getHum();
+    // lux = bh17.getLux();
     Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
 
-    float busvoltage = ina219.getBusVoltage_V();
-    float current_mA = ina219.getCurrent_mA();
-    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+    // busvoltage = ina219.getBusVoltage_V();
+    // current_mA = ina219.getCurrent_mA();
+    // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
 
     // send readings
+    delay(10);
     tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
   }
 
   void setup() {
     unsigned long timeRef = millis();
 
-    pinMode(12, OUTPUT);
+    pinMode(2, OUTPUT);
     // digitalWrite(13, HIGH);
     Serial.begin(115200);
 
     // setup i2C
-    // Wire.begin(4, 5);
+    Wire.begin(4, 5);
     // Wire.begin(33, 32);
-    Wire.begin(9, 8);
     sht.setup(&Wire);
     bh17.setup(&Wire);
 
@@ -84,19 +86,20 @@
     espNow.setup(WiFi.channel());
 
     Serial.printf("\nTImeDIf = %lu", millis()-timeRef);
-    logSensors();
-    // ESP.deepSleep(3e6);
-    
-    delay(1);
-    digitalWrite(12, HIGH);
   }
 
   void loop() {
     // // float busvoltage = ina219.getBusVoltage_V();
     // // float current_mA = ina219.getCurrent_mA();
     // // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
-    // logSensors();
-    // delay(2000);
+    logSensors();
+    // ESP.deepSleep(3e6);
+    
+    // Serial.println("IM HERE");
+
+    delay(1);
+    digitalWrite(2, !digitalRead(2));
+    // delay(1000);
   }
 
 #else

@@ -109,12 +109,15 @@ class Net_Bluetooth {
          // pBLEScan->setWindow(99); // less or equal setInterval value
          // pBLEScan->start(0, true);
          // pinMode(ledPin2, OUTPUT);
+         // pinMode(12, OUTPUT);
+         // pinMode(13, OUTPUT);
       }
       
       void scanForDevice2(const char* target, bool filter = false) {
          if (isBLEConnected) return;
          // Serial.println("\nSTART SCAN ..."); AppPrintHeap();
          BLEScanResults foundDevices = pBLEScan->start(1, true);
+         // digitalWrite(13, !digitalRead(13));
 
          for (int i=0; i<foundDevices.getCount(); i++) {
             BLEAdvertisedDevice device = foundDevices.getDevice(i);
@@ -124,23 +127,53 @@ class Net_Bluetooth {
             const char* servDataId = device.getServiceDataUUID().toString().c_str();
 
             if (!filter) {
-               // digitalWrite(ledPin, !digitalRead(ledPin));
-               Serial.printf("\nName = %s", name);
-               Serial.print("\nAddr = "); Serial.println(addr);
-               Serial.print("servUUID = "); Serial.println(servId);
-               Serial.print("servDataUUID = "); Serial.println(servDataId);
+               std::string ignoreName= "JTX-RGB";
+               bool blkList = strcmp(name, ignoreName.c_str()) == 0;
+               if (blkList) continue;
 
-               Serial.print("Raw Manufacturer Data: ");
-               std::string manufacturerData = device.getManufacturerData();
-               for (int i = 0; i < manufacturerData.length(); i++) {
-                     Serial.print(manufacturerData[i], HEX);
-                     Serial.print(" ");
-               }
+               ignoreName = "NEMR61622510";
+               blkList = strcmp(name, ignoreName.c_str()) == 0;
+               if (blkList) continue;
 
-               Serial.println();
+               ignoreName = "ihoment_H6127_9383";
+               blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               if (blkList) continue;
 
-               std::string nullStr = "<NULL>";
-               bool check1 = strcmp(servId, nullStr.c_str()) != 0;
+               // ignoreName = "51:1f:01:5f:bf:0a";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "70:09:71:82:4d:c1";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "7c:95:6d:8c:23:bb";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "11:86:6d:c9:44:a5";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "13:0d:e3:50:ad:7b";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "4e:d9:a3:84:e2:f3";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "23:d5:1a:0e:d3:2a";
+               // blkList = strcmp(addr, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "43:ca:f0:5d:d4:aa";
+               // blkList = strcmp(servId, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // ignoreName = "4f:09:ca:50:97:77";
+               // blkList = strcmp(servId, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
 
                // std::string blkList = "Fencelight";      // Fencelight
                // bool check3 = strcmp(name, blkList.c_str()) != 0;
@@ -158,9 +191,31 @@ class Net_Bluetooth {
                // check3 = strcmp(name, blkList.c_str()) != 0;
                // if (!check3) continue;
 
+               // ignoreName = "<NULL>";
+               // blkList = strcmp(servId, ignoreName.c_str()) == 0;
+               // if (blkList) continue;
+
+               // digitalWrite(ledPin, !digitalRead(ledPin));
+               Serial.printf("\nName = %s", name);
+               Serial.print("\nAddr = "); Serial.println(addr);
+               Serial.print("servUUID = "); Serial.println(servId);
+               Serial.print("servDataUUID = "); Serial.println(servDataId);
+
+               Serial.print("Raw Manufacturer Data: ");
+               std::string manufacturerData = device.getManufacturerData();
+               for (int i = 0; i < manufacturerData.length(); i++) {
+                     Serial.print(manufacturerData[i], HEX);
+                     Serial.print(" ");
+               }
+
+               Serial.println();
+               std::string whiteList = "Temperature";
+
                BLEAddress compAddr = BLEAddress("98:89:13:0a:69:9b");
                BLEAddress compAddr2 = BLEAddress("b7:7b:08:10:c9:b1");
-               bool check4 = device.getAddress().equals(compAddr) || device.getAddress().equals(compAddr2);
+               bool check4 = device.getAddress().equals(compAddr) || 
+                              device.getAddress().equals(compAddr2) ||
+                              strcmp(name, whiteList.c_str()) == 0;
 
                // 0000ffe0-0000-1000-8000-00805f9b34fb
                // bool check4 = strcmp(name, compAddr.c_str()) == 0;
@@ -168,32 +223,15 @@ class Net_Bluetooth {
                pClient = BLEDevice::createClient();
                // pClient->setClientCallbacks(clientCb);
 
-               if (check1 && check4 && pClient->connect(&device)) {
+               if (check4 && pClient->connect(&device)) {
                   Serial.println("Connected to the device");
-                  getServices();
-
-                  // // std::map<std::string, BLERemoteService*> *services = pClient->getServices();
-
-                  // Serial.println("IM HERE YYYYYY");
-                  // BLEUUID serviceId = BLEUUID("0000ffe0-0000-1000-8000-00805f9b34fb");
-                  // // BLEUUID characteristicId = BLEUUID("0000ffe1-0000-1000-8000-00805f9b34fb");
-                  // BLERemoteService* pService = pClient->getService(serviceId);
-
-                  // // if (pService != nullptr) {
-                  // //    Serial.println("IM HERE 1");
-                  // // //    BLERemoteCharacteristic* pCharacteristic = pService->getCharacteristic(characteristicId);
-
-                  // // //    if (pCharacteristic != nullptr) {
-                  // // //       Serial.println("IM HERE 2");
-                  // // //       pCharacteristic->registerForNotify(notifyCallback);
-                  // // //    }  
-                  // // }
+                  getServices(true);
 
                   // Disconnect from the device
-                  // pClient->disconnect();
+                  pClient->disconnect();
                   // Serial.println("Disconnected from the device");
 
-                  isBLEConnected = true;
+                  // isBLEConnected = true;
                   // pBLEScan->stop();
                   // pBLEScan->clearResults();
                   break;
@@ -204,7 +242,7 @@ class Net_Bluetooth {
       
       void scanForDevice(const char* target) {
          BLEScanResults foundDevices = pBLEScan->start(1, true);
-
+         
          for (int i=0; i<foundDevices.getCount(); i++) {
             BLEAdvertisedDevice device = foundDevices.getDevice(i);
             BLEAddress addr = device.getAddress();
