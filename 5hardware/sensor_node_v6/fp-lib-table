@@ -2,4 +2,5 @@
   (version 7)
   (lib (name "A_SensorNode")(type "KiCad")(uri "${KIPRJMOD}/A_SensorNode.pretty")(options "")(descr ""))
   (lib (name "ESP32-footprints-Lib")(type "KiCad")(uri "C:/Users/unica/Downloads/ESP32-Footprints/ESP32-Footprints/ESP32-footprints-Lib.pretty")(options "")(descr ""))
+  (lib (name "catIcon.preety")(type "KiCad")(uri "C:/Users/unica/OneDrive/Documents/Icons/catIcon.preety")(options "")(descr ""))
 )
