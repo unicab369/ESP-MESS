@@ -1,4 +1,4 @@
-22003362055352958
+22008482886365717
 A_SensorNode
 ButtonSwitch12mm_SMD
 
@@ -104,6 +104,13 @@ SensorBase
 0
 78
 78
+A_SensorNode
+testpoint
+
+
+0
+1
+1
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -91041,3 +91048,17 @@ varistor
 0
 2
 2
+catIcon.preety
+catIcon
+
+
+0
+0
+0
+catIcon.preety
+catIcon8x8
+
+
+0
+0
+0
