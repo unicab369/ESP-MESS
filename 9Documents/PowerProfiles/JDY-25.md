@@ -20,13 +20,13 @@ default Baudrate: 9600. Line ending: \r\n
 - AT+DEFAULT<br>
 - AT+ENLOG(1 enable, 0 disable)<br>
 - AT+SLEEP(mode: 1=LightSleep, 2=DeepSleep no broadcast)<br>
+- AT+INQ(scanDur: 0=2secs, 1=4secs, 2=6secs, 3=8secs, 4=16secs)<br>
 
 #### Configurations
 - AT+ROLE(0=transparent, 1=master, 2=BLE broadcast, 3=iBeacon, 4=iBeacon probe, 5=MESH, 6=Multi-connected slave/4 masters connections, 7=Multi-connected master/slave master supports to connect 4 slaves at the same time, and slave supports to connect 4 masters, 8=Keylabel)<br>
 - AT+POWR(value: 0=-15dBm, 1=-0dBm, 2=2dBm, 3=3dBm, 4=4dBm)<br>
 - AT+ADVIN(delay: 1=100ms, 2=200ms, 3=300ms, 4=500ms, 6=1s, 7=1.5s, 8=3s, 9=60s)<br>
 - AT+STARTEN(mode: 1 power on wakeup, 0 power on sleep/connect wakeup/disconnect sleep)<br>
-- AT+INQ(scanDur: 0=2secs, 1=4secs, 2=6secs, 3=8secs, 4=16secs)<br>
 - AT+KEY(ioInput: 1-5, target: 000-ffff, ioOutput: 1-5, serialoutput: 1=enable 0=disable)<br>
 - AT+NETID(0000-ffff)<br>
 - AT+MADDR(0001-ffff)<br>
@@ -60,6 +60,33 @@ default Baudrate: 9600. Line ending: \r\n
 - AT+TGIO(ioOutput: 1-5, value: 1=On, 2=Off)<br>
 
 ### Observed Behaviors
+JDY-23
+Active: 780uA
+Connected: 1.07mA
+Sleep1: 150uA
+Sleep2: 6.01uA
+
+JDY-23A
+Active: 4.70mA
+Connected: 4.10mA
+Sleep: .88uA
+
+JDY-25
+Active: 1.04mA
+Connected: 1.05mA
+Sleep1: 275uA
+Sleep2: 5.45uA
+
+JDY-27
+Active: 275uA
+Connected: 333uA
+Sleep1: 48uA. Connect while sleep 131uA.
+Sleep2: .80uA
+
+E104-BT07
+Active: 6.5mA
+Connected: 6.09mA
+
 1. Deep Sleep no broadcast (mode 2):
    - repeated signals
    - average current draw 1.30mA.
@@ -85,7 +112,6 @@ default Baudrate: 9600. Line ending: \r\n
    
 3. Others:
    - has a lot of features
-   - power consumption quite high comparing to JDY-23.
    - has MESH network feature
 
 ### Figures

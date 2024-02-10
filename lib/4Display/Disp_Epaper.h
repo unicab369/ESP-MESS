@@ -2,7 +2,7 @@
 #include <GxEPD2_3C.h>
 #include <Fonts/FreeMonoBold9pt7b.h>
 
-GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS*/ 12, /*DC*/ 0, /*RST*/ 5, /*BUSY*/ 4)); // GDEH0154D67
+GxEPD2_BW<GxEPD2_213_B74, GxEPD2_213_B74::HEIGHT> display(GxEPD2_213_B74(/*CS*/ 17, /*DC*/ 16, /*RST*/ 2, /*BUSY*/ 4)); // GDEH0154D67
 
 class Disp_Epaper {
    char HelloWorld[16] = "Hello World!";

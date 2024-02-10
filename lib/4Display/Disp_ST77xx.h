@@ -66,9 +66,9 @@ class Disp_ST77 {
                 tft = Adafruit_ST7735(cs, ao, mosi, sck, rst);
             #endif
 
-            tft.initR(INITR_BLACKTAB);        // Initialize HalloWing-oriented screen
+            tft.initR(INITR_MINI160x80_PLUGIN);        // Initialize HalloWing-oriented screen
             tft.fillScreen(ST77XX_BLACK);
-            // tft.setRotation(2);
+            tft.setRotation(1);
             tft.setTextWrap(false);
 
             // print out string

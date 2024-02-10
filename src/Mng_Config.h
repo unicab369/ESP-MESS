@@ -59,8 +59,10 @@ x
                 // out0 = 12; out1 = 2;
 
                 //! SPI
-                sck0 = 18; miso0 = 19; mosi0 = 23;
-                rst0 = 5; ao0 = 14;
+                sck0 = 18; miso0 = 19; mosi0 = 23; rst0 = 2; 
+                
+                ao0 = 14;
+                cs1 = 5;        // sdCard CS
 
             #elif ESP32
                 //! Lolin missing 1TX, 3RX, 21, 24
@@ -96,11 +98,11 @@ x
                 sck0 = 18; mosi0 = 23; miso0 = 19; rst0 = 2;
                 
                 //! large display: CS low enable
-                
-                out0 = 5;        // sdCard CS
-                out1 = 27;       // display CS
-                out2 = 26;       // display AO
-                out3 = 25;       // display backlight
+                ao0 = 26;       // display AO
+                cs0 = 27;       // display CS
+
+                cs1 = 5;        // sdCard CS
+                // out3 = 25;       // display backlight
 
             #else
                 // xLogSection("DIRECTIVE = ESP8266");

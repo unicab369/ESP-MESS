@@ -49,7 +49,8 @@ class Serv_Network: public Loggable {
             tweet.updateChannel(WiFi.channel());
 
             // //! load ESPNow callback
-            espNow.setup(WiFi.channel()); 
+            espNow.setup(WiFi.channel());
+            if (*onWifiConnected) (*onWifiConnected)();
 
         } else if (retryCnt < 1) {
             output = "[Wifi] Err: Timeout";
@@ -90,6 +91,7 @@ class Serv_Network: public Loggable {
         uint8_t scanChannel = 0;
 
         const char* getHostName() { return wifi.getHostName(); }
+        std::function<void()> *onWifiConnected;
 
         void setupNetwork(Serv_Device* _device) {
             xLogSection(__func__);

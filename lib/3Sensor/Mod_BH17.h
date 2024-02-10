@@ -27,7 +27,7 @@ class Mod2_BH17: public SensorBase, public Lux_Interface {
         Mod2_BH17(): SensorBase(0x23), Lux_Interface() {}
 
         uint16_t setup(TwoWire *wire) override {
-            uint16_t value = _setup(wire, BH17_CONT_LOW, 1);
+            uint16_t value = _setup(wire, BH17_CONT_LOW, 1, 0);
             return value;
         }
 

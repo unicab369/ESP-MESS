@@ -54,7 +54,7 @@
             void run() { 
                 // bluetooth.scanForDevice("98:89:13:0a:4e:36");
                 // bluetooth.run();
-                bluetooth.connectToDevice("JDY-", true);
+                // bluetooth.connectToDevice("JDY-", true);
             }
     };
 #else
@@ -82,6 +82,15 @@
             }
         };
 
+        std::function<void()> onWifiConnected = [&]() {
+            AppPrintSeparator("[Runtime]", "network configured");
+            char *dateStr = servWifi.device->appClock.getDateStr();
+            AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
+            servWifi.device->storage.loadStoragePath(dateStr);
+            AppPrintHeap();
+            wServer.setup(&servWifi);
+        };
+
         public:
             Serv_Network servWifi;
             
@@ -91,6 +100,7 @@
             void setup(Serv_Device* device) {
                 servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
                 servWifi.setupNetwork(device);
+                servWifi.onWifiConnected = &onWifiConnected;
             }
 
             //! iotPlotter
@@ -128,13 +138,6 @@
             void handle_1secInterval_job2() {
                 Network_State state = servWifi.pollNetworkState();
                 if (state != NETWORK_FAILED && state != NETWORK_READY) return;
-                
-                AppPrintSeparator("[Runtime]", "network configured");
-                // char *dateStr = servWifi.device->appClock.getDateStr();
-                // AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
-                // servWifi.device->storage.loadStoragePath(dateStr);
-                AppPrintHeap();
-                wServer.setup(&servWifi);
             }
 
             void handleRotary(RotaryDirection state, uint8_t counter) {

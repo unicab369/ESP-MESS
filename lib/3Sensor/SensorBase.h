@@ -6,10 +6,10 @@ class SensorBase {
         TwoWire *thisWire;
         SensorBase(int _addr): address(_addr) {}
 
-        uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen) {
+        uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen, int delayMs = 20) {
             thisWire = _wire;
             registerCmd(cmd, cmdLen);
-            delay(20);
+            delay(delayMs);
             thisWire->requestFrom(address, 1);
             return thisWire->read();
         }
@@ -73,4 +73,21 @@ class Lux_Interface {
     public:
         void setLux(float _lux) { lux = _lux; }
         float getLux() { return lux; }
+};
+
+class Current_Interface {
+    float busVoltage = -1;
+    float mA = -1;
+
+    public:
+        void setBusVoltage(float value) { busVoltage = value; }
+        void setCurrent(float value) { mA = value; }
+
+        float getBusVoltage() { return busVoltage; }
+        float getmA() { return mA; }
+
+        void reset() {
+            busVoltage = -1;
+            mA = -1;
+        }
 };

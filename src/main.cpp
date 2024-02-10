@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-// #define MODE_TEST 1
+#define MODE_TEST 1
 // #define MODE_SLEEP 1
 
 #ifndef MODE_TEST
@@ -23,7 +23,7 @@
   Serv_Device device;
   Net_Wifi wifi;
   TimeoutItem testTimer;       //* print time logger
-  int BROADCAST_CHANNEL = 2;
+  int BROADCAST_CHANNEL = 10;
 
   std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
     Serial.println("IM HERE 3");
@@ -34,16 +34,40 @@
 
   Adafruit_INA219 ina219;
 
+  void logSensors() {
+    float temp = 0, hum = 0, lux = 0, busvoltage = 0, current_mA = 0;
+
+    // // collect readings
+    // sht.collectReadings();
+    // bh17.collectReadings();
+    // temp = sht.getTemp();
+    // hum = sht.getHum();
+    // lux = bh17.getLux();
+    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
+
+    // busvoltage = ina219.getBusVoltage_V();
+    // current_mA = ina219.getCurrent_mA();
+    // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+
+    // send readings
+    delay(10);
+    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
+  }
+
   void setup() {
-    pinMode(13, OUTPUT);
-    digitalWrite(13, HIGH);
+    unsigned long timeRef = millis();
+
+    pinMode(2, OUTPUT);
+    // digitalWrite(13, HIGH);
     Serial.begin(115200);
 
     // setup i2C
     Wire.begin(4, 5);
+    // Wire.begin(33, 32);
     sht.setup(&Wire);
     bh17.setup(&Wire);
 
+    Serial.print("SLEEP TEST");
     if(!ina219.begin()){
       Serial.println("INA219 not connected!");
     }
@@ -54,30 +78,28 @@
     bh17.requestReadings();
     // delay(20);   //! this is needed if wifi is not used
 
-    wifi.setTxPower(20);
+    wifi.setTxPower(0);
     wifi.startAP(true, BROADCAST_CHANNEL);
     tweet.setup(&device, espNow.mac, &onTweet2);
+
     Serial.print("Channel = "); Serial.println(WiFi.channel());
     espNow.setup(WiFi.channel());
 
-    // collect readings
-    sht.collectReadings();
-    bh17.collectReadings();
-    float temp = sht.getTemp();
-    float hum = sht.getHum();
-    float lux = bh17.getLux();
-    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
-
-    float busvoltage = ina219.getBusVoltage_V();
-    float current_mA = ina219.getCurrent_mA();
-    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
-
-    // send readings
-    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
-    ESP.deepSleep(3e6);
+    Serial.printf("\nTImeDIf = %lu", millis()-timeRef);
   }
 
   void loop() {
+    // // float busvoltage = ina219.getBusVoltage_V();
+    // // float current_mA = ina219.getCurrent_mA();
+    // // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+    logSensors();
+    // ESP.deepSleep(3e6);
+    
+    // Serial.println("IM HERE");
+
+    delay(1);
+    digitalWrite(2, !digitalRead(2));
+    // delay(1000);
   }
 
 #else

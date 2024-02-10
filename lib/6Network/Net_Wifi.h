@@ -65,13 +65,20 @@ class Net_Wifi: public Loggable {
         void startAP(bool forceReset, int channel = 0) {
             xLog(__func__);
 
+            unsigned long timeRef = millis();
+            unsigned long timeDif;
+
             if (forceReset) {
-                WiFi.persistent(false);
+                WiFi.persistent(true);
                 WiFi.disconnect();
-                WiFi.mode(WIFI_AP_STA);
+                WiFi.mode(WIFI_AP_STA);     //! update esp_delay inside this function to reduce wait time
             //    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));     // required for captive portal
             } 
 
+            timeDif = millis() - timeRef;
+            Serial.printf("\nTimeDIf2 = %lu", timeDif);
+            timeRef = millis();
+            
             if (channel == 0) {
                 WiFi.softAP(hostName, "11223344");
             } else {

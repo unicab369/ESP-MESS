@@ -98,7 +98,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
 
     //! storeCred Callback
     std::function<void(char*)> parseStringCb = [&](char* inputStr) {
-        Serial.println("IM HEREzzzz");
         if (storage.handleConsoleCmd(inputStr) == RESET_WIFI) {
             if (onHandleResetWifi) (*onHandleResetWifi)();
         } 
