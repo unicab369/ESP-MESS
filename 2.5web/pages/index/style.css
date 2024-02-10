@@ -1,0 +1,30 @@
+.page {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+
+	& .page-title {
+		
+	}
+
+	& .page-content {
+		& .device-data {
+			background-color: orange;
+			width: 100%;
+			text-align: left;
+			margin-bottom: 2rem;
+		}
+
+		& .ip-entry {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		& .controls {
+			display: flex;
+			gap: 1rem;
+		}
+	}
+}
+
