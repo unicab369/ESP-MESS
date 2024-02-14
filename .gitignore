@@ -5,3 +5,7 @@
 .vscode/ipch
 *.sublime-project
 *.sublime-workspace
+
+src/examples/TestConfig.h
+2.5web/dist/
+2.5web/node_modules/
