@@ -5,13 +5,13 @@
 
 
 void setup() {
-   pinMode(13, OUTPUT);
-   digitalWrite(13, HIGH);
-      // Serial.begin(115200);
+   pinMode(2, OUTPUT);
+   digitalWrite(2, HIGH);
+   Serial.begin(115200);
 }
 
 void loop() {
-   // Serial.println("IM HERE");
+   Serial.println("IM HERE uuu");
    delay(2000);
-   digitalWrite(13, !digitalRead(13));
+   digitalWrite(2, !digitalRead(2));
 }
