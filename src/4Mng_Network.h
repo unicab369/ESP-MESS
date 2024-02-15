@@ -65,7 +65,7 @@
         Net_Radio radio;
         Net_Lora lora;
 
-        Serv_Device *device() { return servWifi.device; }
+        // Serv_Device *device() { return servWifi.device; }
         
         TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
             iotPlotter(val1, val2, val3, val4, val5);
@@ -84,9 +84,9 @@
 
         std::function<void()> onWifiConnected = [&]() {
             AppPrintSeparator("[Runtime]", "network configured");
-            char *dateStr = servWifi.device->appClock.getDateStr();
+            char *dateStr = servWifi.interface->getDateStr();
             AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
-            servWifi.device->storage.loadStoragePath(dateStr);
+            servWifi.interface->getStorage()->loadStoragePath(dateStr);
             AppPrintHeap();
         };
 
@@ -105,9 +105,9 @@
 
             //! iotPlotter
             void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
-                Mng_Storage storage = servWifi.device->storage;
-                Dat_Settings settings = storage.stoSettings.value;
-                Dat_Plotter plotter = storage.stoPlotter.value;
+                Mng_Storage *storage = servWifi.interface->getStorage();
+                Dat_Settings settings = storage->stoSettings.value;
+                Dat_Plotter plotter = storage->stoPlotter.value;
 
                 // Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
 

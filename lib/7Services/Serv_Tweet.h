@@ -1,6 +1,6 @@
 
 class Serv_Tweet {
-    Serv_Device *device;
+    Interface_Device *interface;
 
     public:
         Tweet_Sync tweetSync;
@@ -11,20 +11,20 @@ class Serv_Tweet {
         TweetRecordCb *tweetRecordCb;
 
         void addDisplayQueues(String str) {
-            device->addDisplayQueues(str, 6);
+            interface->addDisplayQueues(str, 6);
         }
 
         std::function<void()> setLadderIdCb = [&]() {
-            device->showLadderId();
+            // device->showLadderId();
         };
 
-        void setup(Serv_Device *_device, uint8_t *mac, std::function<void(DataPacket2*)> *onTweet2) {
+        void setup(Interface_Device *_interface, uint8_t *mac, std::function<void(DataPacket2*)> *onTweet2) {
             attendant.reconfigure(mac, &setLadderIdCb);
             command.reconfigure(mac);
             tweetSync.setup(mac);
             record.setup(mac);
             command.sendStartup();
-            device = _device;
+            interface = _interface;
 
             command.onTweet2 = onTweet2;
             tweetSync.onTweet2 = onTweet2;
@@ -47,11 +47,10 @@ class Serv_Tweet {
 
         void handleMessage(ReceivePacket2* packet) {
             DataContent& content = packet->dataPacket.content;
-            // device->handleReceivePacket(packet);
 
             switch (packet->dataPacket.info.sourceCmd) {
                 case CMD_TRIGGER: {
-                    device->handleCommandTrigger(packet); break;
+                    interface->handlePacket(packet); break;
                 }
                 case CMD_SYNC: {
                     addDisplayQueues("Recv CMD_SYNC: ");

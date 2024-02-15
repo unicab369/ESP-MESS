@@ -2,7 +2,26 @@
 // #define DEV_KMC_70011 1
 #include "Mng_Config.h"
 
-class Serv_Device: public Serv_Serial, public Mng_Config {
+class Interface_Device {
+    public:
+        virtual Mng_Storage* getStorage() { 
+            Serial.println("ERR: NULL STORAGE");
+            return NULL; 
+        }
+
+        virtual char* getDateStr() { 
+            Serial.println("ERR: NULL DateStr");
+            return "<Invalid>"; 
+        }
+
+        virtual void updateTimer(time_t) {}
+        virtual void addDisplayQueues(String, uint8_t) {}
+        virtual void handlePacket(ReceivePacket2*) {}
+        virtual void handleAction(ControlOutput) {}
+        virtual void toggleRelay() {}
+};
+
+class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Device {
     //! iR Switch Callback
     std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
         String output = "IrRead = " + (status ? String(value) : "Locked");
@@ -121,8 +140,30 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
         
         std::function<void()> *onHandleResetWifi;
 
-        virtual void showLadderId() {}
+        //! Interfaces
+        void addDisplayQueues(String str, uint8_t line) override {
+            _addDisplayQueues(str, line);
+        }
 
+        void updateTimer(time_t time) override {
+            appClock.updateTimers(time);
+        }
+
+        void handleAction(ControlOutput control) override {
+            if (control.pin == 200) {
+                led.handle(control);
+            }
+        }
+
+        char* getDateStr() override {
+            return appClock.getDateStr();
+        }
+
+        void toggleRelay() override {
+            relay1.toggle();
+        }
+
+        //! configure
         void configure() {
             setup();
             setupSerial(this);
@@ -135,7 +176,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
         }
 
         //! Tweet CommandTrigger
-        void handleCommandTrigger(ReceivePacket2* packet) {
+        void handlePacket(ReceivePacket2* packet) {
             CommandItem item = packet->dataPacket.content.commandItem;
 
             switch (item.cue) {
@@ -168,14 +209,8 @@ class Serv_Device: public Serv_Serial, public Mng_Config {
             // storage.stoBehavior.handleCue(item->cue);
         }
 
-        void handleAction(ControlOutput control) {
-            if (control.pin == 200) {
-                led.handle(control);
-            }
-        }
-
-        void toggleRelay() {
-            relay1.toggle();
+        Mng_Storage* getStorage() {
+            return &storage;
         }
 
         void runGroupTasks() {

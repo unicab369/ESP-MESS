@@ -59,7 +59,7 @@ class Web_Root: public Web_Base {
 
     std::function<void()> handleToggle = [&]() {
         xLog("IM HERE 111");
-        network->device->toggleRelay();
+        network->interface->toggleRelay();
         server->send(200, "text/plain", "Hello!"); 
     };
 

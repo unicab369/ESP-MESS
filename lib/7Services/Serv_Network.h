@@ -18,7 +18,7 @@ class Serv_Network: public Loggable {
 
     std::function<void(time_t*)> udpTimeRequestCb = [&](time_t* time) {
         time_t _time = *time;
-        device->appClock.updateTimers(_time);
+        interface->updateTimer(_time);
         state = NETWORK_UDP_DONE;
         // udp.reload(&tweetHandler);
     }; 
@@ -64,7 +64,7 @@ class Serv_Network: public Loggable {
         } 
         
         xLog(output.c_str());
-        device->addDisplayQueues(output, 6);    //* LINE 6
+        interface->addDisplayQueues(output, 6);    //* LINE 6
     }
 
     void scanChannels() {
@@ -83,7 +83,7 @@ class Serv_Network: public Loggable {
     public:
         Serv_Network(): Loggable("Net") {}
 
-        Serv_Device *device;
+        Interface_Device *interface;
         Net_Wifi wifi;
         Net_UDP udp;
         Serv_EspNow espNow;
@@ -93,10 +93,10 @@ class Serv_Network: public Loggable {
         const char* getHostName() { return wifi.getHostName(); }
         std::function<void()> *onWifiConnected;
 
-        void setupNetwork(Serv_Device* _device) {
+        void setupNetwork(Interface_Device* _interface) {
             xLogSection(__func__);
-            device = _device;
-            tweet.setup(device, espNow.mac, &onTweet2);
+            interface = _interface;
+            tweet.setup(_interface, espNow.mac, &onTweet2);
             resetWifi();
 
             //! load ESPNow callback
@@ -111,7 +111,7 @@ class Serv_Network: public Loggable {
             xLogLine(__func__);
             state = NETWORK_START;
             retryCnt = 15;
-            Dat_Cred cred = device->storage.stoCred.value;
+            Dat_Cred cred = interface->getStorage()->stoCred.value;
             wifi.setup(cred.ssid, cred.password);
         }
 

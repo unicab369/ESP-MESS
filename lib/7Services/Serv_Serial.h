@@ -73,10 +73,10 @@ class Serv_Serial: public Loggable {
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 aTimer1->model.isEven ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();
 
-                addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1   
-                addDisplayQueues(aTimer1->record(), 2);             //* LINE 2
-                addDisplayQueues(aTimer2->record(), 3);             //* LINE 3
-                addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+                _addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1   
+                _addDisplayQueues(aTimer1->record(), 2);             //* LINE 2
+                _addDisplayQueues(aTimer2->record(), 3);             //* LINE 3
+                _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
 
                 // epaper.printLn();
 
@@ -91,9 +91,9 @@ class Serv_Serial: public Loggable {
             sprintf(sdSize, "sd = %u MB", storage.sd1.getCardSize());
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                addDisplayQueues(hostName, 0);     //! Oled Mini LINE 0  
-                addDisplayQueues(sdSize, 4);       //! Oled Mini LINE 4  
-                addDisplayQueues("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
+                _addDisplayQueues(hostName, 0);     //! Oled Mini LINE 0  
+                _addDisplayQueues(sdSize, 4);       //! Oled Mini LINE 4  
+                _addDisplayQueues("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
             }
         }
 
@@ -104,7 +104,7 @@ class Serv_Serial: public Loggable {
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
                 // showLadderId(); // line0
-                addDisplayQueues(String(output), 4);   //! Oled Mini LINE 4
+                _addDisplayQueues(String(output), 4);   //! Oled Mini LINE 4
             }
             addDisplayQueue2(output, 4);               //* LINE 4
         }
@@ -120,8 +120,8 @@ class Serv_Serial: public Loggable {
 
             //! Oled Mini
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                addDisplayQueues(networkInfo, 0);      //! Oled Mini LINE 0
-                addDisplayQueues(heapInfo, 4);   //! Oled Mini LINE 4        
+                _addDisplayQueues(networkInfo, 0);      //! Oled Mini LINE 0
+                _addDisplayQueues(heapInfo, 4);   //! Oled Mini LINE 4        
             }
             addDisplayQueue2(networkInfo, 0);          //* LINE 0
             addDisplayQueue2(heapInfo, 4);               //* LINE 4 
@@ -144,7 +144,7 @@ class Serv_Serial: public Loggable {
         }
 
         //! Add to both DisplayQueue1 and DisplayQueue2
-        void addDisplayQueues(String str, uint8_t line) {
+        void _addDisplayQueues(String str, uint8_t line) {
             addDisplayQueue1(str, line);
             addDisplayQueue2(str, line);
         }

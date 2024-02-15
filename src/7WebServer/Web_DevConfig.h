@@ -156,7 +156,7 @@ class Web_DevConfig: public Web_Base {
 
             if (strcmp(action, "OUTPUT") == 0) {
                 ControlOutput output(pinCode, pinValue);
-                network->device->handleAction(output);
+                network->interface->handleAction(output);
             } 
             else if (strcmp(action, "WS2812") == 0) {
                 ControlWS2812 output(pinCode, pinValue);
