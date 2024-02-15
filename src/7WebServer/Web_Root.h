@@ -155,7 +155,6 @@ class Web_Root: public Web_Base {
             server = _server;
             load("/", network, server);
             server->onNotFound(handleBaseContent);
-            startPage();
 
             devConfig.begin(network, server);
             ctrlConfig.begin(network, server);

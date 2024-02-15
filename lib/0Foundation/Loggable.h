@@ -8,7 +8,7 @@ class Loggable {
             memcpy(identifier, id, sizeof(identifier));
         }
 
-        void xLog(const char* value, const char* separator = ":") {
+        void xLog(const char* value, const char* separator = "") {
             Serial.printf("[%s]%s %s\n", identifier, separator, value);
         }
 

@@ -64,8 +64,6 @@
         Web_Server wServer;
         Net_Radio radio;
         Net_Lora lora;
-
-        // Serv_Device *device() { return servWifi.device; }
         
         TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
             iotPlotter(val1, val2, val3, val4, val5);

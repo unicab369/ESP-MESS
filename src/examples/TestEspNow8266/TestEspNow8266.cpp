@@ -98,11 +98,10 @@ void setup() {
 void loop() {
    if (currentMode == MODE_SETUP) {
       network.run();
-      return;
+   } else {
+      logSensors();
+      delay(1);
+      digitalWrite(2, !digitalRead(2));
+      delay(1000);
    }
-
-   logSensors();
-   delay(1);
-   digitalWrite(2, !digitalRead(2));
-   delay(1000);
 }

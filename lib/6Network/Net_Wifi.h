@@ -75,15 +75,15 @@ class Net_Wifi: public Loggable {
             //    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));     // required for captive portal
             } 
 
-            timeDif = millis() - timeRef;
-            Serial.printf("\nTimeDIf2 = %lu", timeDif);
-            timeRef = millis();
-            
             if (channel == 0) {
                 WiFi.softAP(hostName, "11223344");
             } else {
                 WiFi.softAP(hostName, "11223344", channel, true);
             }
+
+            timeDif = millis() - timeRef;
+            xLogf("WifiSetupTime = %lu", timeDif);
+            xLogf("AP Channel = %d", WiFi.channel());
 
             xLog("hostName", hostName);
         }
