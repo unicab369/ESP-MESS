@@ -51,6 +51,7 @@ class Web_Server: public Loggable {
 
             //! REQUIRED: otherwise crash if Wifi hasn't begin
             if (WiFi.status() != WL_NO_SHIELD) {
+                xLog("webServer begin");
                 webServer.begin();
             }
         }
@@ -61,7 +62,14 @@ class Web_Server: public Loggable {
         void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
             if (strlen(apiKey) < 32 || strlen(feed) < 10) return;
             
-            http.begin(String(serverUrl) + String(feed));
+            String url = String(serverUrl) + String(feed);
+
+            #ifdef ESP32
+                http.begin(url);
+            #else
+                http.begin(webRoot.server->client(), url);
+            #endif
+            
             http.addHeader("api-key", apiKey);
             http.addHeader("Content-Type", "application/x-www-form-urlencoded");
             

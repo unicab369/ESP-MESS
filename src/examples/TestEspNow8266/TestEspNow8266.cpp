@@ -7,6 +7,11 @@
 #include "3Mng_Runtime.h"
 #include <Adafruit_INA219.h>
 
+enum DeviceMode {
+   MODE_LOWPOWER,
+   MODE_SETUP
+};
+
 Mod2_SHT3 sht;
 Mod2_BH17 bh17;
 Serv_Tweet tweet;
@@ -15,6 +20,10 @@ Net_Wifi wifi;
 TimeoutItem testTimer;       //* print time logger
 int BROADCAST_CHANNEL = 10;
 
+Serv_Device device;
+Mng_Network network;
+DeviceMode currentMode = MODE_LOWPOWER;
+
 std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
    Serial.println("IM HERE 3");
    espNow.send(packet, sizeof(DataPacket2));
@@ -22,9 +31,6 @@ std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
 
 unsigned long timeRef, timeDif;
 Adafruit_INA219 ina219;
-
-Mng_Runtime runTime;
-Serv_Device device;
 
 void logSensors() {
    float temp = 0, hum = 0, lux = 0, busvoltage = 0, current_mA = 0;
@@ -50,13 +56,15 @@ void setup() {
    unsigned long timeRef = millis();
 
    pinMode(2, OUTPUT);
-   pinMode(15, INPUT);
+   pinMode(14, INPUT_PULLUP);
    // digitalWrite(13, HIGH);
    Serial.begin(115200);
 
-   if (digitalRead(15)) {
+   if (!digitalRead(14)) {
       Serial.print("SETUP MODE");
-      runTime.setupRunTime();
+      device.configure();
+      network.setup(&device);
+      currentMode = MODE_SETUP;
       return;
    }
 
@@ -88,14 +96,12 @@ void setup() {
 }
 
 void loop() {
-   if (digitalRead(15)) {
-      runTime.runJob1();
-      runTime.runJob2();
+   if (currentMode == MODE_SETUP) {
+      network.run();
       return;
    }
 
    logSensors();
-   // ESP.deepSleep(3e6);
    delay(1);
    digitalWrite(2, !digitalRead(2));
    delay(1000);

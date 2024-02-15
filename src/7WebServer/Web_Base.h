@@ -68,7 +68,6 @@ class Web_Base: public Loggable {
       virtual void makeContent() {}
       char dirPath[20];
       Serv_Network* network;
-      WebServer* server;
 
       std::function<void(void)> handleBaseContent = [&]() {
          makeContent();
@@ -77,6 +76,7 @@ class Web_Base: public Loggable {
    public:
       Web_Base(const char* name): Loggable(name) {}
 
+      WebServer* server;
       const char* getPath() { return (const char*)dirPath; }
 
       void load(const char* path, Serv_Network *_network, WebServer *_server) {

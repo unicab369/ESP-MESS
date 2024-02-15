@@ -289,10 +289,10 @@ class Mng_Storage: public Loggable {
          // AppPrint("StoreValue", item.value);
 
          uint32_t timeRef = millis();
-         String output = item.formatForStorage();
-         Serial.println("Storing data");
-         Serial.println(output);
-         sd1.appendFile(sensorDataPath, output.c_str());
+         // String output = item.formatForStorage();
+         // Serial.println("Storing data");
+         // Serial.println(output);
+         // sd1.appendFile(sensorDataPath, output.c_str());
          onComplete(millis()-timeRef);
       }
 

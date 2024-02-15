@@ -52,7 +52,6 @@ class Web_Root: public Web_Base {
     Web_DevFile devFile;
     Web_OTA webOTA;
     Serv_Network *network;
-    WebServer *server;
 
     std::function<void()> handleRestart = []() {
         MY_ESP.restart(); 

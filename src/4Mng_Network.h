@@ -88,7 +88,6 @@
             AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
             servWifi.device->storage.loadStoragePath(dateStr);
             AppPrintHeap();
-            wServer.setup(&servWifi);
         };
 
         public:
@@ -99,8 +98,9 @@
 
             void setup(Serv_Device* device) {
                 servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
-                servWifi.setupNetwork(device);
                 servWifi.onWifiConnected = &onWifiConnected;
+                servWifi.setupNetwork(device);
+                wServer.setup(&servWifi);
             }
 
             //! iotPlotter
