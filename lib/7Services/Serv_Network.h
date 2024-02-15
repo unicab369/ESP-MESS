@@ -112,12 +112,7 @@ class Serv_Network: public Loggable {
             state = NETWORK_START;
             retryCnt = 15;
             Dat_Cred cred = device->storage.stoCred.value;
-
-            // if (digitalRead(36)) {
             wifi.setup(cred.ssid, cred.password);
-            // } else {
-            //     // wifi.setup(cred.getValue()->ssid(), "cred.passw()");
-            // }
         }
 
         Network_State pollNetworkState() {
