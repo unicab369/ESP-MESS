@@ -27,8 +27,7 @@ struct DeviceStats {
    }
 };
 
-//# WARNING: This object get stored in EEPROM
-//! please keep size minimal, dont inherit Loggable
+//! WARNING: This object get stored in EEPROM. Keep size minimal, DO NOT inherit
 class Sto_Stat: public EEPROM_Value<DeviceStats>{
    public:
       uint64_t resetCnt() { return value.resetCnt; }
@@ -39,6 +38,7 @@ class Sto_Stat: public EEPROM_Value<DeviceStats>{
          storeData();
       }
 };
+
 
 bool extractValues(const char* key, char* input, char *value1, char *value2) {
    //# WARNING: strtok detroys the original string, perform operation on copied string
@@ -67,38 +67,67 @@ bool extractValues(const char* key, char* input, char *value1, char *value2) {
    return true;
 }
 
-//# WARNING: This object get stored in EEPROM
-//! please keep size minimal, dont inherit Loggable
-class Dat_Cred: public ExtractorInterface {
-   public:
-      char ssid[33] = "";
-      char password[64] = "";
+//! WARNING: This object get stored in EEPROM. Keep size minimal, DO NOT inherit
+struct Data_Cred2 {
+   char ssid[33] = "", password[64] = "";
 
-      bool makeExtraction(char* input) override {
-         return extractValues("cred", input, ssid, password);
+   void printData() {
+      Loggable logger = Loggable("Data_Cred2");
+      Serial.println();
+      logger.xLogf("SSID = %s", ssid);
+      logger.xLogf("PASSW = %s", password);  
+   }
+};
+
+class Sto_Cred2: public EEPROM_Value<Data_Cred2> {
+   public:
+      bool extractSSID(char* input) {
+         bool output = extractValue("ssid", input, value.ssid);
+         if (output) value.printData();
+         return output;
       }
 
-      void printValues() override {
-         Loggable logger = Loggable("Dat_Cred");
-         logger.xLogf("SSID = %s", ssid);
-         logger.xLogf("PASSW = %s", password);   
+      //! only store data when extracting password
+      bool extractPASSW(char* input) {
+         bool output = extractValue("passw", input, value.password);
+         if (output) {
+            storeData();
+            value.printData();
+         }
+         return output;       
       }
 };
 
-//# WARNING: This object get stored in EEPROM
-//! please keep size minimal, dont inherit Loggable
-class Dat_Conf: public ExtractorInterface {
-   public:
-      char name[21], mqttIP[21];
+//! WARNING: This object get stored in EEPROM. Keep size minimal, DO NOT inherit
+struct Data_Conf {
+   char deviceName[21], mqttIP[21];
 
-      bool makeExtraction(char* input) override {
-         return extractValues("conf", input, name, mqttIP);
+   void printData() {
+      Loggable logger = Loggable("Data_Conf");
+      Serial.println();
+      logger.xLogf("deviceName = %s", deviceName);
+      logger.xLogf("mqttIP = %s", mqttIP);  
+   }
+};
+
+class Sto_Conf: public EEPROM_Value<Data_Conf> {
+   public:
+      bool extractDeviceName(char* input) {
+         bool output = extractValue("deviceName", input, value.deviceName);
+         if (output)  {
+            storeData();
+            value.printData();
+         }
+         return output;
       }
 
-      void printValues() override {
-         Loggable logger = Loggable("Dat_Conf");
-         logger.xLogf("name = %s", name);
-         logger.xLogf("mqttIP = %s", mqttIP);    
+      bool extractMqttIP(char* input) {
+         bool output = extractValue("mqttIP", input, value.mqttIP);
+         if (output) {
+            storeData();
+            value.printData();
+         }
+         return output;       
       }
 };
 
@@ -195,8 +224,9 @@ class Mng_Storage: public Loggable {
    public:
       Sto_RTC rtc_storage;
       Sto_Stat stoStat;                               //! length 17 [0 - 17]
-      EEPROM_Extractor<Dat_Cred> stoCred;             //! start 32 + len 104
-      EEPROM_Extractor<Dat_Conf> stoConf;              //! start 144 + len 48
+      Sto_Cred2 stoCred2;                             //! start 500
+      Sto_Conf stoConf;                               //! start 600
+
       EEPROM_Extractor<Dat_Plotter> stoPlotter;       //! start 200 + len 100
       EEPROM_Extractor<Dat_Settings> stoSettings;     //! start 312 + len 10?
 
@@ -217,10 +247,11 @@ class Mng_Storage: public Loggable {
 
          EEPROM.begin(EEPROM_SIZE);
          stoStat.load(0);
+         stoCred2.loadData(500);
+         stoConf.loadData(600);
+
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
-         stoCred.loadEEPROM(32);
-         stoConf.loadEEPROM(144);
          stoPlotter.loadEEPROM(200);
          stoSettings.loadEEPROM(312);
 
@@ -234,21 +265,40 @@ class Mng_Storage: public Loggable {
       }
 
       RESET_Type handleConsoleCmd(char* inputStr) {
-         // xLogf("%s %s", __func__, inputStr);
-         
+         Serial.println();
+         if (strlen(inputStr)<1) {
+            xLogf("%s %s", __func__, "invalid input");
+            return RESET_NONE;
+         }
+
+         xLogf("%s %s", __func__, inputStr);
          if (strcmp(inputStr, "ping") == 0) {
             Serial.println("What is thy bidding my Master?");
          }
+
+         //# Credential
+         else if (strcmp(inputStr, "cred") == 0) {
+            stoCred2.value.printData();
+         }
+         else if (stoCred2.extractSSID(inputStr)) {
+            xLog("ssid extracted");
+         }
+         else if (stoCred2.extractPASSW(inputStr)) {
+            xLog("passw extracted");
+         }
+
+         //# Device Configuration
+         else if (stoConf.extractDeviceName(inputStr)) {
+            xLog("deviceName extracted");
+         }
+
+         else if (stoConf.extractMqttIP(inputStr)) {
+            xLog("mqttIP extracted");
+         }
+
+         //
          else if (strcmp(inputStr, "getSens") == 0) {
             Serial.println(valX++);
-         }
-         else if (stoCred.extractToEEPROM(inputStr)) {
-            xLog("cred extracted");
-            return RESET_WIFI;
-         }
-         else if(stoConf.extractToEEPROM(inputStr)) {
-            xLog("conf extracted");
-            return RESET_WIFI;
          }
          else if (stoPlotter.extractToEEPROM(inputStr)) {
             xLog("iotPlotter extracted");
@@ -299,8 +349,9 @@ class Mng_Storage: public Loggable {
       void deleteData() {
          AppPrint("[Sto]", __func__);
          stoStat.deleteData();
-         stoCred.deleteData();
          stoConf.deleteData();
+         stoCred2.deleteData();
+         
          // stoBehavior.deleteData();
       }
 

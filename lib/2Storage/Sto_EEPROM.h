@@ -77,6 +77,23 @@ class Sto_EEPROM {
 };
 
 
+bool extractValue(const char* key, char* input, char* output) {
+   //! WARNING: strtok detroys the original string, perform operation on copied string
+   char inputStr[240] = "";
+   memcpy(inputStr, input, sizeof(inputStr));
+   char *ref = strtok(inputStr, " ");     // get key
+
+   //! check key
+   if (strcmp(ref, key) == 0 && ref != nullptr && strlen(ref)>0) {
+      ref = strtok(NULL, "");            // get value
+      strcpy(output, ref);
+      return true;
+   } 
+
+   return false;
+}
+
+
 template <class T>
 class EEPROM_Value: public Sto_EEPROM {
    protected:
@@ -93,10 +110,10 @@ class EEPROM_Value: public Sto_EEPROM {
       }
 
       //! startAddr contains checkByte, content follows startAddr
-      uint16_t startAddr = 0;
       uint16_t contentAddr() { return startAddr + 1; }
 
    public:
+      uint16_t startAddr = 0;
       T value;
       T* getValue() { return &value; }
 
