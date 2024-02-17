@@ -7,6 +7,10 @@
 #include "3Mng_Runtime.h"
 #include <Adafruit_INA219.h>
 
+#define DONE_PIN 13
+#define MODE_PIN 14
+#define LED_PIN 2
+
 enum DeviceMode {
    MODE_LOWPOWER,
    MODE_SETUP
@@ -35,32 +39,33 @@ Adafruit_INA219 ina219;
 void logSensors() {
    float temp = 0, hum = 0, lux = 0, busvoltage = 0, current_mA = 0;
 
-   // // collect readings
-   // sht.collectReadings();
-   // bh17.collectReadings();
-   // temp = sht.getTemp();
-   // hum = sht.getHum();
-   // lux = bh17.getLux();
+   // collect readings
+
+   busvoltage = ina219.getBusVoltage_V();
+   current_mA = ina219.getCurrent_mA();
+   Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+   
+   sht.collectReadings();
+   bh17.collectReadings();
+   temp = sht.getTemp();
+   hum = sht.getHum();
+   lux = bh17.getLux();
    Serial.printf("\ntemp = %.2f, hum = %.2f, lux = %.2f", temp, hum, lux);
 
-   // busvoltage = ina219.getBusVoltage_V();
-   // current_mA = ina219.getCurrent_mA();
-   // Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
-
    // send readings
-   delay(10);
    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
 }
 
 void setup() {
    unsigned long timeRef = millis();
 
-   pinMode(2, OUTPUT);
-   pinMode(14, INPUT_PULLUP);
-   // digitalWrite(13, HIGH);
+   pinMode(DONE_PIN, OUTPUT);
+   pinMode(LED_PIN, OUTPUT);
+   pinMode(MODE_PIN, INPUT_PULLUP);
+
    Serial.begin(115200);
 
-   if (!digitalRead(14)) {
+   if (!digitalRead(MODE_PIN)) {
       Serial.print("SETUP MODE");
       device.configure();
       network.setup(&device);
@@ -70,29 +75,27 @@ void setup() {
 
    // setup i2C
    Wire.begin(4, 5);
-   // Wire.begin(33, 32);
    sht.setup(&Wire);
    bh17.setup(&Wire);
 
-   Serial.print("TWEET MODE");
+   // Serial.print("TWEET MODE");
    if(!ina219.begin()){
-      Serial.println("INA219 not connected!");
+      // Serial.println("INA219 not connected!");
    }
 
    // request readings: need to wait at least 20ms before collect reading
    // start the Wifi to save wait time
    sht.requestReadings();
    bh17.requestReadings();
-   // delay(20);   //! this is needed if wifi is not used
 
    wifi.setTxPower(0);
    wifi.startAP(true, BROADCAST_CHANNEL);
    tweet.setup(&device, espNow.mac, &onTweet2);
-
-   Serial.print("Channel = "); Serial.println(WiFi.channel());
    espNow.setup(WiFi.channel());
 
-   Serial.printf("\nTImeDIf = %lu", millis()-timeRef);
+   // Serial.print("Channel = "); Serial.println(WiFi.channel());
+   // Serial.printf("\nTImeDIf = %lu", millis()-timeRef);
+   
 }
 
 void loop() {
@@ -100,8 +103,7 @@ void loop() {
       network.run();
    } else {
       logSensors();
-      delay(1);
-      digitalWrite(2, !digitalRead(2));
-      delay(1000);
+      digitalWrite(DONE_PIN, !digitalRead(DONE_PIN));
+      delay(2000);
    }
 }
