@@ -142,6 +142,29 @@ class EEPROM_Value: public Sto_EEPROM {
          writeCode();
          deleteBytes(contentAddr(), 0, sizeof(T)+1);
       }
+
+      bool storeData(const char* key, char* input, char* output) {
+         bool check = extractValue(key, input, output);
+         if (check)  {
+            storeData();
+            (&value)->printData();
+         }
+
+         return check;
+      }
+
+      bool storeBoolean(const char* key, char* input, bool* output) {
+         char boolStr[2];
+
+         bool check = extractValue(key, input, boolStr);
+         if (check) {
+            *output = strcmp("1", boolStr) == 0;
+            storeData();
+            (&value)->printData();
+         }
+
+         return check;
+      }
 };
 
 class ExtractorInterface {

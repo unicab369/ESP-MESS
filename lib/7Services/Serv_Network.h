@@ -111,7 +111,7 @@ class Serv_Network: public Loggable {
             xLogLine(__func__);
             state = NETWORK_START;
             retryCnt = 15;
-            Data_Cred2 cred = interface->getStorage()->stoCred2.value;
+            Data_Cred cred = interface->getStorage()->stoCred.value;
             wifi.setup(cred.ssid, cred.password);
         }
 

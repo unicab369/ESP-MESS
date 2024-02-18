@@ -104,12 +104,12 @@
             //! iotPlotter
             void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
                 Mng_Storage *storage = servWifi.interface->getStorage();
-                Dat_Settings settings = storage->stoSettings.value;
-                Dat_Plotter plotter = storage->stoPlotter.value;
+                Data_Settings settings = storage->stoSettings.value;
+                Data_IotPlotter plotter = storage->stoPlotter.value;
 
                 // Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
 
-                if (settings.selfPlotEnable) {
+                if (settings.remotePlot) {
                     wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
                 }
             }
