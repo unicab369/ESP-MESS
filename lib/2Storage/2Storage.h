@@ -172,8 +172,6 @@ struct Data_Settings {
 class Sto_Settings: public EEPROM_Value<Data_Settings> {
    public:
       bool handleCommand(char* input) {
-         char value1[2], value2[2], value3[2];
-
          if (strcmp(input, "settings") == 0) {
             value.printData();
             return true;
@@ -229,13 +227,11 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat stoStat;             //! length 17 [0 - 17]
-      Sto_Cred stoCred;             //! start 500
-      Sto_Conf stoConf;             //! start 600
-      Sto_IotPlotter stoPlotter;    //! start 650
-      Sto_Settings stoSettings;     //! start 750
-
-      // EEPROM_Extractor<Dat_Settings> stoSettings;     //! start 312 + len 10?
+      Sto_Stat stoStat;             //! start 0 len 17 
+      Sto_Cred stoCred;             //! start 20 len 98
+      Sto_Conf stoConf;             //! start 120 len 43
+      Sto_IotPlotter stoPlotter;    //! start 170 len 96
+      Sto_Settings stoSettings;     //! start 270 len 4
 
       // Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
       // Sto_Behavior stoBehavior;
@@ -254,10 +250,10 @@ class Mng_Storage: public Loggable {
 
          EEPROM.begin(EEPROM_SIZE);
          stoStat.load(0);
-         stoCred.loadData(500);
-         stoConf.loadData(600);
-         stoPlotter.loadData(650);
-         stoSettings.loadData(750);
+         stoCred.loadData(20);
+         stoConf.loadData(120);
+         stoPlotter.loadData(170);
+         stoSettings.loadData(270);
 
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
@@ -278,9 +274,8 @@ class Mng_Storage: public Loggable {
          }
 
          xLogf("%s %s", __func__, inputStr);
-         if (strcmp(inputStr, "ping") == 0) {
-            Serial.println("What is thy bidding my Master?");
-         }
+         if (strcmp(inputStr, "ping") == 0)        Serial.println("What is thy bidding my Master?");
+         if (strcmp(inputStr, "deleteAll") == 0)   deleteAllData();
 
          //# Credential
          else if (stoCred.handleCommand(inputStr)) { }
@@ -338,7 +333,7 @@ class Mng_Storage: public Loggable {
          onComplete(millis()-timeRef);
       }
 
-      void deleteData() {
+      void deleteAllData() {
          AppPrint("[Sto]", __func__);
          stoStat.deleteData();
          stoCred.deleteData();

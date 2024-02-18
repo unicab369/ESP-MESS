@@ -87,7 +87,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                 if (hold == HOLD_20_SEC) {
                     addDisplayQueues("[Bnt] 20sec hold", 6);
                     led.turnOFF();
-                    storage.deleteData();
+                    storage.deleteAllData();
 
                 //! Long press 10 sec -> Reset - fash flashing
                 } else if (hold == HOLD_10_SEC) {
