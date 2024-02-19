@@ -16,13 +16,13 @@ enum Cue_Trigger: uint8_t {
    TRIGGER_NONE = 0xF1,
 };
 
-struct BehaviorItem {
+struct Data_Behavior {
    Cue_Trigger cue;
    uint8_t peerId;
    uint8_t data[32]; 
    
    void toCharArr(char* charArr) const {
-      memcpy(charArr, this, sizeof(BehaviorItem));
+      memcpy(charArr, this, sizeof(Data_Behavior));
    }
 
    bool check(uint8_t peerIdIdVal, Cue_Trigger cueVal) {
@@ -84,7 +84,7 @@ class ControlOutput {
          value = valueVal;
       }
 
-      bool extract(BehaviorItem* behav) {
+      bool extract(Data_Behavior* behav) {
          behav->produce(this);
          return actionCmd == ACTION_OUTPUT;
       }
@@ -102,7 +102,7 @@ class ControlWS2812 {
       }
 
 
-      bool extract(BehaviorItem* behav) {
+      bool extract(Data_Behavior* behav) {
          behav->produce(this);
          return actionCmd == ACTION_WS2812;
       }

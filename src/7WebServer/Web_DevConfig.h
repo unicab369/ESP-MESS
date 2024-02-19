@@ -115,7 +115,7 @@ class Web_DevConfig: public Web_Base {
 
         if (result == 5) {
             xLogf("validated: %s %s", triggerChar, actionChar);
-            BehaviorItem behav_In;
+            Data_Behavior behav_In;
 
             if (strcmp(actionChar, "OUTPUT") == 0) {
                 ControlOutput output(pinCode, pinValue);

@@ -233,9 +233,10 @@ class Mng_Storage: public Loggable {
       Sto_IotPlotter stoPlotter;    
       Sto_Settings stoSettings;     
       Sto_Peer stoPeer;
+      Sto_Behavior stoBehavior;
 
       // Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
-      // Sto_Behavior stoBehavior;
+      
       Sto_LittleFS littleFS;
       Sto_SD sd1;
 
@@ -255,8 +256,9 @@ class Mng_Storage: public Loggable {
          stoConf.loadData(120);           //! start 120 len 43
          stoPlotter.loadData(170);        //! start 170 len 96
          stoSettings.loadData(270);       //! start 270 len 4
-         stoPeer.loadData(280);           //! start 280
-
+         stoPeer.loadData(280);           //! start 280, Count(5) * len 17
+         stoBehavior.loadData(380);       //! start 380
+         
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
          // stoPeer.load(192);
@@ -344,8 +346,8 @@ class Mng_Storage: public Loggable {
          stoCred.deleteData();
          stoConf.deleteData();
          stoPlotter.deleteData();
-
-         // stoBehavior.deleteData();
+         stoPeer.deleteData();
+         stoBehavior.deleteData();
       }
 
       // void resetBootCnt() {

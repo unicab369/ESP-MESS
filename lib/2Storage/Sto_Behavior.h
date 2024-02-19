@@ -68,14 +68,14 @@ class Sto_Array: public Loggable {
 
 //! This object get stored in EEPROM
 //! please keep size minimal, dont inherit Loggable
-struct PeerItem {
+struct Data_Peer {
    uint8_t mac[6];
    uint8_t peerId = INVALID_UINT8;
    uint64_t builtTime = 0;
 
-   PeerItem() {}
+   Data_Peer() {}
    
-   PeerItem(const uint8_t macVal[6], uint64_t id = 0) {
+   Data_Peer(const uint8_t macVal[6], uint64_t id = 0) {
       memcpy(mac, macVal, sizeof(mac));
       peerId = id;
    }
@@ -106,20 +106,20 @@ struct PeerItem {
 
 #define MAX_PEER_COUNT 5
 
-class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
+class Sto_Peer: public Sto_Array<Data_Peer, MAX_PEER_COUNT> {
    public:
       Sto_Peer(): Sto_Array("Sto_Peer") {}
       
       void printAllPeers() {
          xLogSection(__func__);
-         forEach([&](PeerItem* item, uint8_t index) {
+         forEach([&](Data_Peer* item, uint8_t index) {
             item->printData();
             Serial.println();
          });
       }
 
       uint8_t insertPeer(uint8_t* peerMac, uint8_t index) {
-         PeerItem newPeer(peerMac, index);
+         Data_Peer newPeer(peerMac, index);
          newPeer.builtTime = 0x1122334455667788;
          updateData(index, &newPeer);
          printAllPeers();
@@ -131,7 +131,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
                      peerMac[3], peerMac[4], peerMac[5]);
          uint8_t lastAvailIndex = INVALID_UINT8;
 
-         PeerItem* match = firstMatch([&](PeerItem* item, uint8_t index) {
+         Data_Peer* match = firstMatch([&](Data_Peer* item, uint8_t index) {
             bool foundMatch = item->hasSameMac(peerMac);
 
             if (foundMatch) {
@@ -149,7 +149,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
 
          } else if (lastAvailIndex != INVALID_UINT8) {
             xLogf("**ADD NEW PEER at Index = %u", lastAvailIndex);
-            PeerItem newPeer(peerMac);
+            Data_Peer newPeer(peerMac);
             newPeer.peerId = lastAvailIndex;
             newPeer.builtTime = 0x1122334455667788;
             updateData(lastAvailIndex, &newPeer);
@@ -162,7 +162,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
       }
 
       // uint8_t findPeer(uint8_t* targetMac) {
-      //    forEach([&](PeerItem* item, uint8_t index) {
+      //    forEach([&](Data_Peer* item, uint8_t index) {
       //       if (item->hasSameMac(targetMac)) {
       //          return item->peerId;
       //       }
@@ -202,19 +202,19 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
 
 #define MAX_BEHAVIOR_ITEMS 6
 
-class Sto_Behavior: public Sto_Array<BehaviorItem, MAX_BEHAVIOR_ITEMS> {
+class Sto_Behavior: public Sto_Array<Data_Behavior, MAX_BEHAVIOR_ITEMS> {
    public:
       Sto_Behavior(): Sto_Array("Sto_Behav") {}
       
       void printAll() {
          xLogSection(__func__);
-         forEach([&](BehaviorItem* item, uint8_t index) {
+         forEach([&](Data_Behavior* item, uint8_t index) {
             item->printRaw();
          });
       }
 
       void handleCue(uint8_t peerId, Cue_Trigger cue) {
-         forEach([&](BehaviorItem* item, uint8_t index) {
+         forEach([&](Data_Behavior* item, uint8_t index) {
             // xLogf("At Index = %u", index);
             if (item->check(peerId, cue) == false) return;      
             ControlOutput out1(0, 0);
