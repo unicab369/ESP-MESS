@@ -117,6 +117,7 @@ class EEPROM_Value: public Sto_EEPROM {
       T value;
       T* getValue() { return &value; }
 
+      //! loadData
       bool loadData(uint16_t addr) {
          startAddr = addr;
          if (!checkCode()) return false;
@@ -124,23 +125,22 @@ class EEPROM_Value: public Sto_EEPROM {
          return true;
       }
 
-      void reloadData() {
-         loadData(startAddr);
-      }
-
-      void updateData(T* newValue) {
-         writeCode();
-         writeBytes(contentAddr(), newValue, sizeof(T)+1);
-      }
-
+      //! storeData
       void storeData() {
          writeCode();
          writeBytes(contentAddr(), &value, sizeof(T)+1);
       }
 
+      //! deleteData
       void deleteData() {
          writeCode();
          deleteBytes(contentAddr(), 0, sizeof(T)+1);
+      }
+
+      //! updateData
+      void updateData(T* newValue) {
+         writeCode();
+         writeBytes(contentAddr(), newValue, sizeof(T)+1);
       }
 
       bool storeData(const char* key, char* input, char* output) {

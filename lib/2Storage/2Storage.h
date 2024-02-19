@@ -227,11 +227,12 @@ class Mng_Storage: public Loggable {
 
    public:
       Sto_RTC rtc_storage;
-      Sto_Stat stoStat;             //! start 0 len 17 
-      Sto_Cred stoCred;             //! start 20 len 98
-      Sto_Conf stoConf;             //! start 120 len 43
-      Sto_IotPlotter stoPlotter;    //! start 170 len 96
-      Sto_Settings stoSettings;     //! start 270 len 4
+      Sto_Stat stoStat;             
+      Sto_Cred stoCred;             
+      Sto_Conf stoConf;             
+      Sto_IotPlotter stoPlotter;    
+      Sto_Settings stoSettings;     
+      Sto_Peer stoPeer;
 
       // Sto_Peer stoPeer;                      //! length 17*Count(20) [192 - 532/536]
       // Sto_Behavior stoBehavior;
@@ -249,11 +250,12 @@ class Mng_Storage: public Loggable {
          xLogSection(__func__);
 
          EEPROM.begin(EEPROM_SIZE);
-         stoStat.load(0);
-         stoCred.loadData(20);
-         stoConf.loadData(120);
-         stoPlotter.loadData(170);
-         stoSettings.loadData(270);
+         stoStat.load(0);                 //! start 0 len 17 
+         stoCred.loadData(20);            //! start 20 len 98
+         stoConf.loadData(120);           //! start 120 len 43
+         stoPlotter.loadData(170);        //! start 170 len 96
+         stoSettings.loadData(270);       //! start 270 len 4
+         stoPeer.loadData(280);           //! start 280
 
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
@@ -288,6 +290,9 @@ class Mng_Storage: public Loggable {
 
          //# Settings
          else if (stoSettings.handleCommand(inputStr)) { }
+
+         //# peers
+         else if (stoPeer.handleCommand(inputStr)) { }
 
          //#
          else if (strcmp(inputStr, "getSens") == 0) {

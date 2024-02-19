@@ -1,7 +1,7 @@
 template <class T, uint8_t count>
 class Sto_Array: public Loggable {
    protected:
-      EEPROM_Value<T> rawData[count];
+      EEPROM_Value<T> objects[count];
       bool isLoaded = false; 
       uint16_t arrAddress;
 
@@ -9,40 +9,39 @@ class Sto_Array: public Loggable {
       
    public:
       T* getValueAt(uint8_t index) {
-         return rawData[index].getValue();
+         return objects[index].getValue();
       }
 
-      void load(uint16_t arrAddr) {
+      //! loadData
+      void loadData(uint16_t arrAddr) {
          xLogSectionf("%s count = %u", __func__, count);
          arrAddress = arrAddr;
       
          for (int i=0; i<count; i++) {
             //! offset by 2 = 1 for the checkByte + 1 for array element offset
             uint16_t addr = arrAddress + i*(sizeof(T)+2);
-            rawData[i].loadData(addr);
+            objects[i].loadData(addr);
          }
 
          // xLogSection("Print All Data\n");
-         // AppPrintHex(rawData, 124);
+         // AppPrintHex(objects, 124);
          isLoaded = true;
       }
 
-      void reload() {
-         load(arrAddress);
+      //! updateData
+      void updateData(uint8_t index, T* newItem) {
+         if (index>=count || !isLoaded) return;
+         objects[index].updateData(newItem);
+         loadData(arrAddress);
       }
 
+      //! deleteData
       void deleteData() {
          if (!isLoaded) return;
          for (int i=0; i<count; i++) {
-            rawData[i].deleteData();
+            objects[i].deleteData();
          }
-         reload();   
-      }
-
-      void updateData(uint8_t index, T* newItem) {
-         if (index>=count || !isLoaded) return;
-         rawData[index].updateData(newItem);
-         reload();
+         loadData(arrAddress);   
       }
 
       void forEach(std::function<void(T*, uint8_t index)> cb) {
@@ -93,11 +92,12 @@ struct PeerItem {
       return compare;
    }
 
-   void assignPeerId(uint8_t id) {
-      peerId = id;
+   void clear() {
+      peerId = INVALID_UINT8;
+      memset(mac, 0, sizeof(mac));
    }
 
-   void printRaw() {
+   void printData() {
       Serial.printf("Mac = %02X:%02X:%02X:%02X:%02X:%02X", 
                            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
       Serial.printf(" peerId = %u", peerId);
@@ -113,7 +113,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
       void printAllPeers() {
          xLogSection(__func__);
          forEach([&](PeerItem* item, uint8_t index) {
-            item->printRaw();
+            item->printData();
             Serial.println();
          });
       }
@@ -150,7 +150,7 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
          } else if (lastAvailIndex != INVALID_UINT8) {
             xLogf("**ADD NEW PEER at Index = %u", lastAvailIndex);
             PeerItem newPeer(peerMac);
-            newPeer.assignPeerId(lastAvailIndex);
+            newPeer.peerId = lastAvailIndex;
             newPeer.builtTime = 0x1122334455667788;
             updateData(lastAvailIndex, &newPeer);
          } else {
@@ -170,6 +170,34 @@ class Sto_Peer: public Sto_Array<PeerItem, MAX_PEER_COUNT> {
 
       //    return INVALID_UINT8;
       // }
+
+      bool handleCommand(char* input) {
+         char refStr[64] = "";
+
+         if (strcmp(input, "peers") == 0) {
+            printAllPeers();
+            return true;
+         }
+         else if (strcmp(input, "delAllPeer") == 0) {
+            deleteData();
+            printAllPeers();
+            return true;
+         }
+         else if (extractValue("addPeer", input, refStr)) {
+            uint8_t mac[6] = { 0 };
+            sscanf(refStr, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
+            addPeer(mac);
+            printAllPeers();
+            return true;
+         }
+         else if (extractValue("delPeer", input, refStr)) {
+            int intValue = std::stoi(refStr);
+            objects[intValue].value.clear();
+            printAllPeers();
+            return true;
+         }
+         return false;
+      }
 };
 
 #define MAX_BEHAVIOR_ITEMS 6
