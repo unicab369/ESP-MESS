@@ -51,7 +51,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
         addDisplayQueues(output, 6);       // display
 
         // i2c1.pca96.drivePWM(0, counter);
-        if (onHandleRotary) (*onHandleRotary)(state, counter);
+        onHandleRotary(state, counter);
     };
 
     BNT_Hold releasedState = HOLD_TRANSITION;
@@ -64,7 +64,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                 xSerial.println("Hellow there\n");
                 addDisplayQueues("Single Click", 6);
                 // network.handleSingleClick();
-                if (onHandleSingleClick) (*onHandleSingleClick)();
+                onHandleSingleClick();
                 toggleRelay();
                 led.toggle();
 
@@ -81,7 +81,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             case ACTION_DOUBLE_CLICK: {
                 addDisplayQueues("Double Click", 6);
                 // servDev.i2c1.switchDisplayMode();
-                if (onHandleDoubleClick) (*onHandleDoubleClick)();
+                onHandleDoubleClick();
                 break;
             }
             case ACTION_PRESS_ACTIVE: {
@@ -108,7 +108,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             case ACTION_PRESS_END: {
                 addDisplayQueues("Press Ended " + String(elapse), 6);
                 if (releasedState == HOLD_5_SEC) {
-                    if (onHandleAPRequest) (*onHandleAPRequest)();
+                    onHandleStartAP();
                 } else if (releasedState == HOLD_10_SEC) {
                     MY_ESP.restart();           //! Restart Device
                 }
@@ -119,15 +119,18 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
     //! storeCred Callback
     std::function<void(char*)> parseStringCb = [&](char* inputStr) {
-        if (storage.handleConsoleCmd(inputStr) == RESET_WIFI) {
-            if (onHandleResetWifi) (*onHandleResetWifi)();
+        if (strcmp("resetWifi", inputStr) == 0) {
+            onHandleResetWifi();
+        }
+        else if (strcmp("startAP", inputStr) == 0) {
+            onHandleStartAP();
+        }
+        else if (storage.handleConsoleCmd(inputStr) == RESET_WIFI) {
         } 
 
         // if (handleConsoleCmd(inputStr)) {
         //     return;
-        // } else if (storage.handleConsoleCmd(inputStr) == RESET_WIFI) {
-        //     if (onHandleResetWifi) (*onHandleResetWifi)();
-        // } 
+        // }
     };
 
     public:
@@ -135,12 +138,12 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
         SerialControl serial;
             
-        std::function<void()> *onHandleSingleClick;
-        std::function<void()> *onHandleDoubleClick;
-        std::function<void()> *onHandleAPRequest;
-        std::function<void(RotaryDirection state, uint8_t counter)> *onHandleRotary;
+        std::function<void()> onHandleSingleClick = [] {};
+        std::function<void()> onHandleDoubleClick = [] {};
+        std::function<void(RotaryDirection state, uint8_t counter)> onHandleRotary = [](RotaryDirection state, uint8_t counter) {};
         
-        std::function<void()> *onHandleResetWifi;
+        std::function<void()> onHandleResetWifi = [] {};
+        std::function<void()> onHandleStartAP = [] {};
 
         //! Interfaces
         void addDisplayQueues(String str, uint8_t line) override {

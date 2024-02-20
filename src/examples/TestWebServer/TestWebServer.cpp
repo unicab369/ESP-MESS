@@ -19,7 +19,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WiFiMulti.h>
-#include <ESP8266mDNS.h>
+// #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 #include <FS.h>   // Include the SPIFFS library
 
@@ -48,11 +48,11 @@ void setup() {
    Serial.print("Connected to "); Serial.println(WiFi.SSID()); 
    Serial.print("IP address:\t"); Serial.println(WiFi.localIP());
 
-   if (MDNS.begin("esp8266")) {              // Start the mDNS responder for esp8266.local
-      Serial.println("mDNS responder started");
-   } else {
-      Serial.println("Error setting up MDNS responder!");
-   }
+   // if (MDNS.begin("esp8266")) {              // Start the mDNS responder for esp8266.local
+   //    Serial.println("mDNS responder started");
+   // } else {
+   //    Serial.println("Error setting up MDNS responder!");
+   // }
 
    SPIFFS.begin();                           // Start the SPI Flash Files System
    

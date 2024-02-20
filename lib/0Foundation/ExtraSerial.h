@@ -125,7 +125,6 @@ class Mod_GPS: private Loggable {
 
             void run() {
                 if (!didLoad || !Serial1.available()) return;
-                xLog(__func__);
 
                 while(Serial1.available()>0) {
                     uint8_t read = Serial1.read();

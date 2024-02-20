@@ -191,7 +191,7 @@ class Sto_Peer: public Sto_Array<Data_Peer, MAX_PEER_COUNT> {
             return true;
          }
          else if (extractValue("peerDel", input, refStr)) {
-            int intValue = std::stoi(refStr);
+            int intValue = String(refStr).toInt();
             objects[intValue].value.clear();
             printAll();
             return true;
@@ -262,7 +262,7 @@ class Sto_Behavior: public Sto_Array<Data_Behavior, MAX_BEHAVIOR_ITEMS> {
             return false;
          }
          else if (extractValue("behavDel", input, refStr)) {
-            int intValue = std::stoi(refStr);
+            int intValue = String(refStr).toInt();
             objects[intValue].value.clear();
             printAll();
             return true;

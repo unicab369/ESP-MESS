@@ -98,27 +98,6 @@ class Mng_Runtime: public Loggable {
         }
     };
 
-    std::function<void()> onHandleSingleClick = [&]() {
-        network.handleSingleClick();
-    };
-
-    std::function<void()> onHandleDoubleClick = [&]() {
-        network.handleDoubleClick();
-    };
-
-    std::function<void()> onHandleAPRequest = [&]() {
-        network.startAP(true);      //! Start access point
-    };
-
-    std::function<void()> onHandleResetWifi = [&]() {
-        network.resetWifi();
-    };
-
-    std::function<void(RotaryDirection state, uint8_t counter)> onHandleRotary = 
-            [&](RotaryDirection state, uint8_t counter) {
-        network.handleRotary(state, counter);      // network message
-    };
-
     #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
         static void onRefreshInterval(void* parameter) {
             RunTimeModel *param = (RunTimeModel*)parameter;
@@ -148,11 +127,26 @@ class Mng_Runtime: public Loggable {
             xLogSection(__func__);
 
             device.configure();
-            device.onHandleSingleClick = &onHandleSingleClick;
-            device.onHandleDoubleClick = &onHandleDoubleClick;
-            device.onHandleAPRequest = &onHandleAPRequest;
-            device.onHandleResetWifi = &onHandleResetWifi;
-            device.onHandleRotary = &onHandleRotary;
+
+            device.onHandleSingleClick = [&]() {
+                network.handleSingleClick();
+            };
+
+            device.onHandleDoubleClick = [&]() {
+                network.handleDoubleClick();
+            };
+
+            device.onHandleRotary = [&](RotaryDirection state, uint8_t counter) {
+                network.handleRotary(state, counter);      // network message
+            };
+
+            device.onHandleResetWifi = [&]() {
+                network.resetWifi();
+            };
+
+            device.onHandleStartAP = [&]() {
+                network.startAP(true);      //! Start access point
+            };
 
             network.setup(&device);
 
