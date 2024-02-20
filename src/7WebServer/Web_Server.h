@@ -56,9 +56,9 @@ class Web_Server: public Loggable {
             }
         }
 
-        // cred <ssid> <password>
-        // iotPlotter <apiKey> <feedId>
-        // selfPlot <enable>
+        // cred 
+        // iotPlotter
+        // selfPlot
         void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
             if (strlen(apiKey) < 32 || strlen(feed) < 10) return;
             

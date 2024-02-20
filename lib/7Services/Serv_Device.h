@@ -14,8 +14,10 @@ class Interface_Device {
             return "<Invalid>"; 
         }
 
-        virtual void updateTimer(time_t) {}
         virtual void addDisplayQueues(String, uint8_t) {}
+        virtual void addPlotterQueue(DataContent) {}
+
+        virtual void updateTimer(time_t) {}
         virtual void handlePacket(ReceivePacket2*) {}
         virtual void handleAction(ControlOutput) {}
         virtual void toggleRelay() {}
@@ -143,6 +145,10 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
         //! Interfaces
         void addDisplayQueues(String str, uint8_t line) override {
             _addDisplayQueues(str, line);
+        }
+
+        void addPlotterQueue(DataContent data) override {
+            queuePlotter.sendQueue(&data);
         }
 
         void updateTimer(time_t time) override {

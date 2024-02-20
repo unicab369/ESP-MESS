@@ -10,10 +10,6 @@ class Serv_Tweet {
 
         TweetRecordCb *tweetRecordCb;
 
-        void addDisplayQueues(String str) {
-            interface->addDisplayQueues(str, 6);
-        }
-
         std::function<void()> setLadderIdCb = [&]() {
             // device->showLadderId();
         };
@@ -45,8 +41,12 @@ class Serv_Tweet {
             tweetSync.sendSyncMock();
         }
 
+        void addDisplayQueues(String str) {
+            interface->addDisplayQueues(str, 6);
+        }
+
         void handleMessage(ReceivePacket2* packet) {
-            DataContent& content = packet->dataPacket.content;
+            DataContent content = packet->dataPacket.content;
 
             switch (packet->dataPacket.info.sourceCmd) {
                 case CMD_TRIGGER: {
@@ -58,7 +58,7 @@ class Serv_Tweet {
                 }
                 case CMD_POST: {
                     addDisplayQueues("Recv CMD_POST: ");
-                    record.handleMessage(&content.recordItem); break;
+                    interface->addPlotterQueue(content);
                 }
                 case CMD_ATTENDANT: {
                     addDisplayQueues("Recv CMD_ATTENDANT: ");

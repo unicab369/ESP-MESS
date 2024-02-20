@@ -67,8 +67,30 @@ class Mng_Runtime: public Loggable {
             // wServer.refreshReadings(temp, hum, lux);
 
             if (runTime->isSecondInterval(5)) {
-                network.iotPlotter(temp, hum, lux, 0, 0);
-            }
+                DataContent content;
+
+                while (device.queuePlotter.getQueue(&content)) {
+                    RecordItem item = content.recordItem;
+
+                    switch (item.cue) {
+                        case RECORD_TEMPHUMLUX: {
+                            AppPrint("\nRECORD_TEMPHUMLUX 22", "T=" + String(item.value1) + 
+                                ", H=" + String(item.value2) + ", L=" + String(item.value3) +
+                                ", V=" + String(item.value4) + ", mA=" + String(item.value5));
+                            //     if (callback != nullptr) (*callback)(item->value1, item->value2, item->value3, item->value4, item->value5);
+                            break;
+                        }
+                        default: {
+                            AppPrint("Receiv Unkwnown");
+                            break;
+                        }
+                    }
+                }
+                // device.
+            } 
+            // else if (runTime->isSecondInterval(5)) {
+            //     // network.iotPlotter(temp, hum, lux, 0, 0);
+            // }
 
         } else {
             //! RUNTIME: 25ms intervals

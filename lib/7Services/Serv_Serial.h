@@ -1,6 +1,6 @@
 #define MAX_DISPLAY_QUEUE1 8
 #define MAX_DISPLAY_QUEUE2 20
-
+#define MAX_PLOTTER_QUEUE 10
 
 class Serv_Serial: public Loggable {
     AppQueue<DispItem, MAX_DISPLAY_QUEUE1> dispQueue1;
@@ -15,6 +15,8 @@ class Serv_Serial: public Loggable {
         Mng_Storage storage;
         Mng_AppClock appClock;
         Mod_RTC1302 rtc2;
+
+        AppQueue<DataContent, MAX_PLOTTER_QUEUE> queuePlotter;
 
         Serv_Serial(): Loggable("Serial") {}
 
@@ -168,18 +170,20 @@ class Serv_Serial: public Loggable {
             storage.storeItem(&item);
         }
 
-        //! Handle Qeueues
+        //! Handle Qeueues, one at a time
         void handleQueues() {
             DispItem item;
-            //! Handle one at a time
+
+            //! Finish dispQueue1 first
             if (dispQueue1.getQueue(&item)) {
                 i2c1.disp.printline(String(item.data), item.line);
             } 
-            //! Finish dispQueue1 first
+            
+            //! Finish dispQueue2 next
             else if (dispQueue2.getQueue(&item)) {
                 largeDisp.printline(String(item.data), item.line);
             }
-            //! Finish dispQueue2 first
+            
             else {
                 //! handle valueQueue
                 storage.handleValueQueue([&](uint32_t writeTime) {
@@ -187,6 +191,7 @@ class Serv_Serial: public Loggable {
                 });
             }
         }
+
 
         bool handleConsoleCmd(char* inputStr) {
             //# WARNING: strtok detroys the original string, perform operation on copied string
