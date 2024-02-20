@@ -110,7 +110,7 @@ class Sto_Peer: public Sto_Array<Data_Peer, MAX_PEER_COUNT> {
    public:
       Sto_Peer(): Sto_Array("Sto_Peer") {}
       
-      void printAllPeers() {
+      void printAll() {
          xLogSection(__func__);
          forEach([&](Data_Peer* item, uint8_t index) {
             item->printData();
@@ -122,7 +122,7 @@ class Sto_Peer: public Sto_Array<Data_Peer, MAX_PEER_COUNT> {
          Data_Peer newPeer(peerMac, index);
          newPeer.builtTime = 0x1122334455667788;
          updateData(index, &newPeer);
-         printAllPeers();
+         printAll();
       }
 
       uint8_t addPeer(uint8_t* peerMac) {
@@ -157,7 +157,7 @@ class Sto_Peer: public Sto_Array<Data_Peer, MAX_PEER_COUNT> {
             xLogf("**NO AVAILABLE SPOT");
          }
 
-         printAllPeers();
+         printAll();
          return lastAvailIndex;
       }
 
@@ -175,25 +175,25 @@ class Sto_Peer: public Sto_Array<Data_Peer, MAX_PEER_COUNT> {
          char refStr[64] = "";
 
          if (strcmp(input, "peers") == 0) {
-            printAllPeers();
+            printAll();
             return true;
          }
-         else if (strcmp(input, "delAllPeer") == 0) {
+         else if (strcmp(input, "peerDelAll") == 0) {
             deleteData();
-            printAllPeers();
+            printAll();
             return true;
          }
-         else if (extractValue("addPeer", input, refStr)) {
+         else if (extractValue("peerAdd", input, refStr)) {
             uint8_t mac[6] = { 0 };
             sscanf(refStr, "%2hhx:%2hhx:%2hhx:%2hhx:%2hhx:%2hhx", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
             addPeer(mac);
-            printAllPeers();
+            printAll();
             return true;
          }
-         else if (extractValue("delPeer", input, refStr)) {
+         else if (extractValue("peerDel", input, refStr)) {
             int intValue = std::stoi(refStr);
             objects[intValue].value.clear();
-            printAllPeers();
+            printAll();
             return true;
          }
          return false;
@@ -209,7 +209,7 @@ class Sto_Behavior: public Sto_Array<Data_Behavior, MAX_BEHAVIOR_ITEMS> {
       void printAll() {
          xLogSection(__func__);
          forEach([&](Data_Behavior* item, uint8_t index) {
-            item->printRaw();
+            item->printData();
          });
       }
 
@@ -226,5 +226,47 @@ class Sto_Behavior: public Sto_Array<Data_Behavior, MAX_BEHAVIOR_ITEMS> {
                xLogf("IM HERE2 pin = %u, value = %u", out2.pin, out2.value);
             }
          });
+      }
+
+      template <Cue_Trigger trigger, class T>
+      void storeAction(uint8_t behavIndex, T* action, uint8_t peerId) {
+			// uint8_t id = stoPeer.addPeer(peerMac);
+			Data_Behavior behav_In;
+			behav_In.load(peerId, trigger, action);
+			updateData(behavIndex, &behav_In);     //! store behavior
+         printAll();
+		}
+
+      bool handleCommand(char* input) {
+         char refStr[64] = "";
+
+         if (strcmp(input, "behav") == 0) {
+            printAll();
+            return true;
+         }
+         else if (strcmp(input, "behavDelAll") == 0) {
+            deleteData();
+            printAll();
+            return true;
+         }
+         else if (extractValue("behavAdd", input, refStr)) {
+            uint8_t behavIndex = 255, peerId = 255;
+            char cmdStr[20] = "";
+            if (refStr != nullptr && strlen(refStr)>0) {
+               Serial.printf("\nIM HERE ************************* = %u", strlen(refStr));
+               sscanf(refStr, "%u %u %s", &behavIndex, &peerId, &cmdStr);
+               Serial.printf("\nbehavIndex = %u; peerId = %u; cmdStr = %s", behavIndex, peerId, cmdStr);
+               return true;
+            }
+            
+            return false;
+         }
+         else if (extractValue("behavDel", input, refStr)) {
+            int intValue = std::stoi(refStr);
+            objects[intValue].value.clear();
+            printAll();
+            return true;
+         }
+         return false;
       }
 };

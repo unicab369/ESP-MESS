@@ -67,7 +67,13 @@ struct Data_Behavior {
       memcpy(control, data, sizeof(T));
    }
 
-   void printRaw() {
+   void clear() {
+      peerId = 255;
+      cue = TRIGGER_NONE;
+      memset(data, 0, sizeof(data));
+   }
+
+   void printData() {
       Serial.printf("cue = %u, peerId = %u", cue, peerId);
       AppPrintHex(data, sizeof(data));
    }

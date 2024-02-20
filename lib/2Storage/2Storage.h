@@ -258,7 +258,7 @@ class Mng_Storage: public Loggable {
          stoSettings.loadData(270);       //! start 270 len 4
          stoPeer.loadData(280);           //! start 280, Count(5) * len 17
          stoBehavior.loadData(380);       //! start 380
-         
+
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 
          // stoPeer.load(192);
@@ -296,6 +296,9 @@ class Mng_Storage: public Loggable {
          //# peers
          else if (stoPeer.handleCommand(inputStr)) { }
 
+         //# behaviors
+         else if (stoBehavior.handleCommand(inputStr)) { }
+   
          //#
          else if (strcmp(inputStr, "getSens") == 0) {
             Serial.println(valX++);

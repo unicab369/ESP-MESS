@@ -84,7 +84,7 @@ bool extractValue(const char* key, char* input, char* output) {
    char *ref = strtok(inputStr, " ");     // get key
 
    //! check key
-   if (strcmp(ref, key) == 0 && ref != nullptr && strlen(ref)>0) {
+   if (ref != nullptr && strlen(ref)>0 && strcmp(ref, key) == 0) {
       ref = strtok(NULL, "");            // get value
       strcpy(output, ref);
       return true;

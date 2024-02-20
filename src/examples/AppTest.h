@@ -995,7 +995,7 @@ void testRun() {
       switch (action) {
          case ACTION_SINGLE_CLICK: {
                ControlOutput action1(11, 22);    
-               servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
+               // servBehav.storeAction<TRIGGER_SINGLECLICK>(0, &action1, peer1Mac);
                break;
          }   
          case ACTION_DOUBLE_CLICK: {

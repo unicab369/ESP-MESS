@@ -2,17 +2,17 @@ class Serv_Behavior {
 	public:
 		// Sto_Peer stoPeer;
 		// Sto_Behavior stoBehav;
-		
-		template <Cue_Trigger trigger, class T>
-		void storeAction(uint8_t behavIndex, T* action, uint8_t* peerMac) {
-			// uint8_t id = stoPeer.addPeer(peerMac);
+
+		// template <Cue_Trigger trigger, class T>
+		// void storeAction(uint8_t behavIndex, T* action, uint8_t* peerMac) {
+		// 	// uint8_t id = stoPeer.addPeer(peerMac);
 
 
-			Data_Behavior behav_In;
-			behav_In.load(0x99, trigger, action);
-			// behav_In.load(peer->peerId, trigger, action);
-			// stoBehav.updateData(behavIndex, &behav_In);     //! store behavior
-		}
+		// 	Data_Behavior behav_In;
+		// 	behav_In.load(0x99, trigger, action);
+		// 	// behav_In.load(peer->peerId, trigger, action);
+		// 	// stoBehav.updateData(behavIndex, &behav_In);     //! store behavior
+		// }
 
 		void handleCommandItem(uint8_t* source, CommandItem *item) {
 			// uint8_t match = stoPeer.findPeer(source);
