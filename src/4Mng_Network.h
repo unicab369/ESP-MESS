@@ -9,7 +9,7 @@ class Mng_Network {
     public:
         Serv_Network servWifi;
         
-        const char* getHostName()   { servWifi.getHostName(); }
+        const char* getHostName()   { return servWifi.wifi.hostName; }
         const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
 
         void setup(Serv_Device* device) {

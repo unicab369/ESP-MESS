@@ -87,7 +87,6 @@ class Serv_Network: public Loggable {
         Serv_Tweet tweet;
         uint8_t scanChannel = 0;
 
-        const char* getHostName() { return wifi.getHostName(); }
         std::function<void()> onWifiConnected = [](){};
 
         void setupNetwork(Interface_Device* _interface) {

@@ -21,7 +21,7 @@ class Web_Root: public Web_Base {
 
         makeNewRow();
         makeTableRow("DevName", deviceName);
-        makeTableRow("Hostname", network->getHostName());
+        makeTableRow("Hostname", network->wifi.hostName);
         makeTableRow("Network", WiFi.SSID() + " (" + String(WiFi.RSSI()) + " dBm)");
         makeTableRow("MAC Addr", WiFi.macAddress());
 

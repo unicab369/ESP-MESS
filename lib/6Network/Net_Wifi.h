@@ -11,7 +11,6 @@
 #endif
 
 class Net_Wifi: public Loggable {
-    char hostName[21] = "fakeHostName";
     bool isLoaded = false;
 
     void setHostName() {
@@ -39,6 +38,7 @@ class Net_Wifi: public Loggable {
     
     public:
         Net_Wifi(): Loggable("Wifi") {} 
+        char hostName[21] = "fakeHostName";
 
         bool isConnected() { 
             if (!isLoaded) return false;
@@ -48,8 +48,6 @@ class Net_Wifi: public Loggable {
         String localIp() { 
             return isConnected() ? WiFi.localIP().toString() : "0.0.0.0"; 
         }
-
-        const char* getHostName() { return hostName; }
 
         void setup(const char* ssid, const char* passw) {
             uint8_t mac[6];

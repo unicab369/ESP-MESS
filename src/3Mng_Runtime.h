@@ -13,23 +13,7 @@ uint8_t secondCounter = 0;
 class Mng_Runtime: public Loggable {
     //! MAIN JOB
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
-        if (runTime->secondsChanged == true) {
-            // if (runTime->isSecondInterval(5)) {
-            //     char hostName[22];
-            //     strcpy(hostName, network.getHostName());
-            //     device.render5s_Interval(hostName);
-
-            // } else if (runTime->isSecondInterval(3)) { 
-            //     device.render3s_Interval(&asyncTimer1, &asyncTimer2);
-
-            // } else if (runTime->isSecondInterval(2)) {
-            //     device.render2s_Interval(network.getNetworkId());
-            //     // network.handle_2secInterval();
-
-            //     // //! Enable Rotary on 2nd second to prevent automatic trigger at the start
-            //     device.rotary.isEnabled = true;
-            // }
-            
+        if (runTime->secondsChanged == true) {            
             // //! Reset sensors reading every second
             // device.addStoreQueue();
         }
@@ -134,7 +118,7 @@ class Mng_Runtime: public Loggable {
                     while(1) {
                         vTaskDelay(pdMS_TO_TICKS(1000));
                         uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-                        String output = "C0: " + String(loopCnt1) + " " + String(stackUsage);
+                        String output = "C0 D" + String(stackUsage) + " +" + String(loopCnt1);
                         network->servWifi.interface->addDisplayQueues(output, 3);
                         
                         // Serial.printf("\n\nTimer0 = %lu; stack = %lu", loopCnt1, stackUsage);
@@ -142,7 +126,7 @@ class Mng_Runtime: public Loggable {
 
                         
                     }
-                }, "core0_Task2", 15000, &network, 1, NULL, 0);
+                }, "core0_Task2", 25000, &network, 1, NULL, 0);
 
                 xTaskCreatePinnedToCore([](void *pvParam){
                     Mng_Network* network = (Mng_Network*)pvParam;
@@ -150,7 +134,7 @@ class Mng_Runtime: public Loggable {
                     while(1) {
                         vTaskDelay(pdMS_TO_TICKS(1000));
                         uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-                        String output = "C1: " + String(loopCnt2) + " " + String(stackUsage);
+                        String output = "C1 D" + String(stackUsage) + " +" + String(loopCnt2);
                         network->servWifi.interface->addDisplayQueues(output, 4);
 
                         // Serial.printf("\n\nTimer1*** = %lu; stack = %lu", loopCnt2, stackUsage);
@@ -159,7 +143,9 @@ class Mng_Runtime: public Loggable {
                         secondCounter++;
                         if (secondCounter>59) secondCounter = 0;
 
-                        network->servWifi.interface->renderInterval(secondCounter);
+                        char hostName[22];
+                        strcpy(hostName, network->getHostName());
+                        network->servWifi.interface->renderInterval(secondCounter, network->getHostName(), network->getNetworkId());
 
                         network->handle_PollNetworkState();
                     }
@@ -186,7 +172,6 @@ class Mng_Runtime: public Loggable {
                 digitalWrite(22, !digitalRead(22));
                 timeRef = millis();
                 device.handleQueues();
-                device.i2c1.run();
             }
 
             device.runGroupTasks();

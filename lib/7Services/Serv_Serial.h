@@ -54,48 +54,6 @@ class Serv_Serial: public Loggable {
             }
         }
 
-        //! 5 Seconds Interval
-        void render5s_Interval(const char* hostName) {
-            char sdSize[22];
-            sprintf(sdSize, "sd = %u MB", storage.sd1.getCardSize());
-
-            if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                _addDisplayQueues(hostName, 0);     //! Oled Mini LINE 0  
-                _addDisplayQueues(sdSize, 4);       //! Oled Mini LINE 4  
-                _addDisplayQueues("Heap: " + String(ESP.getFreeHeap()), 6);      //* LINE 6
-            }
-        }
-
-        //! 3 Seconds Interval
-        void render3s_Interval(AsyncTimer* aTimer1, AsyncTimer* aTimer2) {
-            char output[22];
-            sprintf(output, "dep = %u/%u", aTimer1->stackUsage, aTimer2->stackUsage);
-
-            if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                // showLadderId(); // line0
-                _addDisplayQueues(String(output), 4);   //! Oled Mini LINE 4
-            }
-            addDisplayQueue2(output, 4);               //* LINE 4
-        }
-
-        //! 2 Seconds Interval
-        void render2s_Interval(String localIP) {
-            char heapInfo[22];
-            char networkInfo[64];
-            sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
-
-            uint64_t resetCount = storage.stoStat.resetCnt();
-            sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
-
-            //! Oled Mini
-            if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                _addDisplayQueues(networkInfo, 0);      //! Oled Mini LINE 0
-                _addDisplayQueues(heapInfo, 4);   //! Oled Mini LINE 4        
-            }
-            addDisplayQueue2(networkInfo, 0);          //* LINE 0
-            addDisplayQueue2(heapInfo, 4);               //* LINE 4 
-        }
-
         //! DisplayQueue1
         void addDisplayQueue1(String str, uint8_t line) {
             if (!i2c1.isLoaded) return;

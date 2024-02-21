@@ -16,7 +16,7 @@ class Interface_Device {
 
         virtual void addDisplayQueues(String, uint8_t) {}
         virtual void addPlotterQueue(DataContent) {}
-        virtual void renderInterval(uint8_t interval)  {}
+        virtual void renderInterval(uint8_t, String, String)  {}
 
         virtual void updateTimer(time_t) {}
         virtual void handlePacket(ReceivePacket2*) {}
@@ -140,7 +140,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             relay1.toggle();
         }
 
-        void renderInterval(uint8_t interval) override {
+        void renderInterval(uint8_t interval, String hostName, String localIP) override {
             // bool checkConn = i2c2.ch32v.checkConnection();
             // xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
@@ -152,9 +152,34 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             // epaper.printLn();
 
             if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                (interval%2==0) ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();
-                _addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1   
-                _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+                _addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1  
+
+                if (interval%2==0) {
+                    i2c1.sensors.requestReadings();
+                } 
+                else if (interval%1==0) {
+                    i2c1.sensors.collectReadings(); 
+                    _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+
+                    if (interval%3==0) {
+                        char heapInfo[22];
+                        char networkInfo[64];
+                        sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
+                        uint64_t resetCount = storage.stoStat.resetCnt();
+                        sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
+
+                        _addDisplayQueues(networkInfo, 0);      //* LINE 0
+                        _addDisplayQueues(heapInfo, 6);         //* LINE 6
+                    }
+                    else if (interval%5==0) {
+                        char strOut[22];
+                        sprintf(strOut, "sd %luMB", storage.sd1.getCardSize());
+
+                        _addDisplayQueues(hostName, 0);         //* LINE 0
+                        _addDisplayQueues(strOut, 6);           //* LINE 6
+                    }
+                }
+
                 // epaper.printLn();
             } 
             else if (i2c1.dispMode == DISPLAY_2ND) {
