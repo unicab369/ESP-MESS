@@ -16,6 +16,7 @@ class Interface_Device {
 
         virtual void addDisplayQueues(String, uint8_t) {}
         virtual void addPlotterQueue(DataContent) {}
+        virtual void renderInterval(uint8_t interval)  {}
 
         virtual void updateTimer(time_t) {}
         virtual void handlePacket(ReceivePacket2*) {}
@@ -138,6 +139,29 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
         void toggleRelay() override {
             relay1.toggle();
         }
+
+        void renderInterval(uint8_t interval) override {
+            // bool checkConn = i2c2.ch32v.checkConnection();
+            // xLogf("I2C1 Connection = %d", checkConn);
+            // i2c2.ch32v.requestReadings();
+            // rtc2.run();
+            // String timeStr = i2c1.rtc.timeDisplay();
+            // // xLogf("TimeStr = %s", timeStr.c_str());
+            // Serial.println(timeStr);
+            // i2c1.as5600.run();
+            // epaper.printLn();
+
+            if (i2c1.dispMode == DISPLAY_DEFAULT) {
+                (interval%2==0) ? i2c1.sensors.requestReadings() : i2c1.sensors.collectReadings();
+                _addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1   
+                _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+                // epaper.printLn();
+            } 
+            else if (i2c1.dispMode == DISPLAY_2ND) {
+
+            }
+        }
+
 
         //! configure
         void configure() {

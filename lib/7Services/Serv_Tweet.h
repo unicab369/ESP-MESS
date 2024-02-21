@@ -8,8 +8,6 @@ class Serv_Tweet {
         Tweet_Attendant attendant;
         Tweet_Record record;
 
-        TweetRecordCb *tweetRecordCb;
-
         std::function<void()> setLadderIdCb = [&]() {
             // device->showLadderId();
         };
@@ -26,8 +24,6 @@ class Serv_Tweet {
             tweetSync.onTweet2 = onTweet2;
             record.onTweet2 = onTweet2;
             attendant.onTweet2 = onTweet2;
-
-            record.callback = tweetRecordCb;
         } 
 
         void updateChannel(uint8_t channel) {

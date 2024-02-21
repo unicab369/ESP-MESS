@@ -8,24 +8,12 @@
 AsyncTimer asyncTimer1;
 
 uint32_t loopCnt1 = 0, loopCnt2 = 0;
+uint8_t secondCounter = 0;
 
 class Mng_Runtime: public Loggable {
     //! MAIN JOB
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
-            Serial.printf("\n\nTimer0 = %lu", loopCnt1);
-            
-            uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-            Serial.printf("\nstackSize = %lu", stackUsage);
-            // String output = String(loopCnt1) + " " + String(stackUsage);
-            // runtime->device.i2c1.disp.printline(output, 0);
-            loopCnt1 = 0;
-            
-            // //! RUNTIME (inclusive): 1 second interval
-            // device.render1s_Interval(&asyncTimer1, &asyncTimer2, [&]() {
-                
-            // });
-
             // if (runTime->isSecondInterval(5)) {
             //     char hostName[22];
             //     strcpy(hostName, network.getHostName());
@@ -44,40 +32,12 @@ class Mng_Runtime: public Loggable {
             
             // //! Reset sensors reading every second
             // device.addStoreQueue();
-
-            // #ifndef ESP32 
-            //     network.handle_PollNetworkState();
-            // #endif
-            
-        } else {
-            // //! RUNTIME: 25ms intervals
-            // device.tick();
-
-            // // #ifndef ESP32
-            // //     device.runGroupTasks();
-            // // #endif
         }
     };
 
     //! SECONDARY JOB
     std::function<void(RunTimeModel*)> runtimeCb2 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {
-            Serial.printf("\n\nTimer1*** = %lu", loopCnt2);
-
-            uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-            Serial.printf("\nstackSize = %lu", stackUsage);
-            // String output = String(loopCnt2) + " " + String(stackUsage);
-            // runtime->device.i2c1.disp.printline(output, 1);
-
-            loopCnt2 = 0;
-
-            // //! RUNTIME: 1 second intervals
-            // network.handle_PollNetworkState();
-
-            // float temp, hum, lux;
-            // device.i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
-            // // wServer.refreshReadings(temp, hum, lux);
-
             // if (runTime->isSecondInterval(5)) {
             //     DataContent content;
 
@@ -104,9 +64,6 @@ class Mng_Runtime: public Loggable {
             // //     // network.iotPlotter(temp, hum, lux, 0, 0);
             // // }
 
-        } else {
-            //! RUNTIME: 25ms intervals
-            // device.runGroupTasks();
         }
     };
 
@@ -198,6 +155,11 @@ class Mng_Runtime: public Loggable {
 
                         // Serial.printf("\n\nTimer1*** = %lu; stack = %lu", loopCnt2, stackUsage);
                         loopCnt2 = 0;
+                        
+                        secondCounter++;
+                        if (secondCounter>59) secondCounter = 0;
+
+                        network->servWifi.interface->renderInterval(secondCounter);
 
                         network->handle_PollNetworkState();
                     }
@@ -224,6 +186,7 @@ class Mng_Runtime: public Loggable {
                 digitalWrite(22, !digitalRead(22));
                 timeRef = millis();
                 device.handleQueues();
+                device.i2c1.run();
             }
 
             device.runGroupTasks();

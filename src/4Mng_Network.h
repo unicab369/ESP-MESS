@@ -6,10 +6,6 @@ class Mng_Network {
     Net_Radio radio;
     Net_Lora lora;
     
-    TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
-        iotPlotter(val1, val2, val3, val4, val5);
-    };
-
     public:
         Serv_Network servWifi;
         
@@ -17,8 +13,6 @@ class Mng_Network {
         const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
 
         void setup(Serv_Device* device) {
-            servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER
-
             servWifi.onWifiConnected = [&]() {
                 char *dateStr = servWifi.interface->getDateStr();
                 AppPrint("\n[Runtime]", "configure storage path = " + String(dateStr));
