@@ -8,22 +8,11 @@ enum Network_State {
 };
 
 class Serv_Network: public Loggable {
-    // ReceivePacketCb tweetHandler = [&](ReceivePacket* packet) {
-    //     tweet.handleMessage(packet);
-    // };
-
-
     std::function<void(time_t*)> udpTimeRequestCb = [&](time_t* time) {
         time_t _time = *time;
         interface->updateTimer(_time);
         state = NETWORK_UDP_DONE;
-        // udp.reload(&tweetHandler);
     }; 
-
-    std::function<void(DataPacket2*)> onTweet2 = [&](DataPacket2* packet) {
-        espNow.send(packet, sizeof(DataPacket2));
-        // udp.broadcast(packet);
-    };
 
     std::function<void(uint8_t)> onReceiveBounce = [&](uint8_t destChannel) {
         if (scanChannel != destChannel) return;
@@ -89,27 +78,63 @@ class Serv_Network: public Loggable {
 
         std::function<void()> onWifiConnected = [](){};
 
-        void setupNetwork(Interface_Device* _interface) {
+        void setupNetwork(Interface_Device* _devInterface) {
             xLogSection(__func__);
-            interface = _interface;
-            tweet.setup(_interface, espNow.mac, &onTweet2);
+            interface = _devInterface;
+            tweet.setup(&espNow);
 
             espNow.callback = [&](ReceivePacket2* packet) {
                 DataContent content = packet->dataPacket.content;
 
                 switch (packet->dataPacket.info.sourceCmd) {
                     case CMD_TRIGGER: {
-                        interface->handlePacket(packet);
+                        CommandItem item = packet->dataPacket.content.commandItem;
+
+                        switch (item.cue) {
+                            case TRIGGER_STARTUP: {
+                                interface->addDisplayQueues("Recv Startup", 6);
+                                break;
+                            }
+                            case TRIGGER_SINGLECLICK: {
+                                char output[22];
+                                sprintf(output, "Recv Single: %lu", item.value);
+                                interface->addDisplayQueues(output, 6);
+                                // device->led.toggle();
+                                break;
+                            }
+                            case TRIGGER_DOUBLECLICK: {
+                                char output[22];
+                                sprintf(output, "Recv Double: %lu", item.value);
+                                interface->addDisplayQueues(output, 6);
+                                // device->led.repeatPulses(1000);
+                                break;  
+                            }
+                            case TRIGGER_PIR: {
+                                char output[22];
+                                sprintf(output, "Recv Pir: %lu", item.value);
+                                interface->addDisplayQueues(output, 6);
+                                break;
+                            }
+                            case TRIGGER_IR: {
+                                char output[22];
+                                sprintf(output, "Recv Ir: %lu", item.value);
+                                interface->addDisplayQueues(output, 6);
+                                break;
+                            }
+                            default: {
+                                interface->addDisplayQueues("Recv Unknown", 6);
+                            }
+                        }
+                        interface->addPlotterQueue(packet); break;
+                    }
+                    case CMD_POST: {
+                        interface->addDisplayQueues("Recv CMD_POST: ", 6);
                         interface->addPlotterQueue(packet); break;
                     }
                     case CMD_SYNC: {
                         interface->addDisplayQueues("Recv CMD_SYNC: ", 6);
                         break;
                         // tweetSync.handleMessage(&content.syncItem); break;
-                    }
-                    case CMD_POST: {
-                        interface->addDisplayQueues("Recv CMD_POST: ", 6);
-                        interface->addPlotterQueue(packet); break;
                     }
                     case CMD_ATTENDANT: {
                         interface->addDisplayQueues("Recv CMD_ATTENDANT: ", 6);

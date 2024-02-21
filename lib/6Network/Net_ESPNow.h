@@ -66,7 +66,18 @@ byte BROADCAST_ADDR[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
     #include <espnow.h>
 #endif
 
-class Net_EspNow {            
+class Interface_Net {
+    public:
+        virtual uint8_t* getMac() { 
+            uint8_t mac[6] = {0};
+            return mac; 
+        }
+
+        virtual void sendData(void* raw, size_t len) {}
+};
+
+
+class Net_EspNow: public Interface_Net {            
 	void addPeer(byte *peer, uint8_t channel) {
         AppPrint("[EspN]", __func__);
 		#ifdef ESP32
@@ -125,24 +136,18 @@ class Net_EspNow {
             isLoaded = true;
         }
 
-        void _send(DataPacket* packet) {
-            if (!isLoaded) { return; }
-            AppPrint("\n[EspN]", __func__);
-            esp_now_send(BROADCAST_ADDR, (uint8_t*) packet, sizeof(DataPacket));
-        }
-
-        void _send2(DataPacket2* packet) {
-            if (!isLoaded) { return; }
-            AppPrint("\n[EspN]", __func__);
-
-            AppPrint("IM HERE JJJJ");
-            AppPrintHex(packet, sizeof(DataPacket2));
-
-            esp_now_send(BROADCAST_ADDR, (uint8_t*) packet, sizeof(DataPacket2));
-        }
-
     public: 
         uint8_t mac[6];
+
+        uint8_t* getMac() override { return mac; }
+
+        void sendData(void* raw, size_t len) override {
+            if (!isLoaded) { return; }
+            // AppPrint("\n[EspN]", __func__);
+            // AppPrintHex(raw, len);
+            
+            esp_now_send(BROADCAST_ADDR, (uint8_t*) raw, len);
+        }
 
         void sendCustomPacket() {
             AppPrint("[EspN]", __func__);
@@ -161,14 +166,6 @@ class Net_EspNow {
                 uint8_t* pk = (uint8_t*)&packet;
                 wifi_send_pkt_freedom(pk, sizeof(packet), false);
             #endif
-        }
-
-        void send(void* raw, size_t len) {
-            if (!isLoaded) { return; }
-            // AppPrint("\n[EspN]", __func__);
-            // AppPrintHex(raw, len);
-            
-            esp_now_send(BROADCAST_ADDR, (uint8_t*) raw, len);
         }
 };
 

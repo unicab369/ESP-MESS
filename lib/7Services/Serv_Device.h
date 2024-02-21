@@ -206,43 +206,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
         //! Tweet CommandTrigger
         void handlePacket(ReceivePacket2* packet) {
-            CommandItem item = packet->dataPacket.content.commandItem;
-
-            switch (item.cue) {
-                case TRIGGER_STARTUP: {
-                    addDisplayQueues("Recv Startup", 6);
-                    break;
-                }
-                case TRIGGER_SINGLECLICK: {
-                    char output[22];
-                    sprintf(output, "Recv Single: %lu", item.value);
-                    addDisplayQueues(output, 6);
-                    // device->led.toggle();
-                    break;
-                }
-                case TRIGGER_DOUBLECLICK: {
-                    char output[22];
-                    sprintf(output, "Recv Double: %lu", item.value);
-                    addDisplayQueues(output, 6);
-                    // device->led.repeatPulses(1000);
-                    break;  
-                }
-                case TRIGGER_PIR: {
-                    char output[22];
-                    sprintf(output, "Recv Pir: %lu", item.value);
-                    addDisplayQueues(output, 6);
-                    break;
-                }
-                case TRIGGER_IR: {
-                    char output[22];
-                    sprintf(output, "Recv Ir: %lu", item.value);
-                    addDisplayQueues(output, 6);
-                    break;
-                }
-                default: {
-                    addDisplayQueues("Recv Unknown", 6);
-                }
-            }
             // storage.stoBehavior.handleCue(item->cue);
         }
 

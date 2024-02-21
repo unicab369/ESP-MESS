@@ -61,9 +61,11 @@ class Mng_Network {
 
         void handleRotary(RotaryDirection state, uint8_t counter) {
             if (state == CLOCKWISE) {
-                // tweet.command.sendIr(222333);   
+                // tweet.command.sendIr(222333);
+                servWifi.tweet.sendSyncMock(); 
             } else {
                 // tweet.attendant.startAttendant();
+                servWifi.tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
             }
         }
 

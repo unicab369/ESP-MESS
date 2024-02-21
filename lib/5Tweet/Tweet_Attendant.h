@@ -23,16 +23,10 @@ class Tweet_Attendant: public Interface_Tweet<AttedantItem, CMD_ATTENDANT> {
         sendMessage2();
     }
 
-    std::function<void()> *setLadderIdCallback;
-
     public:
         bool isMaster() { return ladderId == 1; }
         uint16_t ladderId = 0;
-
-        void reconfigure(uint8_t *mac, std::function<void()> *setLadderIdCb) {
-            setup(mac);
-            setLadderIdCallback = setLadderIdCb;
-        }
+        std::function<void()> *setLadderIdCallback;
 
         void startAttendant() {
             AppPrint("[TwAttendant]", __func__);
@@ -58,12 +52,12 @@ class Tweet_Attendant: public Interface_Tweet<AttedantItem, CMD_ATTENDANT> {
                 if (ladderId == 0) {
                     //! unassigned_slave sends SLAVE_PROPOSE command
                     AppPrint("[Mesh] SLAVE_PROPOSE Send");
-                    item.setTarget(myMac);
+                    item.setTarget(interface->getMac());
                     send(SLAVE_PROPOSE);
                 } else if (isMatched) {
                     //! maching slave sends SLAVE_CLAIM command
                     AppPrint("[Mesh] SLAVE_CLAIM Send");
-                    item.setTarget(myMac);
+                    item.setTarget(interface->getMac());
                     send(SLAVE_CLAIM);
                 }
 
@@ -103,6 +97,8 @@ class Tweet_Attendant: public Interface_Tweet<AttedantItem, CMD_ATTENDANT> {
                 if (!isMaster()) {
                     //! Slave receives MASTER_ASSIGN command
                     AppPrint("[Mesh] MASTER_ASSIGN Received", String(item.next_ladderId));
+                    uint8_t* myMac = interface->getMac();
+                    
                     if (item.checkTarget(myMac)) {
                         //! if the targetMac matches the current slaveMac, send SLAVE_CONFIRM command
                         String str = String(myMac[0]) + ":" + String(myMac[1]) + ":" + String(myMac[2])

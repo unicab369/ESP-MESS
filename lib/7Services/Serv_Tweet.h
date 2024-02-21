@@ -1,7 +1,5 @@
 
 class Serv_Tweet {
-    Interface_Device *interface;
-
     public:
         Tweet_Sync tweetSync;
         Tweet_Command command;
@@ -12,18 +10,12 @@ class Serv_Tweet {
             // device->showLadderId();
         };
 
-        void setup(Interface_Device *_interface, uint8_t *mac, std::function<void(DataPacket2*)> *onTweet2) {
-            attendant.reconfigure(mac, &setLadderIdCb);
-            command.reconfigure(mac);
-            tweetSync.setup(mac);
-            record.setup(mac);
+        void setup(Interface_Net *interface) {
+            attendant.setup(interface);
+            command.setup(interface);
+            tweetSync.setup(interface);
+            record.setup(interface);
             command.sendStartup();
-            interface = _interface;
-
-            command.onTweet2 = onTweet2;
-            tweetSync.onTweet2 = onTweet2;
-            record.onTweet2 = onTweet2;
-            attendant.onTweet2 = onTweet2;
         } 
 
         void updateChannel(uint8_t channel) {

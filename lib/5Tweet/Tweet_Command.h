@@ -1,9 +1,5 @@
 class Tweet_Command: public Interface_Tweet<CommandItem, CMD_TRIGGER> {
     public:
-        void reconfigure(uint8_t *mac) {
-            setup(mac);
-        }
-
         void sendStartup() {
             item.update(TRIGGER_STARTUP);
             sendMessage2();

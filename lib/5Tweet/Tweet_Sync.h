@@ -8,7 +8,7 @@ class Tweet_Sync: public Interface_Tweet<SyncItem, CMD_SYNC> {
             item.cue = SYNC_MOCK;
             item.srcChannel = myChannel;
             item.timeStamp = millis();
-            item.setSource(myMac);
+            item.setSource(interface->getMac());
             sendMessage2(55);
         }
 
@@ -28,7 +28,7 @@ class Tweet_Sync: public Interface_Tweet<SyncItem, CMD_SYNC> {
                 case SYNC_BOUNCE: {
                     //! Master received
                     AppPrint("\n[TwSync] SYNC_BOUNCE received");
-                    if (receivedItem->checkSource(myMac)) {
+                    if (receivedItem->checkSource(interface->getMac())) {
                         uint32_t transTime = receivedItem->getTransmitTime();
                         Serial.print("transTime = "); Serial.println(transTime);
 

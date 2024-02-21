@@ -91,7 +91,7 @@ class Mng_Runtime: public Loggable {
             };
 
             device.onHandleRotary = [&](RotaryDirection state, uint8_t counter) {
-                // network.handleRotary(state, counter);      // network message
+                network.handleRotary(state, counter);      // network message
             };
 
             device.onHandleResetWifi = [&]() {
