@@ -190,7 +190,6 @@ AppQueue<ReceivePacket2, MAX_MSG_QUEUE> msgQueue2;
 #endif
 
 class Serv_EspNow: public Net_EspNow {
-    ReceivePacketCb *callback; 
     uint32_t selectedChannel = 1;
 
     void reload() {
@@ -198,7 +197,7 @@ class Serv_EspNow: public Net_EspNow {
     }
 
     public:
-        std::function<void(ReceivePacket2*)> *callback2;
+        std::function<void(ReceivePacket2*)> callback = [](ReceivePacket2*){};
         
         void rollChannel() {
             selectedChannel++;
@@ -218,10 +217,9 @@ class Serv_EspNow: public Net_EspNow {
         }
 
         void run() {
-            if (callback2 == nullptr) return;
             ReceivePacket2 item;
             while (msgQueue2.getQueue(&item)) {
-                (*callback2)(&item);
+                callback(&item);
             }
         }
 };

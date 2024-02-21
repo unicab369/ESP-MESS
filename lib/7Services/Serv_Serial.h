@@ -24,6 +24,7 @@ class Serv_Serial: public Loggable {
             xLogSection(__func__);
             
             rtc2.setup();
+            storage.setupStorage();
 
             //! setup i2C
             if (conf->checkWire0()) {
@@ -31,33 +32,26 @@ class Serv_Serial: public Loggable {
                 appClock.setup(&(i2c1.rtc));                    //! ORDER DOES MATTER
             }
 
+            #ifdef ESP32
+                if (conf->checkWire1()) {
+                    i2c2.setup(conf->scl1, conf->sda1, &Wire1);
+                }
+            #endif
 
-            // #ifdef ESP32
-            //     if (conf->checkWire1()) {
-            //         // pinMode(14, OUTPUT);
-            //         // pinMode(36, INPUT);
-            //         // pinMode(39, INPUT);
-            //         i2c2.setup(conf->scl1, conf->sda1, &Wire1);
-            //     }
-            // #endif
+            if (conf->checkHSPIPins()) {
+                MY_ESP.printSPIPins();
+                appTimer0.logElapse("LogTime until Storage");
 
-            // storage.setupStorage();
+                #ifdef ESP32
+                    SPI.begin(conf->sck0, conf->miso0, conf->mosi0);
+                #else
+                    SPI.begin();
+                #endif
+                storage.setupSDCard(conf->cs1);
 
-            // if (conf->checkHSPIPins()) {
-            //     MY_ESP.printSPIPins();
-
-            //     appTimer0.logElapse("LogTime until Storage");
-
-            //     #ifdef ESP32
-            //         SPI.begin(conf->sck0, conf->miso0, conf->mosi0);
-            //     #else
-            //         SPI.begin();
-            //     #endif
-            //     storage.setupSDCard(conf->cs1);
-
-            //     largeDisp.setup2(conf->cs0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0);
-            //     // epaper.setup();
-            // }
+                largeDisp.setup2(conf->cs0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0);
+                // epaper.setup();
+            }
         }
 
         //! 1 Second Interval

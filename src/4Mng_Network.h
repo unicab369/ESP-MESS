@@ -10,25 +10,6 @@ class Mng_Network {
         iotPlotter(val1, val2, val3, val4, val5);
     };
 
-    std::function<void(ReceivePacket2*)> onHandleTweet = [&](ReceivePacket2* packet) {
-        DataContent& content = packet->dataPacket.content;
-
-        switch (packet->dataPacket.info.sourceCmd) {
-            case CMD_POST: {
-                break;
-            }
-            default: break;
-        }
-    };
-
-    std::function<void()> onWifiConnected = [&]() {
-        AppPrintSeparator("[Runtime]", "network configured");
-        char *dateStr = servWifi.interface->getDateStr();
-        AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
-        servWifi.interface->getStorage()->loadStoragePath(dateStr);
-        AppPrintHeap();
-    };
-
     public:
         Serv_Network servWifi;
         
@@ -36,8 +17,15 @@ class Mng_Network {
         const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
 
         void setup(Serv_Device* device) {
-            servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
-            servWifi.onWifiConnected = &onWifiConnected;
+            servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER
+
+            servWifi.onWifiConnected = [&]() {
+                char *dateStr = servWifi.interface->getDateStr();
+                AppPrint("\n[Runtime]", "configure storage path = " + String(dateStr));
+                servWifi.interface->getStorage()->loadStoragePath(dateStr);
+                AppPrintHeap();
+            };
+
             servWifi.setupNetwork(device);
             wServer.setup(&servWifi);
         }

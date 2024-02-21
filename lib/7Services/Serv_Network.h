@@ -12,9 +12,6 @@ class Serv_Network: public Loggable {
     //     tweet.handleMessage(packet);
     // };
 
-    std::function<void(ReceivePacket2*)> onEspNowCallback = [&](ReceivePacket2* packet) {
-        tweet.handleMessage(packet);
-    };
 
     std::function<void(time_t*)> udpTimeRequestCb = [&](time_t* time) {
         time_t _time = *time;
@@ -46,18 +43,18 @@ class Serv_Network: public Loggable {
             AppPrint("IP Addr", wifi.localIp());
             
             udp.requestTime(&udpTimeRequestCb);
-            tweet.updateChannel(WiFi.channel());
+            // tweet.updateChannel(WiFi.channel());
 
             //! load ESPNow callback
             espNow.setup(WiFi.channel());
-            if (*onWifiConnected) (*onWifiConnected)();
+            onWifiConnected();
 
         } else if (retryCnt < 1) {
             output = "[Wifi] Err: Timeout";
             state = NETWORK_FAILED;
 
             //! load tweetSync callback
-            tweet.tweetSync.onReceiveBounce = &onReceiveBounce;
+            // tweet.tweetSync.onReceiveBounce = &onReceiveBounce;
 
             // //! load ESPNow callback
             espNow.setup(WiFi.channel()); 
@@ -91,7 +88,7 @@ class Serv_Network: public Loggable {
         uint8_t scanChannel = 0;
 
         const char* getHostName() { return wifi.getHostName(); }
-        std::function<void()> *onWifiConnected;
+        std::function<void()> onWifiConnected = [](){};
 
         void setupNetwork(Interface_Device* _interface) {
             xLogSection(__func__);
@@ -99,8 +96,9 @@ class Serv_Network: public Loggable {
             tweet.setup(_interface, espNow.mac, &onTweet2);
             resetWifi();
 
-            //! load ESPNow callback
-            espNow.callback2 = &onEspNowCallback;
+            espNow.callback = [&](ReceivePacket2* packet) {
+                tweet.handleMessage(packet);
+            };
 
             // radio.setup(5, 2);
             // const char *mqtt = "10.0.0.5";

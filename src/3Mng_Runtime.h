@@ -185,7 +185,7 @@ class Mng_Runtime: public Loggable {
 
                         
                     }
-                }, "core0_Task2", 7000, &network, 1, NULL, 0);
+                }, "core0_Task2", 15000, &network, 1, NULL, 0);
 
                 xTaskCreatePinnedToCore([](void *pvParam){
                     Mng_Network* network = (Mng_Network*)pvParam;
@@ -220,7 +220,7 @@ class Mng_Runtime: public Loggable {
         void runJob2() {
             loopCnt2++;
 
-            if (millis() - timeRef > 50) {
+            if (millis() - timeRef > 100) {
                 digitalWrite(22, !digitalRead(22));
                 timeRef = millis();
                 device.handleQueues();

@@ -206,7 +206,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                 if (strcmp(inputStr, "ping") == 0)  {
                     Serial.println("What is thy bidding my Master?");
                 }       
-                else if (strcmp("resetWifi", inputStr) == 0) {
+                else if (strcmp("wifiReset", inputStr) == 0) {
                     onHandleResetWifi();
                 }
                 else if (strcmp("startAP", inputStr) == 0) {

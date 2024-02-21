@@ -61,8 +61,8 @@ class Serv_Tweet {
                     interface->addPlotterQueue(content);
                 }
                 case CMD_ATTENDANT: {
-                    addDisplayQueues("Recv CMD_ATTENDANT: ");
-                    attendant.handleMessage(packet); break;
+                    // addDisplayQueues("Recv CMD_ATTENDANT: ");
+                    // attendant.handleMessage(packet); break;
                 }
             }
         }
