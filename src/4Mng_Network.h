@@ -1,165 +1,103 @@
-#ifdef CONFIG_IDF_TARGET_ESP32C3
-    #include <Net_Bluetooth.h>
-    class Mng_Network {
-        Net_Bluetooth bluetooth;
 
-        public:
-            const char* getHostName()   { return "hostName"; }
-            const char* getNetworkId()  { return "netId"; }
+#include "7WebServer/Web_Server.h"      // Flash +6%
 
-            void setup(Serv_Device* device) {
-                bluetooth.setup();
-            }
-
-            //! iotPlotter
-            void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
-
-            }
-
-            void handleSingleClick() {
-                // char myStr[] = "Hello There!";
-                // lora.sendData(myStr);
-            }
-
-            void handleDoubleClick() {
-
-            }
-
-            void handle_1secInterval() {
-                // appTimer0.reset();
-                // packetAnalyzer.draw(&(device->i2c1.disp));
-                // AppPrint("1 anaylyzeTime", timer.elapsed());
-            }
-
-            void handle_1secInterval_job2() {
-
-            }
-
-            void handleRotary(RotaryDirection state, uint8_t counter) {
-                if (state == CLOCKWISE) {
-                    // tweet.command.sendIr(222333);   
-                } else {
-                    // tweet.attendant.startAttendant();
-                }
-            }
-
-            void startAP(bool forceReset) {
-
-            }
-
-            void resetWifi() {
-                
-            }
-
-            void run() { 
-                // bluetooth.scanForDevice("98:89:13:0a:4e:36");
-                // bluetooth.run();
-                // bluetooth.connectToDevice("JDY-", true);
-            }
+class Mng_Network {
+    Web_Server wServer;
+    Net_Radio radio;
+    Net_Lora lora;
+    
+    TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
+        iotPlotter(val1, val2, val3, val4, val5);
     };
-#else
-    #include "7WebServer/Web_Server.h"      // Flash +6%
 
-    class Mng_Network {
-        Web_Server wServer;
-        Net_Radio radio;
-        Net_Lora lora;
+    std::function<void(ReceivePacket2*)> onHandleTweet = [&](ReceivePacket2* packet) {
+        DataContent& content = packet->dataPacket.content;
+
+        switch (packet->dataPacket.info.sourceCmd) {
+            case CMD_POST: {
+                break;
+            }
+            default: break;
+        }
+    };
+
+    std::function<void()> onWifiConnected = [&]() {
+        AppPrintSeparator("[Runtime]", "network configured");
+        char *dateStr = servWifi.interface->getDateStr();
+        AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
+        servWifi.interface->getStorage()->loadStoragePath(dateStr);
+        AppPrintHeap();
+    };
+
+    public:
+        Serv_Network servWifi;
         
-        TweetRecordCb tweetRecordHandler = [&](float val1, float val2, float val3, float val4, float val5) {
-            iotPlotter(val1, val2, val3, val4, val5);
-        };
+        const char* getHostName()   { servWifi.getHostName(); }
+        const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
 
-        std::function<void(ReceivePacket2*)> onHandleTweet = [&](ReceivePacket2* packet) {
-            DataContent& content = packet->dataPacket.content;
+        void setup(Serv_Device* device) {
+            servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
+            servWifi.onWifiConnected = &onWifiConnected;
+            servWifi.setupNetwork(device);
+            wServer.setup(&servWifi);
+        }
 
-            switch (packet->dataPacket.info.sourceCmd) {
-                case CMD_POST: {
-                    break;
-                }
-                default: break;
+        //! iotPlotter
+        void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
+            Mng_Storage *storage = servWifi.interface->getStorage();
+            Data_Settings settings = storage->stoSettings.value;
+            Data_IotPlotter plotter = storage->stoPlotter.value;
+
+            // Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
+
+            if (settings.remotePlot) {
+                wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
             }
-        };
+        }
 
-        std::function<void()> onWifiConnected = [&]() {
-            AppPrintSeparator("[Runtime]", "network configured");
-            char *dateStr = servWifi.interface->getDateStr();
-            AppPrint("\[Runtime]", "configure storage path = " + String(dateStr));
-            servWifi.interface->getStorage()->loadStoragePath(dateStr);
-            AppPrintHeap();
-        };
+        void handleSingleClick() {
+            servWifi.tweet.command.sendSingleClick(22);
+            servWifi.tweet.sendSyncMock();
+            // espNow.sendCustomPacket();
+        }
 
-        public:
-            Serv_Network servWifi;
-            
-            const char* getHostName()   { servWifi.getHostName(); }
-            const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
+        void handleDoubleClick() {
+            servWifi.tweet.command.sendDoubleClick(33);
+            servWifi.tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
+        }
 
-            void setup(Serv_Device* device) {
-                servWifi.tweet.tweetRecordCb = &tweetRecordHandler;      //! ORDER DOES MATTER: need to assign callback bc it gets pass on
-                servWifi.onWifiConnected = &onWifiConnected;
-                servWifi.setupNetwork(device);
-                wServer.setup(&servWifi);
+        void handle_1secInterval() {
+            // appTimer0.reset();
+            // packetAnalyzer.draw(&(device->i2c1.disp));
+            // AppPrint("1 anaylyzeTime", timer.elapsed());
+        }
+
+        void handle_PollNetworkState() {
+            Network_State state = servWifi.pollNetworkState();
+            if (state != NETWORK_FAILED && state != NETWORK_READY) return;
+        }
+
+        void handleRotary(RotaryDirection state, uint8_t counter) {
+            if (state == CLOCKWISE) {
+                // tweet.command.sendIr(222333);   
+            } else {
+                // tweet.attendant.startAttendant();
             }
+        }
 
-            //! iotPlotter
-            void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
-                Mng_Storage *storage = servWifi.interface->getStorage();
-                Data_Settings settings = storage->stoSettings.value;
-                Data_IotPlotter plotter = storage->stoPlotter.value;
+        void startAP(bool forceReset) {
+            servWifi.wifi.startAP(forceReset, servWifi.scanChannel);
+            servWifi.espNow.changeChannel(servWifi.scanChannel);
+        }
 
-                // Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
+        void resetWifi() {
+            servWifi.resetWifi();        //! Reset Wifi
+        }
 
-                if (settings.remotePlot) {
-                    wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
-                }
-            }
-
-            void handleSingleClick() {
-                // char myStr[] = "Hello There!";
-                // lora.sendData(myStr);
-                servWifi.tweet.command.sendSingleClick(22);
-                servWifi.tweet.sendSyncMock();
-                // espNow.sendCustomPacket();
-            }
-
-            void handleDoubleClick() {
-                servWifi.tweet.command.sendDoubleClick(33);
-                servWifi.tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
-            }
-
-            void handle_1secInterval() {
-                // appTimer0.reset();
-                // packetAnalyzer.draw(&(device->i2c1.disp));
-                // AppPrint("1 anaylyzeTime", timer.elapsed());
-            }
-
-            void handle_1secInterval_job2() {
-                Network_State state = servWifi.pollNetworkState();
-                if (state != NETWORK_FAILED && state != NETWORK_READY) return;
-            }
-
-            void handleRotary(RotaryDirection state, uint8_t counter) {
-                if (state == CLOCKWISE) {
-                    // tweet.command.sendIr(222333);   
-                } else {
-                    // tweet.attendant.startAttendant();
-                }
-            }
-
-            void startAP(bool forceReset) {
-                servWifi.wifi.startAP(forceReset, servWifi.scanChannel);
-                servWifi.espNow.changeChannel(servWifi.scanChannel);
-            }
-
-            void resetWifi() {
-                servWifi.resetWifi();        //! Reset Wifi
-            }
-
-            void run() { 
-                servWifi.udp.run();
-                servWifi.espNow.run();
-                wServer.run();
-                // radio.run();
-            }
-    };
-#endif
+        void run() { 
+            servWifi.udp.run();
+            servWifi.espNow.run();
+            wServer.run();
+            // radio.run();
+        }
+};

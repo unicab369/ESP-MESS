@@ -37,23 +37,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
         Serial.print(" | "); Serial.println(status);
     };
 
-    //! RotaryEncoder Callback
-    std::function<void(RotaryDirection, uint16_t)> rotaryCb = [&](RotaryDirection state, uint16_t counter) {
-        #ifdef ESP32
-            String readings = "IO36=" + String(digitalRead(36)) + " IO39=" + String(digitalRead(39));
-            AppPrint("\nRead ", readings);
-            addDisplayQueues(readings, 5);
-        #endif
-
-        String dir = (state == CLOCKWISE) ? "CW" : "CCW";
-        String output =  "val=" + String(counter) + " Dir=" + dir;
-        AppPrint("[Rot]", output);
-        addDisplayQueues(output, 6);       // display
-
-        // i2c1.pca96.drivePWM(0, counter);
-        onHandleRotary(state, counter);
-    };
-
     BNT_Hold releasedState = HOLD_TRANSITION;
 
     //! ButtonPress Callback
@@ -117,22 +100,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
         }
     };
 
-    //! storeCred Callback
-    std::function<void(char*)> parseStringCb = [&](char* inputStr) {
-        if (strcmp("resetWifi", inputStr) == 0) {
-            onHandleResetWifi();
-        }
-        else if (strcmp("startAP", inputStr) == 0) {
-            onHandleStartAP();
-        }
-        else if (storage.handleConsoleCmd(inputStr) == RESET_WIFI) {
-        } 
-
-        // if (handleConsoleCmd(inputStr)) {
-        //     return;
-        // }
-    };
-
     public:
         Serv_Device(): Serv_Serial() {}
 
@@ -180,8 +147,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             irSwitch.callback = &irSwitchCb;
             edgeDetector.callback = &pirCb;
             button1.callback = &buttonCb;
-            rotary.onCallback = &rotaryCb;
-            serial.onParseString = &parseStringCb;
         }
 
         //! Tweet CommandTrigger
@@ -224,17 +189,39 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
         void runGroupTasks() {
             button1.run();
-            irSwitch.run(); 
-            led.run();
-            ws2812.run();
-            serial.run();
-            xSerial.run();
+
+            //! Rotary Encoder
+            rotary.run([&](RotaryDirection state, uint16_t counter) {
+                String dir = (state == CLOCKWISE) ? "CW" : "CCW";
+                String output =  "val=" + String(counter) + " Dir=" + dir;
+                AppPrint("\n[Rot]", output);
+                addDisplayQueues(output, 6);       // display
+
+                // i2c1.pca96.drivePWM(0, counter);
+                onHandleRotary(state, counter);
+            });
+
+            //! Serial
+            serial.run([&](char* inputStr) {
+                if (strcmp(inputStr, "ping") == 0)  {
+                    Serial.println("What is thy bidding my Master?");
+                }       
+                else if (strcmp("resetWifi", inputStr) == 0) {
+                    onHandleResetWifi();
+                }
+                else if (strcmp("startAP", inputStr) == 0) {
+                    onHandleStartAP();
+                }
+                else if (storage.handleConsoleCmd(inputStr) == RESET_WIFI) {
+                } 
+            });
+
+            // irSwitch.run(); 
+            // led.run();
+            // ws2812.run();
+            // xSerial.run();
 
             // buzzer.run();
             // edgeDetector.run();
-        }
-
-        void runMainTask2() {
-            rotary.run();
         }
 };

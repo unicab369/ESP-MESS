@@ -58,8 +58,8 @@ class MyButton: private PinReadable, public Loggable {
 
         MyButton(): Loggable("Bnt") {}
 
-        void setup(uint8_t pin, uint32_t debounceTicks = 50, 
-                            uint32_t clickTicks = 200, uint32_t longPressTicks = 2000) {
+        void setup(uint8_t pin, uint32_t debounceTicks = 20, 
+                            uint32_t clickTicks = 170, uint32_t longPressTicks = 2000) {
             pin_setup(pin, true);
             if (!isValid()) { return; }
             debounce_timer.load(debounceTicks);

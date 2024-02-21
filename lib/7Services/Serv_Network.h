@@ -48,7 +48,7 @@ class Serv_Network: public Loggable {
             udp.requestTime(&udpTimeRequestCb);
             tweet.updateChannel(WiFi.channel());
 
-            // //! load ESPNow callback
+            //! load ESPNow callback
             espNow.setup(WiFi.channel());
             if (*onWifiConnected) (*onWifiConnected)();
 
@@ -133,7 +133,7 @@ class Serv_Network: public Loggable {
                 }
 
                 case NETWORK_START: {
-                    checkWifi(); 
+                    checkWifi();        // -> NETWORK_READY or NETWORK_FAILED
                     break;
                 } 
                 default: break;

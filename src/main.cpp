@@ -23,31 +23,17 @@ void setup() {
   // disp.setup(&Wire);
   // pinMode(12, OUTPUT);
 
-  #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-    xTaskCreatePinnedToCore([](void *pvParam) {
-      for (;;) { 
-        runTime.runJob1();
-      }
-    }, "loopCore0", 10000, NULL, 1, NULL, 0);
-
-    xTaskCreatePinnedToCore([](void *pvParam) {
-      for (;;) { 
-        runTime.runJob2();
-      }
-    }, "loopCore1", 5000, NULL, 1, NULL, 1);
-  #else
-    for(;;) {
-      //! should not be called for ESP32 duo cores
+  xTaskCreatePinnedToCore([](void *pvParam) {
+    while(1) { 
       runTime.runJob1();
-      runTime.runJob2();
-      // bluetooth.connectToDevice("JDY-", true);
-      // String output = "count="+String(counter);
-      // disp.printline(myChar, 0);
-      // disp.printline(output, 1);
-      // digitalWrite(12, !digitalRead(12));
-      // counter++;
     }
-  #endif
+  }, "loopCore0", 10000, NULL, 0, NULL, 0);
+
+  xTaskCreatePinnedToCore([](void *pvParam) {
+    while(1) {
+      runTime.runJob2();
+    }
+  }, "loopCore1", 10000, NULL, 1, NULL, 1);
 } 
 
 void loop() {

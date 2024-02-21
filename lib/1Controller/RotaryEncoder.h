@@ -15,7 +15,7 @@ class RotaryEncoder: public Loggable {
 
    public:
       bool isEnabled = false;
-      std::function<void(RotaryDirection, uint16_t)> *onCallback;
+      // std::function<void(RotaryDirection, uint16_t)> onCallback = [](RotaryDirection, uint16_t){};
 
       RotaryEncoder(): Loggable("Rotary") {}
 
@@ -30,21 +30,20 @@ class RotaryEncoder: public Loggable {
          isEnabled = true;
       }
 
-      void run() {
-         if (onCallback == nullptr || !pinA.hasChanged() || !isEnabled) return;
+      void run(std::function<void(RotaryDirection, uint16_t)> onCallback) {
+         if (!pinA.hasChanged() || !isEnabled) return;
          rotaryState = (pinA.compareToCurrentRead(pinB.pin_read())) ? COUNTERCLOCKWISE : CLOCKWISE;
          counter += (rotaryState*increment);
 
          if (counter < minMax.min) {
-               counter = minMax.min;
+            counter = minMax.min;
          } else if (counter > minMax.max) {
-               counter = minMax.max;
+            counter = minMax.max;
          }
 
          timer.onTimeoutWithReset(100, [&]() {
-               (*onCallback)(rotaryState, counter); 
+            onCallback(rotaryState, counter); 
          });
       }
-         
 };
 

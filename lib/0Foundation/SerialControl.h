@@ -5,18 +5,18 @@ class SerialControl: public Loggable {
    char inputString[124] = "";
 
    public:
-      std::function<void(char*)> *onParseString;
+      // std::function<void(char*)> onParseString = [](char*){};
       
       SerialControl(): Loggable("Serial") {}
 
-   void run() {
-      if (!Serial.available() || onParseString == nullptr) return;
+   void run(std::function<void(char*)> onParseString) {
+      if (!Serial.available()) return;
 
       while (Serial.available()) {
          char c = Serial.read();
 
          if (c == '\n' || c == '\r') {
-            (*onParseString)(inputString);
+            onParseString(inputString);
 
             //! clear the character one by one, just printing an emptyString wont do it
             for (int i = 0; i < 124; i++) {

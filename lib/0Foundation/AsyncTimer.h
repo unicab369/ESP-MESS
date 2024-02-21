@@ -87,38 +87,38 @@ struct RunTimeModel {
 #endif
 
 class AsyncTimer {
-    uint32_t timeRef = 0;
+    uint32_t timeRef = millis();
     std::function<void(RunTimeModel*)>* callback;
     uint8_t coreId;
-    uint16_t lastRead = 0;
+    uint16_t lastRead = 2;
 
     public:
-        uint32_t stackUsage = 0;
         RunTimeModel model;
-        
-        String record() { return model.getRecords(); }
+        uint32_t stackUsage = 0; 
 
-        void setup(std::function<void(RunTimeModel*)> *cb) {
-            // timeRef = millis();
-            callback = cb;
-        }
+        String record() { return model.getRecords(); }
         
-        void run() {
+        void run(std::function<void(RunTimeModel*)> callback) {
             model.countCycle();     // get Reset every second
             // if (callback == nullptr) return;
-            // uint32_t startTime = millis();
-            // uint32_t timeDif = startTime - timeRef;
-
-            if (model.millisec == lastRead || callback == nullptr) return;
-            // if (timeDif < model.millisec + 25) return;
-            // model.millisec +=25;
-
             uint32_t startTime = millis();
+            uint32_t timeDif = startTime - timeRef;
+
+            // if (model.millisec == lastRead) {
+            //     return;
+            // } 
+            if (startTime - timeRef > model.millisec + 25) {
+                model.millisec +=25;
+            } 
+            // else {
+            //     return;
+            // }
             
-            if (model.millisec >= 1000) {                
+            if (model.millisec >= 1000) {
                 #ifdef ESP32
                     stackUsage = uxTaskGetStackHighWaterMark(NULL);
-                    // Serial.print("Core# = "); Serial.println(xPortGetCoreID());
+                    // Serial.printf("Core# = %lu; stackUsage = %lu", xPortGetCoreID(), stackUsage); 
+
                     // feed the WDT to prevent crash
                     // if (xPortGetCoreID() == 0) {
                     //     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
@@ -132,11 +132,11 @@ class AsyncTimer {
                 #endif
     
                 model.updateSeconds();      // ORDER DOES MATTER: update seconds before processCb
-                (*callback)(&model);        // ORDER DOES MATTER: Pinning!
+                callback(&model);        // ORDER DOES MATTER: Pinning!
                 model.resetFlags();         // ORDER DOES MATTER: reset flags after processCb 
                 timeRef = millis();      // ORDER DOES MATTER: reset timeRef if seconds changed
             } else {
-                (*callback)(&model);
+                callback(&model);
             }
 
             model.updateMaxLoopTime(startTime);

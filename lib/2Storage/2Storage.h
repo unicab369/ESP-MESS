@@ -278,7 +278,6 @@ class Mng_Storage: public Loggable {
          }
 
          xLogf("%s %s", __func__, inputStr);
-         if (strcmp(inputStr, "ping") == 0)        Serial.println("What is thy bidding my Master?");
          if (strcmp(inputStr, "deleteAll") == 0)   deleteAllData();
 
          //# Credential
