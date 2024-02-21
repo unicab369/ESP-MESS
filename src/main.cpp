@@ -27,13 +27,13 @@ void setup() {
     while(1) { 
       runTime.runJob1();
     }
-  }, "loopCore0", 10000, NULL, 0, NULL, 0);
+  }, "Core0_TaskA", 10000, NULL, 0, NULL, 0);
 
   xTaskCreatePinnedToCore([](void *pvParam) {
     while(1) {
       runTime.runJob2();
     }
-  }, "loopCore1", 10000, NULL, 1, NULL, 1);
+  }, "Core1_TaskA", 10000, NULL, 1, NULL, 1);
 } 
 
 void loop() {

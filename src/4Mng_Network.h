@@ -10,7 +10,7 @@ class Mng_Network {
         Serv_Network servWifi;
         
         const char* getHostName()   { return servWifi.wifi.hostName; }
-        const char* getNetworkId()  { return servWifi.wifi.localIp().c_str(); }
+        const char* getNetworkId()  { return servWifi.wifi.localIp(); }
 
         void setup(Serv_Device* device) {
             servWifi.onWifiConnected = [&]() {
@@ -39,13 +39,13 @@ class Mng_Network {
 
         void handleSingleClick() {
             servWifi.tweet.command.sendSingleClick(22);
-            servWifi.tweet.sendSyncMock();
+            // servWifi.tweet.sendSyncMock();
             // espNow.sendCustomPacket();
         }
 
         void handleDoubleClick() {
             servWifi.tweet.command.sendDoubleClick(33);
-            servWifi.tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
+            // servWifi.tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
         }
 
         void handle_1secInterval() {

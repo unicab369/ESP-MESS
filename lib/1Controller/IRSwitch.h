@@ -7,7 +7,6 @@ class IRSwitch {
     unsigned long timeRef = 0;
 
     public:
-        std::function<void(bool, uint32_t)> *callback;
         uint16_t receiveCounter = 0;
 
         void load(uint8_t _pin) {
@@ -23,16 +22,16 @@ class IRSwitch {
             IrReceiver.begin(pin, ENABLE_LED_FEEDBACK);
         }
 
-        void run() {
+        void run(std::function<void(bool, uint32_t)> callback) {
             if (receiveCounter == 0 || callback == nullptr || IrReceiver.decode() == false) return;
-            (*callback)(true, IrReceiver.decodedIRData.decodedRawData);
+            callback(true, IrReceiver.decodedIRData.decodedRawData);
             IrReceiver.resume();
 
             if (receiveCounter > IR_RECEIVE_THRESDHOLD) {
                 unsigned long timeDif = millis()-timeRef;
 
                 if (timeDif>1000) {
-                    (*callback)(false, 0);
+                    callback(false, 0);
                     IrReceiver.stop();
                     receiveCounter = 0;
                 } else {

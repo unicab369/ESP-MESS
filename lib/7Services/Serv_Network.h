@@ -61,7 +61,7 @@ class Serv_Network: public Loggable {
         } 
         
         xLog(output.c_str());
-        interface->addDisplayQueues(output, 6);    //* LINE 6
+        interface->addDisplayQueues(output.c_str(), 6);    //* LINE 6
     }
 
     void scanChannels() {
@@ -93,11 +93,33 @@ class Serv_Network: public Loggable {
             xLogSection(__func__);
             interface = _interface;
             tweet.setup(_interface, espNow.mac, &onTweet2);
-            resetWifi();
 
             espNow.callback = [&](ReceivePacket2* packet) {
-                tweet.handleMessage(packet);
+                DataContent content = packet->dataPacket.content;
+
+                switch (packet->dataPacket.info.sourceCmd) {
+                    case CMD_TRIGGER: {
+                        interface->handlePacket(packet);
+                        interface->addPlotterQueue(packet); break;
+                    }
+                    case CMD_SYNC: {
+                        interface->addDisplayQueues("Recv CMD_SYNC: ", 6);
+                        break;
+                        // tweetSync.handleMessage(&content.syncItem); break;
+                    }
+                    case CMD_POST: {
+                        interface->addDisplayQueues("Recv CMD_POST: ", 6);
+                        interface->addPlotterQueue(packet); break;
+                    }
+                    case CMD_ATTENDANT: {
+                        interface->addDisplayQueues("Recv CMD_ATTENDANT: ", 6);
+                        break;
+                        // attendant.handleMessage(packet); break;
+                    }
+                }
             };
+
+            resetWifi();
 
             // radio.setup(5, 2);
             // const char *mqtt = "10.0.0.5";

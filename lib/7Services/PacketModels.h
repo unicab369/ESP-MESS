@@ -44,7 +44,7 @@ struct ReceivePacket {
    uint8_t sourceB[6] = { 0 };
    DataPacket packetData;
 
-   String getSource(bool shortStr = false) {
+   const char* getSource(bool shortStr = false) {
       char info[22];
       sprintf(info, shortStr ? "%02X%02X%02X%02X%02X%02X" : "%02X:%02X:%02X:%02X:%02X:%02X", 
                   sourceB[0], sourceB[1], sourceB[2], sourceB[3], sourceB[4], sourceB[5]);
@@ -222,7 +222,7 @@ struct ReceivePacket2 {
       return output;
    }
 
-   String getSource(bool shortStr = false) {
+   const char* getSource(bool shortStr = false) {
       char info[22];
       sprintf(info, shortStr ? "%02X%02X%02X%02X%02X%02X" : "%02X:%02X:%02X:%02X:%02X:%02X", 
                   sourceB[0], sourceB[1], sourceB[2], sourceB[3], sourceB[4], sourceB[5]);

@@ -36,30 +36,4 @@ class Serv_Tweet {
         void sendSyncMock() {
             tweetSync.sendSyncMock();
         }
-
-        void addDisplayQueues(String str) {
-            interface->addDisplayQueues(str, 6);
-        }
-
-        void handleMessage(ReceivePacket2* packet) {
-            DataContent content = packet->dataPacket.content;
-
-            switch (packet->dataPacket.info.sourceCmd) {
-                case CMD_TRIGGER: {
-                    interface->handlePacket(packet); break;
-                }
-                case CMD_SYNC: {
-                    addDisplayQueues("Recv CMD_SYNC: ");
-                    tweetSync.handleMessage(&content.syncItem); break;
-                }
-                case CMD_POST: {
-                    addDisplayQueues("Recv CMD_POST: ");
-                    interface->addPlotterQueue(content);
-                }
-                case CMD_ATTENDANT: {
-                    // addDisplayQueues("Recv CMD_ATTENDANT: ");
-                    // attendant.handleMessage(packet); break;
-                }
-            }
-        }
 };

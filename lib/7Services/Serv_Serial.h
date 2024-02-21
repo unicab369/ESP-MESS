@@ -16,7 +16,7 @@ class Serv_Serial: public Loggable {
         Mng_AppClock appClock;
         Mod_RTC1302 rtc2;
 
-        AppQueue<DataContent, MAX_PLOTTER_QUEUE> queuePlotter;
+        AppQueue<ReceivePacket2, MAX_PLOTTER_QUEUE> queuePlotter;
 
         Serv_Serial(): Loggable("Serial") {}
 
@@ -55,23 +55,21 @@ class Serv_Serial: public Loggable {
         }
 
         //! DisplayQueue1
-        void addDisplayQueue1(String str, uint8_t line) {
+        void addDisplayQueue1(const char* str, uint8_t line) {
             if (!i2c1.isLoaded) return;
-            const char* arr = str.c_str();
-            DispItem item = DispItem::make(arr, line);
+            DispItem item = DispItem::make(str, line);
             dispQueue1.sendQueue(&item);   
         }
 
         //! DisplayQueue2
-        void addDisplayQueue2(String str, uint8_t line) {
+        void addDisplayQueue2(const char* str, uint8_t line) {
             if (!largeDisp.isLoaded) return;
-            const char* arr = str.c_str();
-            DispItem item = DispItem::make(arr, line);
+            DispItem item = DispItem::make(str, line);
             dispQueue2.sendQueue(&item);            
         }
 
         //! Add to both DisplayQueue1 and DisplayQueue2
-        void _addDisplayQueues(String str, uint8_t line) {
+        void _addDisplayQueues(const char* str, uint8_t line) {
             addDisplayQueue1(str, line);
             addDisplayQueue2(str, line);
         }
@@ -101,18 +99,20 @@ class Serv_Serial: public Loggable {
 
             //! Finish dispQueue1 first
             if (dispQueue1.getQueue(&item)) {
-                i2c1.disp.printline(String(item.data), item.line);
+                i2c1.disp.printline(item.data, item.line);
             } 
             
             //! Finish dispQueue2 next
             else if (dispQueue2.getQueue(&item)) {
-                largeDisp.printline(String(item.data), item.line);
+                largeDisp.printline(item.data, item.line);
             }
             
             else {
                 //! handle valueQueue
                 storage.handleValueQueue([&](uint32_t writeTime) {
-                    addDisplayQueue2("sd write: " + String(writeTime) + "ms", 8);
+                    char output[22];
+                    sprintf(output, "sd wr: %lu ms", writeTime);
+                    addDisplayQueue2(output, 8);
                 });
             }
         }

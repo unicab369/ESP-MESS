@@ -14,9 +14,10 @@ class Interface_Device {
             return "<Invalid>"; 
         }
 
-        virtual void addDisplayQueues(String, uint8_t) {}
-        virtual void addPlotterQueue(DataContent) {}
-        virtual void renderInterval(uint8_t, String, String)  {}
+        virtual void addDisplayQueues(const char*, uint8_t) {}
+        virtual void addPlotterQueue(ReceivePacket2*) {}
+        virtual void handle_PlotterQueue() {}
+        virtual void handle_Interval(uint8_t, const char*, const char*)  {}
 
         virtual void updateTimer(time_t) {}
         virtual void handlePacket(ReceivePacket2*) {}
@@ -25,13 +26,6 @@ class Interface_Device {
 };
 
 class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Device {
-    //! iR Switch Callback
-    std::function<void(bool, uint32_t)> irSwitchCb = [&](bool status, uint32_t value) {
-        String output = "IrRead = " + (status ? String(value) : "Locked");
-        AppPrint("[IR]", output);
-        addDisplayQueue1(output, 6);
-    };
-
     //! Pir Callback
     std::function<void(bool, uint8_t)> pirCb = [&](bool status, uint8_t pin) {
         Serial.print("PirTriggered = "); Serial.print(pin);
@@ -90,7 +84,10 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                 break;
             }
             case ACTION_PRESS_END: {
-                addDisplayQueues("Press Ended " + String(elapse), 6);
+                char output[22];
+                sprintf(output, "Press Ended %lu", elapse);
+                addDisplayQueues(output, 6);
+
                 if (releasedState == HOLD_5_SEC) {
                     onHandleStartAP();
                 } else if (releasedState == HOLD_10_SEC) {
@@ -114,12 +111,8 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
         std::function<void()> onHandleStartAP = [] {};
 
         //! Interfaces
-        void addDisplayQueues(String str, uint8_t line) override {
+        void addDisplayQueues(const char* str, uint8_t line) override {
             _addDisplayQueues(str, line);
-        }
-
-        void addPlotterQueue(DataContent data) override {
-            queuePlotter.sendQueue(&data);
         }
 
         void updateTimer(time_t time) override {
@@ -140,7 +133,7 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             relay1.toggle();
         }
 
-        void renderInterval(uint8_t interval, String hostName, String localIP) override {
+        void handle_Interval(uint8_t interval, const char* hostName, const char* localIP) override {
             // bool checkConn = i2c2.ch32v.checkConnection();
             // xLogf("I2C1 Connection = %d", checkConn);
             // i2c2.ch32v.requestReadings();
@@ -156,27 +149,28 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
                 if (interval%2==0) {
                     i2c1.sensors.requestReadings();
+                    handle_PlotterQueue();
                 } 
                 else if (interval%1==0) {
                     i2c1.sensors.collectReadings(); 
                     _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
-
+                    
                     if (interval%3==0) {
-                        char heapInfo[22];
-                        char networkInfo[64];
-                        sprintf(heapInfo, "mem = %u/%u", MY_ESP.maxHeap(), ESP.getFreeHeap());
-                        uint64_t resetCount = storage.stoStat.resetCnt();
-                        sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
-
-                        _addDisplayQueues(networkInfo, 0);      //* LINE 0
-                        _addDisplayQueues(heapInfo, 6);         //* LINE 6
-                    }
-                    else if (interval%5==0) {
                         char strOut[22];
                         sprintf(strOut, "sd %luMB", storage.sd1.getCardSize());
 
                         _addDisplayQueues(hostName, 0);         //* LINE 0
                         _addDisplayQueues(strOut, 6);           //* LINE 6
+                    } 
+                    else {
+                        char heapInfo[22];
+                        char networkInfo[64];
+                        sprintf(heapInfo, "a%lu/%lu/%lu", MY_ESP.maxAllocatedHeap(), ESP.getFreeHeap(), MY_ESP.heapSize());
+                        uint64_t resetCount = storage.stoStat.resetCnt();
+                        sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
+
+                        _addDisplayQueues(networkInfo, 0);      //* LINE 0
+                        _addDisplayQueues(heapInfo, 6);         //* LINE 6
                     }
                 }
 
@@ -187,13 +181,25 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             }
         }
 
+        void addPlotterQueue(ReceivePacket2* packet) override {
+            queuePlotter.sendQueue(packet);
+        }
+
+        void handle_PlotterQueue() override {
+            ReceivePacket2 packet;
+
+            Serial.println("\n-----------------");
+            while (queuePlotter.getQueue(&packet)) {
+                Serial.println("\nplotterQueue Item");
+                packet.printData();
+            }
+        }
 
         //! configure
         void configure() {
             setup();
             setupSerial(this);
 
-            irSwitch.callback = &irSwitchCb;
             edgeDetector.callback = &pirCb;
             button1.callback = &buttonCb;
         }
@@ -208,21 +214,29 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                     break;
                 }
                 case TRIGGER_SINGLECLICK: {
-                    addDisplayQueues("Recv Single: " + String(item.value), 6);
+                    char output[22];
+                    sprintf(output, "Recv Single: %lu", item.value);
+                    addDisplayQueues(output, 6);
                     // device->led.toggle();
                     break;
                 }
                 case TRIGGER_DOUBLECLICK: {
-                    addDisplayQueues("Recv Double: " + String(item.value), 6);
+                    char output[22];
+                    sprintf(output, "Recv Double: %lu", item.value);
+                    addDisplayQueues(output, 6);
                     // device->led.repeatPulses(1000);
                     break;  
                 }
                 case TRIGGER_PIR: {
-                    addDisplayQueues("Recv Pir: " + String(item.value), 6);
+                    char output[22];
+                    sprintf(output, "Recv Pir: %lu", item.value);
+                    addDisplayQueues(output, 6);
                     break;
                 }
                 case TRIGGER_IR: {
-                    addDisplayQueues("Recv Ir: " + String(item.value), 6);
+                    char output[22];
+                    sprintf(output, "Recv Ir: %lu", item.value);
+                    addDisplayQueues(output, 6);
                     break;
                 }
                 default: {
@@ -241,8 +255,8 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
             //! Rotary Encoder
             rotary.run([&](RotaryDirection state, uint16_t counter) {
-                String dir = (state == CLOCKWISE) ? "CW" : "CCW";
-                String output =  "val=" + String(counter) + " Dir=" + dir;
+                char output[22];
+                sprintf(output, "val = %lu dir %s", counter, (state == CLOCKWISE) ? "CW" : "CCW");
                 AppPrint("\n[Rot]", output);
                 addDisplayQueues(output, 6);       // display
 
@@ -265,7 +279,14 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                 } 
             });
 
-            // irSwitch.run(); 
+            //! IRSwitch
+            irSwitch.run([&](bool status, uint32_t value) {
+                char output[22];
+                sprintf(output, "Ir = %s", status ? String(value) : "Locked");
+                AppPrint("\n[IR]", output);
+                addDisplayQueues(output, 6);
+            }); 
+
             // led.run();
             // ws2812.run();
             // xSerial.run();
