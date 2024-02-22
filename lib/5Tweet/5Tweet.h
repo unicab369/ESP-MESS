@@ -1,4 +1,4 @@
-typedef std::function<void(DataPacket*)> DataPacketCb;
+// typedef std::function<void(DataPacket*)> DataPacketCb;
 
 template <typename T, SourceCmd command>
 class Interface_Tweet {

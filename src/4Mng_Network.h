@@ -112,7 +112,7 @@ class Mng_Network {
         void handle_PlotterQueue() {
             ReceivePacket2 packet;
 
-            // Serial.println("\n-----------------");
+            Serial.println("\n----------------MsgQueue");
             while (queuePlotter.getQueue(&packet)) {
                 Serial.println("\nplotterQueue Item");
                 packet.printData();

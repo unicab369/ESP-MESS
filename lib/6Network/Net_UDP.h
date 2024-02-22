@@ -15,37 +15,38 @@ class Net_UDP {
     unsigned int localPort = 1234;  
 
     void sendPacket(IPAddress &address, byte *data, size_t size, int port) {
-        if (callback == nullptr && timeRequestCb == nullptr) { return; }
+        // if (callback == nullptr && timeRequestCb == nullptr) { return; }
+        if (timeRequestCb == nullptr) { return; }
         udp.beginPacket(address, port);
         udp.write(data, size);
         udp.endPacket();
     }
 
-    ReceivePacketCb *callback;
+    // ReceivePacketCb *callback;
     std::function<void(time_t*)> *timeRequestCb;
 
     public:
-        void reload(ReceivePacketCb *cb) {
-            AppPrint("[UDP]", __func__);
-            udp.begin(localPort);
-            callback = cb;
-            timeRequestCb = NULL;
-        }    
+        // void reload(ReceivePacketCb *cb) {
+        //     AppPrint("[UDP]", __func__);
+        //     udp.begin(localPort);
+        //     callback = cb;
+        //     timeRequestCb = NULL;
+        // }    
 
-        void sendPacket(IPAddress &address, DataPacket *packet, int port) {
-            AppPrint("[UDP]", __func__);
-            sendPacket(address, (uint8_t*)packet, sizeof(DataPacket), port);
-        }
+        // void sendPacket(IPAddress &address, DataPacket *packet, int port) {
+        //     AppPrint("[UDP]", __func__);
+        //     sendPacket(address, (uint8_t*)packet, sizeof(DataPacket), port);
+        // }
 
-        void broadcast(DataPacket *packet, int port = 1234) {
-            IPAddress broadcast_ip(255, 255, 255, 255);
-            sendPacket(broadcast_ip, packet, port);
-        }
+        // void broadcast(DataPacket *packet, int port = 1234) {
+        //     IPAddress broadcast_ip(255, 255, 255, 255);
+        //     sendPacket(broadcast_ip, packet, port);
+        // }
 
         void requestTime(std::function<void(time_t*)> *cb) {
             udp.begin(localPort);
             timeRequestCb = cb;
-            callback = NULL;
+            // callback = NULL;
 
             IPAddress ntpServerIP; // NTP server's ip address
             WiFi.hostByName(ntpServerName, ntpServerIP);
@@ -68,16 +69,18 @@ class Net_UDP {
         }
 
         void run() {
-            if (callback) {
-                int readLen = udp.parsePacket();
-                if (!readLen) { return; }
-                AppPrint("\n[UDP] Received");
+            // if (callback) {
+            //     int readLen = udp.parsePacket();
+            //     if (!readLen) { return; }
+            //     AppPrint("\n[UDP] Received");
 
-                ReceivePacket packet;
-                udp.read((char*)&packet.packetData, sizeof(DataPacket));
-                (*callback)(&packet);
+            //     // ReceivePacket packet;
+            //     // udp.read((char*)&packet.packetData, sizeof(DataPacket));
+            //     // (*callback)(&packet);
 
-            } else if (timeRequestCb) {
+            // } else 
+            
+            if (timeRequestCb) {
                 int readLen = udp.parsePacket();
                 if (readLen < NTP_PACKET_SIZE) { return; }
 
