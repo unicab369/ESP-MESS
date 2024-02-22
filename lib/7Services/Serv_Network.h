@@ -4,22 +4,15 @@ enum Network_State {
     NETWORK_FAILED,
     NETWORK_DONE,
     NETWORK_PROBING,
-    NETWORK_UDP_DONE,
 };
 
 class Serv_Network: public Loggable {
-    std::function<void(time_t*)> udpTimeRequestCb = [&](time_t* time) {
-        time_t _time = *time;
-        interface->updateTimer(_time);
-        state = NETWORK_UDP_DONE;
-    }; 
-
-    std::function<void(uint8_t)> onReceiveBounce = [&](uint8_t destChannel) {
-        if (scanChannel != destChannel) return;
-        AppPrint("\n\n\n**** FOUND ZZZZZ 111");
-        state = NETWORK_DONE;
-        tweet.tweetSync.onReceiveBounce = NULL;
-    };
+    // std::function<void(uint8_t)> onReceiveBounce = [&](uint8_t destChannel) {
+    //     if (scanChannel != destChannel) return;
+    //     AppPrint("\n\n\n**** FOUND ZZZZZ 111");
+    //     state = NETWORK_DONE;
+    //     tweet.tweetSync.onReceiveBounce = NULL;
+    // };
 
     void checkWifi() {
         if (retryCnt < 0) return;
@@ -30,23 +23,16 @@ class Serv_Network: public Loggable {
             output = "[Wifi] CONNECTED";
             state = NETWORK_READY;
             AppPrint("IP Addr", wifi.localIp());
-            
-            udp.requestTime(&udpTimeRequestCb);
-            // tweet.updateChannel(WiFi.channel());
 
-            //! load ESPNow callback
-            espNow.setup(WiFi.channel());
-            onWifiConnected();
+            // tweet.updateChannel(WiFi.channel());
+            onWifiConnected(true);
 
         } else if (retryCnt < 1) {
             output = "[Wifi] Err: Timeout";
             state = NETWORK_FAILED;
 
-            //! load tweetSync callback
             // tweet.tweetSync.onReceiveBounce = &onReceiveBounce;
-
-            // //! load ESPNow callback
-            espNow.setup(WiFi.channel()); 
+            onWifiConnected(false);
         } 
         
         xLog(output.c_str());
@@ -71,79 +57,14 @@ class Serv_Network: public Loggable {
 
         Interface_Device *interface;
         Net_Wifi wifi;
-        Net_UDP udp;
-        Serv_EspNow espNow;
-        Serv_Tweet tweet;
         uint8_t scanChannel = 0;
 
-        std::function<void()> onWifiConnected = [](){};
+        std::function<void(boolean)> onWifiConnected = [](boolean){};
 
         void setupNetwork(Interface_Device* _devInterface) {
             xLogSection(__func__);
+
             interface = _devInterface;
-            tweet.setup(&espNow);
-
-            espNow.callback = [&](ReceivePacket2* packet) {
-                DataContent content = packet->dataPacket.content;
-
-                switch (packet->dataPacket.info.sourceCmd) {
-                    case CMD_TRIGGER: {
-                        CommandItem item = packet->dataPacket.content.commandItem;
-
-                        switch (item.cue) {
-                            case TRIGGER_STARTUP: {
-                                interface->addDisplayQueues("Recv Startup", 6);
-                                break;
-                            }
-                            case TRIGGER_SINGLECLICK: {
-                                char output[22];
-                                sprintf(output, "Recv Single: %lu", item.value);
-                                interface->addDisplayQueues(output, 6);
-                                // device->led.toggle();
-                                break;
-                            }
-                            case TRIGGER_DOUBLECLICK: {
-                                char output[22];
-                                sprintf(output, "Recv Double: %lu", item.value);
-                                interface->addDisplayQueues(output, 6);
-                                // device->led.repeatPulses(1000);
-                                break;  
-                            }
-                            case TRIGGER_PIR: {
-                                char output[22];
-                                sprintf(output, "Recv Pir: %lu", item.value);
-                                interface->addDisplayQueues(output, 6);
-                                break;
-                            }
-                            case TRIGGER_IR: {
-                                char output[22];
-                                sprintf(output, "Recv Ir: %lu", item.value);
-                                interface->addDisplayQueues(output, 6);
-                                break;
-                            }
-                            default: {
-                                interface->addDisplayQueues("Recv Unknown", 6);
-                            }
-                        }
-                        interface->addPlotterQueue(packet); break;
-                    }
-                    case CMD_POST: {
-                        interface->addDisplayQueues("Recv CMD_POST: ", 6);
-                        interface->addPlotterQueue(packet); break;
-                    }
-                    case CMD_SYNC: {
-                        interface->addDisplayQueues("Recv CMD_SYNC: ", 6);
-                        break;
-                        // tweetSync.handleMessage(&content.syncItem); break;
-                    }
-                    case CMD_ATTENDANT: {
-                        interface->addDisplayQueues("Recv CMD_ATTENDANT: ", 6);
-                        break;
-                        // attendant.handleMessage(packet); break;
-                    }
-                }
-            };
-
             resetWifi();
 
             // radio.setup(5, 2);

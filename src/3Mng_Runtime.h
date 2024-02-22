@@ -146,6 +146,10 @@ class Mng_Runtime: public Loggable {
                         secondCounter++;
                         if (secondCounter>59) secondCounter = 0;
 
+                        if (secondCounter%5==0) {
+                            network->handle_PlotterQueue();
+                        }
+
                         dev->handle_Interval(secondCounter, network->getHostName(), network->getNetworkId());
                         network->handle_PollNetworkState();
                     }

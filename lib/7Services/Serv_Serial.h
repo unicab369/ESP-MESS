@@ -16,8 +16,6 @@ class Serv_Serial: public Loggable {
         Mng_AppClock appClock;
         Mod_RTC1302 rtc2;
 
-        AppQueue<ReceivePacket2, MAX_PLOTTER_QUEUE> queuePlotter;
-
         Serv_Serial(): Loggable("Serial") {}
 
         void setupSerial(Serv_IO* conf) {

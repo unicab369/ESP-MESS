@@ -15,8 +15,6 @@ class Interface_Device {
         }
 
         virtual void addDisplayQueues(const char*, uint8_t) {}
-        virtual void addPlotterQueue(ReceivePacket2*) {}
-        virtual void handle_PlotterQueue() {}
         virtual void handle_Interval(uint8_t, const char*, const char*)  {}
 
         virtual void updateTimer(time_t) {}
@@ -149,7 +147,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
                 if (interval%2==0) {
                     i2c1.sensors.requestReadings();
-                    handle_PlotterQueue();
                 } 
                 else if (interval%1==0) {
                     i2c1.sensors.collectReadings(); 
@@ -178,20 +175,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             } 
             else if (i2c1.dispMode == DISPLAY_2ND) {
 
-            }
-        }
-
-        void addPlotterQueue(ReceivePacket2* packet) override {
-            queuePlotter.sendQueue(packet);
-        }
-
-        void handle_PlotterQueue() override {
-            ReceivePacket2 packet;
-
-            Serial.println("\n-----------------");
-            while (queuePlotter.getQueue(&packet)) {
-                Serial.println("\nplotterQueue Item");
-                packet.printData();
             }
         }
 
