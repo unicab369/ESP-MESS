@@ -7,13 +7,6 @@ enum SourceCmd: uint8_t {
    CMD_DEFAULT = 0xFF
 };
 
-struct PacketXfo {
-   uint32_t timeStamp = 0;
-   uint8_t groupId = 0;
-   uint8_t sourceCmd = CMD_DEFAULT;
-   uint16_t validationCode = 0xEEEE;
-};
-
 // struct DataPacket {
 //    PacketXfo info;
 //    uint8_t data[32] = { 0 };
@@ -198,14 +191,18 @@ union DataContent {
 };
 
 struct DataPacket2 {
-   PacketXfo info;
+   uint32_t timeStamp = 0;
+   uint8_t groupId = 0;
+   uint8_t sourceCmd = CMD_DEFAULT;
+   uint16_t validationCode = 0xEEEE;
+   
    DataContent content;
 
    static DataPacket2 make(void *buff, SourceCmd sourceCmd, uint8_t groupId = 0) {
       DataPacket2 packet;
-      packet.info.timeStamp = millis();
-      packet.info.sourceCmd = sourceCmd;
-      packet.info.groupId = groupId;
+      packet.timeStamp = millis();
+      packet.sourceCmd = sourceCmd;
+      packet.groupId = groupId;
       memcpy(&packet.content, buff, sizeof(packet.content));
       return packet;
    }

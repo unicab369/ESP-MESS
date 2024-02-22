@@ -30,7 +30,7 @@ DeviceMode currentMode = MODE_LOWPOWER;
 
 std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
    Serial.println("IM HERE 3");
-   espNow.send(packet, sizeof(DataPacket2));
+   // espNow.send(packet, sizeof(DataPacket2));
 };
 
 unsigned long timeRef, timeDif;
@@ -90,7 +90,7 @@ void setup() {
 
    wifi.setTxPower(0);
    wifi.startAP(true, BROADCAST_CHANNEL);
-   tweet.setup(&device, espNow.mac, &onTweet2);
+   // tweet.setup(&device, espNow.mac, &onTweet2);
    espNow.setup(WiFi.channel());
 
    // Serial.print("Channel = "); Serial.println(WiFi.channel());

@@ -37,7 +37,7 @@ class Mng_Network {
                 espNow.callback = [&](ReceivePacket2* packet) {
                     DataContent content = packet->dataPacket.content;
 
-                    switch (packet->dataPacket.info.sourceCmd) {
+                    switch (packet->dataPacket.sourceCmd) {
                         case CMD_TRIGGER: {
                             CommandItem item = packet->dataPacket.content.commandItem;
 
@@ -117,7 +117,7 @@ class Mng_Network {
                 Serial.println("\nplotterQueue Item");
                 packet.printData();
 
-                switch (packet.dataPacket.info.sourceCmd) {
+                switch (packet.dataPacket.sourceCmd) {
                     case CMD_POST: break;
                 }
             }
