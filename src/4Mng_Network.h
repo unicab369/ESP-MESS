@@ -110,6 +110,8 @@ class Mng_Network {
         }
 
         void handle_PlotterQueue() {
+            // cmd: remotePlot
+            if (device->storage.stoSettings.value.remotePlot == false) return;
             ReceivePacket2 packet;
 
             Serial.println("\n----------------MsgQueue");
@@ -118,7 +120,10 @@ class Mng_Network {
                 packet.printData();
 
                 switch (packet.dataPacket.sourceCmd) {
-                    case CMD_POST: break;
+                    case CMD_POST: 
+                        RecordItem record = packet.dataPacket.content.recordItem;
+                        record.printData();
+                        break;
                 }
             }
         }
@@ -164,7 +169,7 @@ class Mng_Network {
                 tweet.sendSyncMock(); 
             } else {
                 // tweet.attendant.startAttendant();
-                tweet.record.sendTempHumLux(2, 3, 4, 5, 6);
+                tweet.record.sendTempHumLux(2.3, 3.5, 4.5, 5.6, 6.7);
             }
         }
 

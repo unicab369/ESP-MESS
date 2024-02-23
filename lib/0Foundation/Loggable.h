@@ -1,4 +1,4 @@
-#define LOG_MAX_LENGTH 64
+#define LOG_MAX_LENGTH 128
 
 class Loggable {
     char identifier[20];

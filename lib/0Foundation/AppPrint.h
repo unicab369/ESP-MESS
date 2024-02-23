@@ -27,9 +27,10 @@ void AppPrintHex(const void *data, int len, char separator = ' ') {
    uint8_t* arr = (uint8_t*)data;
 
    for (int i=0; i<len; i++) {
-      Serial.print(arr[i], HEX);
+      Serial.printf("0x%02X", arr[i]);
       if (i<len-1) Serial.print(separator);
    }
+
    Serial.println();
 }
 

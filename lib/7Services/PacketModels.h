@@ -7,86 +7,6 @@ enum SourceCmd: uint8_t {
    CMD_DEFAULT = 0xFF
 };
 
-// struct DataPacket {
-//    PacketXfo info;
-//    uint8_t data[32] = { 0 };
-
-//    void reset() {
-//       info.timeStamp = 0;
-//       info.sourceCmd = CMD_DEFAULT;
-//    }
-
-//    bool validate(DataPacket *packetData) {
-//       // if (packetData->timeStamp != timeStamp) { return false; }
-//       if (packetData->info.sourceCmd != info.sourceCmd) { return false; }
-//       // if (packetData->validationCode != validationCode) { return false; }
-//       return true;
-//    }
-
-//    static DataPacket make(void *bufData, SourceCmd sourceCmd, uint8_t groupId = 0) {
-//       DataPacket packet;
-//       packet.info.timeStamp = millis();
-//       packet.info.sourceCmd = sourceCmd;
-//       packet.info.groupId = groupId;
-//       memcpy(&packet.data, bufData, sizeof(data));
-//       return packet;
-//    }
-// };
-
-// struct ReceivePacket {
-//    uint8_t sourceB[6] = { 0 };
-//    DataPacket packetData;
-
-//    const char* getSource(bool shortStr = false) {
-//       char info[22];
-//       sprintf(info, shortStr ? "%02X%02X%02X%02X%02X%02X" : "%02X:%02X:%02X:%02X:%02X:%02X", 
-//                   sourceB[0], sourceB[1], sourceB[2], sourceB[3], sourceB[4], sourceB[5]);
-//       return info;
-//    }
-
-//    void reset() {
-//       packetData.reset();
-//       // source.reset();
-//    }
-
-//    void print() {
-//       Serial.print("timeStamp = "); Serial.println(packetData.info.timeStamp);
-//       // printBuffer("\n*Receiv_packet", this, sizeof(ReceivePacket));
-//    }
-
-//    // check if sources are the same and timeStamp different doesn't exceed timeWindow
-//    bool check(ReceivePacket *packet, uint32_t timeWindow = 500) {
-//       // if (source.isEqual(&packet->source) == false) { return false; }
-//       // if (packet->packetData.timeStamp - packetData.timeStamp < timeWindow) { return false; }
-//       memcpy(this, packet, sizeof(ReceivePacket));
-//       return true;
-//    }
-
-//    bool validate(ReceivePacket *packet) {
-//       // return packetData.timeStamp != 0;
-//       // if (source.isEqual(&packet->source) == false) { return false; }
-//       // if (packetData.validate(&packet->packetData) == false) { return false; }
-//       return true;
-//    }
-   
-//    bool validateSender() {
-//       return std::all_of(sourceB, sourceB+6, [](uint8_t val) { return val == 0; }) == false;
-//    }
-
-//    void clearSender() {
-//       memcpy(sourceB, 0, sizeof(sourceB));
-//    }
-
-//    static ReceivePacket make(const uint8_t *sourceB, const uint8_t *data) {
-//       ReceivePacket output;
-//       memcpy(&output.packetData, data, sizeof(DataPacket));
-//       memcpy(&output.sourceB, sourceB, 6);
-//       return output;
-//    }
-// };
-
-// typedef std::function<void(ReceivePacket*)> ReceivePacketCb;
-
 enum CMD_Sync: uint8_t {
    SYNC_MOCK,
    SYNC_BOUNCE
@@ -142,6 +62,12 @@ struct RecordItem {
       value3 = val3;
       value4 = val4;
       value5 = val5;
+   }
+
+   void printData() {
+      Loggable logger = Loggable("RecordItem");
+      logger.xLogf("Data val1 = %f, val2 = %f, val3 = %f, val4 = %f", 
+                     value1, value2, value3, value4); 
    }
 };
 
