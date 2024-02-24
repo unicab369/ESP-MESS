@@ -130,7 +130,7 @@ class Mng_Network {
                         Data_Settings settings = storage->stoSettings.value;
                         Data_IotPlotter plotter = storage->stoPlotter.value;
 
-                        wServer.sendIotPlotter(plotter.apiKey, plotter.feedId, output);           
+                        wServer.sendIotPlotter(plotter.apiKey, plotter.url, output);           
                         break;
                 }
             }

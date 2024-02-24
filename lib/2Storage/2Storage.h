@@ -17,7 +17,7 @@ struct RTC_Data {
    unsigned long bootCount = 0;
 };
 
-struct DeviceStats {
+struct Data_Stats {
    uint8_t status = 0;
    uint16_t builtCode = 0;
    uint64_t resetCnt = 0;
@@ -25,10 +25,16 @@ struct DeviceStats {
    void increseResetCnt() {
       resetCnt++;
    }
+
+   void printData() {
+      Loggable logger = Loggable("Data_Stats");
+      Serial.println();
+      logger.xLogf("resetCnt = %lu", resetCnt);
+   }
 };
 
 //! WARNING: This object get stored in EEPROM. Keep size minimal, DO NOT inherit
-class Sto_Stat: public EEPROM_Value<DeviceStats>{
+class Sto_Stat: public EEPROM_Value<Data_Stats>{
    public:
       uint64_t resetCnt() { return value.resetCnt; }
 
@@ -86,10 +92,10 @@ class Sto_Cred: public EEPROM_Value<Data_Cred> {
             value.printData();
             return true;
          }
-         else if (storeData("ssid", input, value.ssid)) {
+         else if (storeValue("ssid", input, value.ssid)) {
             return true;
          }
-         else if (storeData("passw", input, value.password)) {
+         else if (storeValue("passw", input, value.password)) {
             return true;
          }
 
@@ -116,10 +122,10 @@ class Sto_Conf: public EEPROM_Value<Data_Conf> {
             value.printData();
             return true;
          }
-         else if (storeData("deviceName", input, value.deviceName)) {
+         else if (storeValue("deviceName", input, value.deviceName)) {
             return true;
          }
-         else if (storeData("mqttIP", input, value.mqttIP)) {
+         else if (storeValue("mqttIP", input, value.mqttIP)) {
             return true;
          }
 
@@ -128,13 +134,13 @@ class Sto_Conf: public EEPROM_Value<Data_Conf> {
 };
 
 struct Data_IotPlotter {
-   char apiKey[63] = "", feedId[32] = "";
+   char apiKey[63] = "", url[126] = "";
 
    void printData() {
       Loggable logger = Loggable("Data_IotPlotter");
       Serial.println();
       logger.xLogf("apiKey = %s", apiKey);
-      logger.xLogf("feedId = %s", feedId);  
+      logger.xLogf("url = %s", url);  
    }
 };
 
@@ -145,10 +151,10 @@ class Sto_IotPlotter: public EEPROM_Value<Data_IotPlotter> {
             value.printData();
             return true;
          } 
-         else if (storeData("apiKey", input, value.apiKey)) {
+         else if (storeValue("apiKey", input, value.apiKey)) {
             return true;
          }
-         else if (storeData("feedId", input, value.feedId)) {
+         else if (storeValue("url", input, value.url)) {
             return true;
          }
          
@@ -160,12 +166,14 @@ struct Data_Settings {
    bool xSerialEnable = true;
    bool espNowEnable = true;
    bool remotePlot = false;
+   uint8_t espNowFreq = 3;
 
    void printData() {
       Loggable logger = Loggable("Data_Settings");
       logger.xLogf("xSerial = %d", xSerialEnable);
       logger.xLogf("espNow = %d", espNowEnable);
       logger.xLogf("remotePlot = %d", remotePlot);
+      logger.xLogf("espNowFreq = %u", espNowFreq);
    }
 };
 
@@ -176,16 +184,21 @@ class Sto_Settings: public EEPROM_Value<Data_Settings> {
             value.printData();
             return true;
          }
-         else if (storeBoolean("xSerial", input, &value.xSerialEnable)) {
+         else if (storeValue("xSerial", input, &value.xSerialEnable)) {
             return true;
          }
-         else if (storeBoolean("espNow", input, &value.espNowEnable)) {
+         else if (storeValue("espNow", input, &value.espNowEnable)) {
             return true;
          }
-         else if (storeBoolean("remotePlot", input, &value.remotePlot)) {
+         else if (storeValue("remotePlot", input, &value.remotePlot)) {
             return true;
          }
-
+         else if (storeValue("espNowFreq", input, &value.espNowFreq, [](uint8_t value) { 
+            return value > 2;
+         })) 
+         {
+            return true;
+         }
          return false;
       }
 };
@@ -229,9 +242,10 @@ class Mng_Storage: public Loggable {
       Sto_RTC rtc_storage;
       Sto_Stat stoStat;             
       Sto_Cred stoCred;             
-      Sto_Conf stoConf;             
-      Sto_IotPlotter stoPlotter;    
-      Sto_Settings stoSettings;     
+      Sto_Conf stoConf;
+
+      Sto_Settings stoSettings;             
+      Sto_IotPlotter stoPlotter;     
       Sto_Peer stoPeer;
       Sto_Behavior stoBehavior;
 
@@ -251,13 +265,14 @@ class Mng_Storage: public Loggable {
          xLogSection(__func__);
 
          EEPROM.begin(EEPROM_SIZE);
-         stoStat.load(0);                 //! start 0 len 17 
-         stoCred.loadData(20);            //! start 20 len 98
-         stoConf.loadData(120);           //! start 120 len 43
-         stoPlotter.loadData(170);        //! start 170 len 96
-         stoSettings.loadData(270);       //! start 270 len 4
-         stoPeer.loadData(280);           //! start 280, Count(5) * len 17
-         stoBehavior.loadData(380);       //! start 380
+         stoStat.load(0);                 //! len 17 
+         stoCred.loadData(20);            //! len 98
+         stoConf.loadData(120);           //! len 43
+         stoSettings.loadData(220);       //! len 4
+         stoPlotter.loadData(230);        //! len 96
+
+         stoPeer.loadData(580);           //! Count(5) * len 17
+         stoBehavior.loadData(680);       //! 
 
          xLogSectionf("resetCount = %llu", stoStat.resetCnt());
 

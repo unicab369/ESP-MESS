@@ -126,9 +126,12 @@ class EEPROM_Value: public Sto_EEPROM {
       }
 
       //! storeData
-      void storeData() {
+      void storeData(bool log = true) {
          writeCode();
          writeBytes(contentAddr(), &value, sizeof(T)+1);
+         if (log) {
+            (&value)->printData();
+         }
       }
 
       //! deleteData
@@ -143,24 +146,35 @@ class EEPROM_Value: public Sto_EEPROM {
          writeBytes(contentAddr(), newValue, sizeof(T)+1);
       }
 
-      bool storeData(const char* key, char* input, char* output) {
+      bool storeValue(const char* key, char* input, char* output) {
          bool check = extractValue(key, input, output);
-         if (check)  {
-            storeData();
-            (&value)->printData();
-         }
-
+         if (check) storeData();
          return check;
       }
 
-      bool storeBoolean(const char* key, char* input, bool* output) {
+      bool storeValue(const char* key, char* input, bool* output) {
          char boolStr[2];
 
          bool check = extractValue(key, input, boolStr);
          if (check) {
             *output = strcmp("1", boolStr) == 0;
             storeData();
-            (&value)->printData();
+         }
+
+         return check;
+      }
+
+      bool storeValue(const char* key, char* input, uint8_t* output, 
+               std::function<bool(uint8_t)> validate = [](uint8_t) { return true; }) {
+         char valStr[16];
+
+         bool check = extractValue(key, input, valStr);
+         if (check) {
+            uint8_t value = (uint8_t)atoi(valStr);
+            if (validate(value)) {
+               *output = value;
+               storeData();
+            }
          }
 
          return check;
