@@ -50,8 +50,8 @@ enum Sign_Record: uint8_t {
    RECORD_USERDEFINED
 };
 
-void appendParam(char* output, const char* key, uint8_t id, float value) {
-   sprintf(output + strlen(output), "\"%s-%u\":[{\"value\":%.2f}]", key, id, value);
+void appendParam(char* output, uint8_t* id, const char* key, float value) {
+   sprintf(output + strlen(output), "\"%u%u%u-%s\":[{\"value\":%.2f}]", id[3], id[4], id[5], key, value);
 }
 
 struct RecordItem {
@@ -68,10 +68,14 @@ struct RecordItem {
       value5 = val5;
    }
 
-   void fillValue(char* output, uint8_t id) {
-      appendParam(output, "Temp", id, 2.3); strcat(output, ",");
-      appendParam(output, "Hum", id, 2.3); strcat(output, ",");
-      appendParam(output, "Lux", id, 2.3); strcat(output, ",");
+   void makeJson(char* output, uint8_t* id) {
+      strcat(output, "{\"data\":{");
+      appendParam(output, id, "Temp", value1); strcat(output, ",");
+      appendParam(output, id, "Hum", value2); strcat(output, ",");
+      appendParam(output, id, "Lux", value3); strcat(output, ",");
+      appendParam(output, id, "Volt", value4); strcat(output, ",");
+      appendParam(output, id, ",A", value5); 
+      strcat(output, "}}");
    }
 
    void printData() {

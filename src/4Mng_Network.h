@@ -114,31 +114,24 @@ class Mng_Network {
             if (device->storage.stoSettings.value.remotePlot == false) return;
             ReceivePacket2 packet;
 
-            char postOutput[256] = "{\"data\":{";
-            bool hasPostValue = false;
             Serial.println("\n----------------MsgQueue");
 
-            while (queuePlotter.getQueue(&packet)) {
+            if (queuePlotter.getQueue(&packet)) {
                 Serial.println("\nplotterQueue Item");
                 packet.printData();
 
                 switch (packet.dataPacket.sourceCmd) {
                     case CMD_POST:
-                        hasPostValue = true;
                         RecordItem record = packet.dataPacket.content.recordItem;
-                        record.fillValue(postOutput, 1);
+                        char output[256];
+                        record.makeJson(output, packet.sourceB);
+                        Serial.println("\nIM HERE");
+                        Serial.println(output);
                         // record.printData();
                         break;
                 }
             }
 
-            if (hasPostValue) {
-                size_t len = strlen(postOutput);
-                if (len>0) postOutput[len-1] = '\0';
-                strcat(postOutput, "}}");
-                Serial.println("\nPostOUTPUT>>>>");
-                Serial.println(postOutput);
-            }
         }
 
         //! iotPlotter
