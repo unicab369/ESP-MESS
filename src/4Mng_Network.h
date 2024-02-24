@@ -37,7 +37,7 @@ class Mng_Network {
                 espNow.callback = [&](ReceivePacket2* packet) {
                     DataContent content = packet->dataPacket.content;
 
-                    switch (packet->dataPacket.sourceCmd) {
+                    switch (packet->dataPacket.msgType) {
                         case CMD_TRIGGER: {
                             CommandItem item = packet->dataPacket.content.commandItem;
 
@@ -111,6 +111,7 @@ class Mng_Network {
 
         void handle_PlotterQueue() {
             // cmd: remotePlot
+            // cmd: iotPlotter
             if (device->storage.stoSettings.value.remotePlot == false) return;
             ReceivePacket2 packet;
 
@@ -120,31 +121,20 @@ class Mng_Network {
                 Serial.println("\nplotterQueue Item");
                 packet.printData();
 
-                switch (packet.dataPacket.sourceCmd) {
+                switch (packet.dataPacket.msgType) {
                     case CMD_POST:
                         RecordItem record = packet.dataPacket.content.recordItem;
                         char output[256];
                         record.makeJson(output, packet.sourceB);
-                        Serial.println("\nIM HERE");
-                        Serial.println(output);
-                        // record.printData();
+                        Mng_Storage *storage = servWifi.interface->getStorage();
+                        Data_Settings settings = storage->stoSettings.value;
+                        Data_IotPlotter plotter = storage->stoPlotter.value;
+
+                        wServer.sendIotPlotter(plotter.apiKey, plotter.feedId, output);           
                         break;
                 }
             }
 
-        }
-
-        //! iotPlotter
-        void iotPlotter(float temp, float hum, float lux, float volt, float mA) {
-            Mng_Storage *storage = servWifi.interface->getStorage();
-            Data_Settings settings = storage->stoSettings.value;
-            Data_IotPlotter plotter = storage->stoPlotter.value;
-
-            // Serial.print("SelfPlotEnable = "); Serial.println(settings.selfPlotEnable);
-
-            if (settings.remotePlot) {
-                wServer.makePostRequest(plotter.apiKey, plotter.feedId, temp, hum, lux, volt, mA);
-            }
         }
 
         void handleSingleClick() {

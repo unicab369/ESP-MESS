@@ -1,4 +1,4 @@
-template <typename T, SourceCmd command>
+template <typename T, Type_Message command>
 class Template_Tweet {
     protected:
         T item;

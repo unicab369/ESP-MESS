@@ -56,10 +56,7 @@ class Web_Server: public Loggable {
             }
         }
 
-        // cred 
-        // iotPlotter
-        // selfPlot
-        void makePostRequest(const char* apiKey, const char* feed, float temp, float hum, float lux, float volt, float mA) {
+        void sendIotPlotter(const char* apiKey, const char* feed, const char* postData) {
             if (strlen(apiKey) < 32 || strlen(feed) < 10) return;
             
             String url = String(serverUrl) + String(feed);
@@ -72,15 +69,9 @@ class Web_Server: public Loggable {
             
             http.addHeader("api-key", apiKey);
             http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-            
-            String postData = "{\"data\":{\"Temp\": [{\"value\":" + String(temp) + 
-                                "}], \"Hum\":[{\"value\":" + String(hum) + 
-                                "}], \"Lux\":[{\"value\":" + String(lux) + 
-                                "}], \"Volt\":[{\"value\":" + String(volt) +
-                                "}], \"mA\":[{\"value\":" + String(mA) + "}] }}";
-            // String postData = "{\"data\":{\"Temperature\":[{\"value\":25.05},{\"value\":25.99,\"epoch\":1516195980},{\"value\":24.99,\"epoch\":1516195280}],\"ANY_GRAPH_NAME_HERE\":[{\"value\":123}]}}";
-            // postData += String(temp) + "}], \"ANY_GRAPH_NAME_HERE\":[{\"value\":123}]}}"
+
             int responseCode = http.POST(postData);
+            Serial.printf("\nSend iotPlotter = %s", postData);
             xLogf("responseCode: %d", responseCode);
         }
         

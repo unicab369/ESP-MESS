@@ -1,5 +1,4 @@
-enum SourceCmd: uint8_t {
-   // CMD_SENSORS = 0x10,
+enum Type_Message: uint8_t {
    CMD_POST = 0xF0,
    CMD_SYNC = 0xF1,
    CMD_ATTENDANT = 0xF2,
@@ -51,7 +50,7 @@ enum Sign_Record: uint8_t {
 };
 
 void appendParam(char* output, uint8_t* id, const char* key, float value) {
-   sprintf(output + strlen(output), "\"%u%u%u-%s\":[{\"value\":%.2f}]", id[3], id[4], id[5], key, value);
+   sprintf(output + strlen(output), "\"%02x%02x%02x_%s\":[{\"value\":%.2f}]", id[3], id[4], id[5], key, value);
 }
 
 struct RecordItem {
@@ -74,7 +73,7 @@ struct RecordItem {
       appendParam(output, id, "Hum", value2); strcat(output, ",");
       appendParam(output, id, "Lux", value3); strcat(output, ",");
       appendParam(output, id, "Volt", value4); strcat(output, ",");
-      appendParam(output, id, ",A", value5); 
+      appendParam(output, id, "mA", value5); 
       strcat(output, "}}");
    }
 
@@ -133,15 +132,15 @@ union DataContent {
 struct DataPacket2 {
    uint32_t timeStamp = 0;
    uint8_t groupId = 0;
-   uint8_t sourceCmd = CMD_DEFAULT;
+   Type_Message msgType = CMD_DEFAULT;
    uint16_t validationCode = 0xEEEE;
    
    DataContent content;
 
-   static DataPacket2 make(void *buff, SourceCmd sourceCmd, uint8_t groupId = 0) {
+   static DataPacket2 make(void *buff, Type_Message type, uint8_t groupId = 0) {
       DataPacket2 packet;
       packet.timeStamp = millis();
-      packet.sourceCmd = sourceCmd;
+      packet.msgType = type;
       packet.groupId = groupId;
       memcpy(&packet.content, buff, sizeof(packet.content));
       return packet;
