@@ -17,10 +17,10 @@
 // assigning the id to the first unassigned_slave that it receives the ATTENDANT_CONFIRM from.
 // The Master picks a slave's MacAddress and sends the ATTENDANT_ASSIGN command.
 
-class Tweet_Attendant: public Interface_Tweet<AttedantItem, CMD_ATTENDANT> {
+class Tweet_Attendant: public Template_Tweet<AttedantItem, CMD_ATTENDANT> {
     void send(CMD_Attedant cue) {
         item.cue = cue;
-        sendMessage2();
+        sendMessage();
     }
 
     public:
@@ -39,7 +39,7 @@ class Tweet_Attendant: public Interface_Tweet<AttedantItem, CMD_ATTENDANT> {
         void pollAttendant() {
             AppPrint("[TwAttendant]", __func__);
             item.recuitCommand();
-            sendMessage2();
+            sendMessage();
         }
 
     void handleMessage(ReceivePacket2* packet) {

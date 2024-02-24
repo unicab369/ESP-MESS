@@ -50,6 +50,10 @@ enum Sign_Record: uint8_t {
    RECORD_USERDEFINED
 };
 
+void appendParam(char* output, const char* key, uint8_t id, float value) {
+   sprintf(output + strlen(output), "\"%s-%u\":[{\"value\":%.2f}]", key, id, value);
+}
+
 struct RecordItem {
    Sign_Record cue;
    float value1, value2, value3;
@@ -62,6 +66,12 @@ struct RecordItem {
       value3 = val3;
       value4 = val4;
       value5 = val5;
+   }
+
+   void fillValue(char* output, uint8_t id) {
+      appendParam(output, "Temp", id, 2.3); strcat(output, ",");
+      appendParam(output, "Hum", id, 2.3); strcat(output, ",");
+      appendParam(output, "Lux", id, 2.3); strcat(output, ",");
    }
 
    void printData() {
