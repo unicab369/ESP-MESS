@@ -90,7 +90,7 @@ class Mng_Runtime: public Loggable {
 
                 xTaskCreatePinnedToCore([](void *pvParam){
                     Mng_Network* network = (Mng_Network*)pvParam;
-                    Interface_Device *dev = network->servWifi.interface;
+                    Serv_Device *dev = network->device;
 
                     while(1) {
                         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -107,7 +107,7 @@ class Mng_Runtime: public Loggable {
 
                 xTaskCreatePinnedToCore([](void *pvParam){
                     Mng_Network* network = (Mng_Network*)pvParam;
-                    Interface_Device *dev = network->servWifi.interface;
+                    Serv_Device *dev = network->device;
 
                     while(1) {
                         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -125,6 +125,17 @@ class Mng_Runtime: public Loggable {
 
                         if (secondCounter%3==0) {
                             network->handle_PlotterQueue();
+                        }
+
+                        //#cmd: iotPlotter
+                        //#cmd: apiKey
+                        //#cmd: url http://iotplotter.com/api/v2/feed/
+                        uint8_t send_freq = dev->getStorage()->stoSettings.value.espNowFreq;
+
+                        if (send_freq>1 && secondCounter%send_freq == 0) {
+                            float temp, hum, lux, volt = 0, mA = 0;
+                            dev->i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
+                            network->tweet.record.sendTempHumLux(temp, hum, lux, volt, mA);
                         }
 
                         dev->handle_Interval(secondCounter, network->getHostName(), network->getNetworkId());

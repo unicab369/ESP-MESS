@@ -79,8 +79,8 @@ struct RecordItem {
 
    void printData() {
       Loggable logger = Loggable("RecordItem");
-      logger.xLogf("Data val1 = %f, val2 = %f, val3 = %f, val4 = %f", 
-                     value1, value2, value3, value4); 
+      logger.xLogf("Data val1 = %.2f, val2 = %.2f, val3 = %.2f, val4 = %.2f, val5= %.2f", 
+                     value1, value2, value3, value4, value5); 
    }
 };
 

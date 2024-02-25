@@ -6,7 +6,6 @@ class Mng_Network {
     Net_Radio radio;
     Net_Lora lora;
     Net_UDP udp;
-    Serv_Device *device;
 
     AppQueue<ReceivePacket2, MAX_PLOTTER_QUEUE> queuePlotter;
 
@@ -19,6 +18,7 @@ class Mng_Network {
         Serv_Network servWifi;
         Serv_EspNow espNow;
         Serv_Tweet tweet;
+        Serv_Device *device;
 
         const char* getHostName()   { return servWifi.wifi.hostName; }
         const char* getNetworkId()  { return servWifi.wifi.localIp(); }
@@ -118,9 +118,6 @@ class Mng_Network {
             Serial.println("\n----------------MsgQueue");
 
             if (queuePlotter.getQueue(&packet)) {
-                Serial.println("\nplotterQueue Item");
-                packet.printData();
-
                 switch (packet.dataPacket.msgType) {
                     case CMD_POST:
                         RecordItem record = packet.dataPacket.content.recordItem;

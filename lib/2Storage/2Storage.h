@@ -193,9 +193,7 @@ class Sto_Settings: public EEPROM_Value<Data_Settings> {
          else if (storeValue("remotePlot", input, &value.remotePlot)) {
             return true;
          }
-         else if (storeValue("espNowFreq", input, &value.espNowFreq, [](uint8_t value) { 
-            return value > 2;
-         })) 
+         else if (storeValue("espNowFreq", input, &value.espNowFreq)) 
          {
             return true;
          }
