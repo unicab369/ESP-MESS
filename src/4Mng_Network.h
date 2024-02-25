@@ -110,9 +110,6 @@ class Mng_Network {
         }
 
         void handle_PlotterQueue() {
-            // cmd: remotePlot
-            // cmd: iotPlotter
-            if (device->storage.stoSettings.value.remotePlot == false) return;
             ReceivePacket2 packet;
 
             Serial.println("\n----------------MsgQueue");

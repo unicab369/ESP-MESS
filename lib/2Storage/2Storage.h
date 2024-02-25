@@ -163,17 +163,15 @@ class Sto_IotPlotter: public EEPROM_Value<Data_IotPlotter> {
 };
 
 struct Data_Settings {
-   bool xSerialEnable = true;
-   bool espNowEnable = true;
-   bool remotePlot = false;
-   uint8_t espNowFreq = 3;
+   bool useXSerial = true;     
+   uint8_t espNowLogFreq = 3;
+   uint8_t espNowSendFreq = 3;
 
    void printData() {
       Loggable logger = Loggable("Data_Settings");
-      logger.xLogf("xSerial = %d", xSerialEnable);
-      logger.xLogf("espNow = %d", espNowEnable);
-      logger.xLogf("remotePlot = %d", remotePlot);
-      logger.xLogf("espNowFreq = %u", espNowFreq);
+      logger.xLogf("xSerial = %d", useXSerial);
+      logger.xLogf("espNowLogFreq = %d", espNowLogFreq);
+      logger.xLogf("espNowSendFreq = %u", espNowSendFreq);
    }
 };
 
@@ -184,17 +182,13 @@ class Sto_Settings: public EEPROM_Value<Data_Settings> {
             value.printData();
             return true;
          }
-         else if (storeValue("xSerial", input, &value.xSerialEnable)) {
+         else if (storeValue("xSerial", input, &value.useXSerial)) {
             return true;
          }
-         else if (storeValue("espNow", input, &value.espNowEnable)) {
+         else if (storeValue("espNowLogFreq", input, &value.espNowLogFreq)) {
             return true;
          }
-         else if (storeValue("remotePlot", input, &value.remotePlot)) {
-            return true;
-         }
-         else if (storeValue("espNowFreq", input, &value.espNowFreq)) 
-         {
+         else if (storeValue("espNowSendFreq", input, &value.espNowSendFreq)) {
             return true;
          }
          return false;

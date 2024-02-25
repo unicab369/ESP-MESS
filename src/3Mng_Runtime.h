@@ -99,7 +99,6 @@ class Mng_Runtime: public Loggable {
                         char output[22];
                         sprintf(output, "C0 D%lu +%lu", stackUsage, loopCnt1);
                         dev->addDisplayQueues(output, 3);
-
                         // Serial.printf("\n\nTimer0 = %lu; stack = %lu", loopCnt1, stackUsage);
                         loopCnt1 = 0;
                     }
@@ -116,23 +115,25 @@ class Mng_Runtime: public Loggable {
                         char output[22];
                         sprintf(output, "C1 D%lu +%lu", stackUsage, loopCnt2);
                         dev->addDisplayQueues(output, 4);
-
                         // Serial.printf("\n\nTimer1*** = %lu; stack = %lu", loopCnt2, stackUsage);
                         loopCnt2 = 0;
                         
                         secondCounter++;
                         if (secondCounter>59) secondCounter = 0;
 
-                        if (secondCounter%3==0) {
+                        //#cmd: settings
+                        uint8_t log_freq = dev->getStorage()->stoSettings.value.espNowLogFreq;
+
+                        if (log_freq>2 && secondCounter%log_freq==0) {
                             network->handle_PlotterQueue();
                         }
 
                         //#cmd: iotPlotter
                         //#cmd: apiKey
                         //#cmd: url http://iotplotter.com/api/v2/feed/
-                        uint8_t send_freq = dev->getStorage()->stoSettings.value.espNowFreq;
+                        uint8_t send_freq = dev->getStorage()->stoSettings.value.espNowSendFreq;
 
-                        if (send_freq>1 && secondCounter%send_freq == 0) {
+                        if (send_freq>2 && secondCounter%send_freq == 0) {
                             float temp, hum, lux, volt = 0, mA = 0;
                             dev->i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
                             network->tweet.record.sendTempHumLux(temp, hum, lux, volt, mA);

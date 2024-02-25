@@ -72,8 +72,8 @@ struct RecordItem {
       appendParam(output, id, "Temp", value1); strcat(output, ",");
       appendParam(output, id, "Hum", value2); strcat(output, ",");
       appendParam(output, id, "Lux", value3); strcat(output, ",");
-      appendParam(output, id, "Volt", value4); strcat(output, ",");
-      appendParam(output, id, "mA", value5); 
+      appendParam(output, id, "Volt", value4);
+      // appendParam(output, id, "mA", value5); 
       strcat(output, "}}");
    }
 
