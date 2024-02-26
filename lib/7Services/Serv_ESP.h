@@ -25,6 +25,7 @@ class ESP_Device {
             uint64_t chipId() { return (uint64_t)ESP.getEfuseMac(); }
             uint32_t maxAllocatedHeap()     { return ESP.getMaxAllocHeap(); }
             uint32_t heapSize()             { return ESP.getHeapSize(); }
+
             String getResetReason() { return String(esp_reset_reason()); }
             uint32_t randomNumber() { return esp_random(); }
             
@@ -35,6 +36,8 @@ class ESP_Device {
             void restart() { ESP.reset(); }
             uint32_t chipId() { return ESP.getChipId(); }
             uint32_t maxAllocatedHeap()      { return ESP.getMaxFreeBlockSize(); }
+            uint32_t heapSize()             { return ESP.getFreeHeap(); }
+
             String getResetReason() { return ESP.getResetReason(); }
             uint32_t randomNumber() { return RANDOM_REG32; }
 

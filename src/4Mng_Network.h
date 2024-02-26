@@ -111,7 +111,6 @@ class Mng_Network {
 
         void handle_PlotterQueue() {
             ReceivePacket2 packet;
-
             Serial.println("\n----------------MsgQueue");
 
             if (queuePlotter.getQueue(&packet)) {
@@ -119,7 +118,9 @@ class Mng_Network {
                     case CMD_POST:
                         RecordItem record = packet.dataPacket.content.recordItem;
                         char output[256];
+                        //! Make Json
                         record.makeJson(output, packet.sourceB);
+
                         Mng_Storage *storage = servWifi.interface->getStorage();
                         Data_Settings settings = storage->stoSettings.value;
                         Data_IotPlotter plotter = storage->stoPlotter.value;

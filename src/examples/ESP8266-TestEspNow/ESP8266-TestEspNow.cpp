@@ -43,6 +43,7 @@ void logSensors() {
 
    busvoltage = ina219.getBusVoltage_V();
    current_mA = ina219.getCurrent_mA();
+   if (std::isnan(current_mA)) current_mA = 0.0f;
    Serial.printf("\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
    
    sht.collectReadings();
