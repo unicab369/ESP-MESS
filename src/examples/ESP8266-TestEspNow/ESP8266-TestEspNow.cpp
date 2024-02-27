@@ -7,9 +7,12 @@
 #include "3Mng_Runtime.h"
 #include <Adafruit_INA219.h>
 
-#define DONE_PIN 13
-#define MODE_PIN 14
-#define LED_PIN 2
+#define PIN_CTRL1 12
+#define PIN_CTRL2 14
+#define PIN_DONE 13
+#define PIN_MODE 14
+#define PIN_DRIVE 15
+#define PIN_LED 2
 
 enum DeviceMode {
    MODE_LOWPOWER,
@@ -57,44 +60,61 @@ void logSensors() {
    tweet.record.sendTempHumLux(temp, hum, lux, busvoltage, current_mA);
 }
 
-void setup() {
-   unsigned long timeRef = millis();
-
-   pinMode(DONE_PIN, OUTPUT);
-   pinMode(LED_PIN, OUTPUT);
-   pinMode(MODE_PIN, INPUT_PULLUP);
-
-   Serial.begin(115200);
-
-   if (!digitalRead(MODE_PIN)) {
-      Serial.print("SETUP MODE");
-      device.configure();
-      network.setup(&device);
-      currentMode = MODE_SETUP;
-      return;
-   }
-
-   // setup i2C
-   Wire.begin(4, 5);
-   sht.setup(&Wire);
-   bh17.setup(&Wire);
-
-   // Serial.print("TWEET MODE");
-   if(!ina219.begin()){
-      // Serial.println("INA219 not connected!");
-   }
-
-   // request readings: need to wait at least 20ms before collect reading
-   // start the Wifi to save wait time
-   sht.requestReadings();
-   bh17.requestReadings();
-
+void configureESPNow() {
    wifi.setTxPower(0);
    wifi.startAP(true, BROADCAST_CHANNEL);
-   // tweet.setup(&device, espNow.mac, &onTweet2);
+   tweet.setup(&espNow);
    espNow.setup(WiFi.channel());
-
    // Serial.print("Channel = "); Serial.println(WiFi.channel());
+}
+
+void setup() {
+   pinMode(PIN_DRIVE, OUTPUT);
+   digitalWrite(PIN_DRIVE, HIGH);            //! Power Lock
+   Serial.begin(115200);
+   unsigned long timeRef = millis();
+
+   pinMode(PIN_CTRL1, INPUT);    //! Control Input1
+   pinMode(PIN_CTRL2, INPUT);    //! Control Input2
+   pinMode(PIN_MODE, INPUT_PULLUP);
+   pinMode(PIN_DONE, OUTPUT);
+   pinMode(PIN_LED, OUTPUT);
+
+   bool read1 = digitalRead(PIN_CTRL1);
+   bool read2 = digitalRead(PIN_CTRL2);
+   configureESPNow();
+
+   if (read1 || read2) {
+      read1 ? tweet.command.sendSingleClick(PIN_CTRL1) : tweet.command.sendSingleClick(PIN_CTRL2);
+      delay(1);
+      digitalWrite(PIN_DRIVE, LOW);             //! Power Release
+      for (;;) {}
+
+   } else {
+      // setup i2C
+      Wire.begin(4, 5);
+      sht.setup(&Wire);
+      bh17.setup(&Wire);
+
+      // Serial.print("TWEET MODE");
+      if(!ina219.begin()){
+         // Serial.println("INA219 not connected!");
+      }
+
+      // request readings: need to wait at least 20ms before collect reading
+      // start the Wifi to save wait time
+      sht.requestReadings();
+      bh17.requestReadings();
+   }
+
+
+   // if (!digitalRead(PIN_MODE)) {
+   //    Serial.print("SETUP MODE");
+   //    device.configure();
+   //    network.setup(&device);
+   //    currentMode = MODE_SETUP;
+   //    return;
+   // }
    // Serial.printf("\nTImeDIf = %lu", millis()-timeRef);
    
 }
@@ -104,7 +124,7 @@ void loop() {
       network.run();
    } else {
       logSensors();
-      digitalWrite(DONE_PIN, !digitalRead(DONE_PIN));
+      digitalWrite(PIN_DONE, !digitalRead(PIN_DONE));
       delay(2000);
    }
 }
