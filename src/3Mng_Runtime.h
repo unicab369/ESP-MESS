@@ -63,7 +63,6 @@ class Mng_Runtime: public Loggable {
             };
 
             device.onHandleDoubleClick = [&]() {
-                Serial.println("DOUBLE CLICK B");
                 network.handleDoubleClick();
             };
 
@@ -79,11 +78,11 @@ class Mng_Runtime: public Loggable {
                 network.startAP(true);      //! Start access point
             };
 
-            pinMode(22, OUTPUT);
-
             network.setup(&device);
 
             #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+                pinMode(22, OUTPUT);
+
                 //! create task that run every 25ms on both cores
                 // xTaskCreatePinnedToCore(Mng_Runtime::onRefreshInterval, "myTask1", 1000, &(asyncTimer1.model), 1, NULL, 0);
                 // xTaskCreatePinnedToCore(Mng_Runtime::onRefreshInterval, "myTask2", 1000, &(asyncTimer2.model), 1, NULL, 1);
@@ -162,7 +161,10 @@ class Mng_Runtime: public Loggable {
             loopCnt2++;
 
             if (millis() - timeRef > 100) {
-                digitalWrite(22, !digitalRead(22));
+                #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+                    digitalWrite(22, !digitalRead(22));
+                #endif
+                
                 timeRef = millis();
                 device.handleQueues();
             }
