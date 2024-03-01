@@ -99,7 +99,6 @@ class AsyncTimer {
         
         void run(std::function<void(RunTimeModel*)> callback) {
             model.countCycle();     // get Reset every second
-            // if (callback == nullptr) return;
             uint32_t startTime = millis();
             uint32_t timeDif = startTime - timeRef;
 

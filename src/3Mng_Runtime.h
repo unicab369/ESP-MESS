@@ -1,9 +1,5 @@
 #include "4Mng_Network.h"
 
-// #ifndef ESP32 
-    #include <Ticker.h>
-// #endif 
-
 //! timerCallback is static sto asyncTimer1 cannot be an instance of Mng_Runtime
 AsyncTimer asyncTimer1;
 
@@ -24,23 +20,6 @@ class Mng_Runtime: public Loggable {
             // device.addStoreQueue();
         }
     };
-
-    #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-        static void onRefreshInterval(void* parameter) {
-            RunTimeModel *param = (RunTimeModel*)parameter;
-
-            for (;;) {
-                vTaskDelay(pdMS_TO_TICKS(25));
-                param->millisec += 25;
-            }
-        }
-    #else
-        Ticker timer;
-
-        static void timerCallback() {
-            asyncTimer1.model.millisec += 25;
-        }
-    #endif
 
     public:
         Mng_Runtime(): Loggable("Runtime") {}
@@ -79,10 +58,6 @@ class Mng_Runtime: public Loggable {
 
             #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
                 pinMode(22, OUTPUT);
-
-                //! create task that run every 25ms on both cores
-                // xTaskCreatePinnedToCore(Mng_Runtime::onRefreshInterval, "myTask1", 1000, &(asyncTimer1.model), 1, NULL, 0);
-                // xTaskCreatePinnedToCore(Mng_Runtime::onRefreshInterval, "myTask2", 1000, &(asyncTimer2.model), 1, NULL, 1);
 
                 xTaskCreatePinnedToCore([](void *pvParam){
                     Mng_Network* network = (Mng_Network*)pvParam;
@@ -141,7 +116,6 @@ class Mng_Runtime: public Loggable {
                 }, "core1_TaskB", 4000, &network, 1, NULL, 1);
             #else
                 pinMode(2, OUTPUT);
-                // timer.attach(0.025, Mng_Runtime::timerCallback);
             #endif
         }
 
