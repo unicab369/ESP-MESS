@@ -134,14 +134,14 @@ domReady(function() {
 )!^!";
 
 class Web_OTA: public Web_Base {
-    void makeContent() override {
-        char buf[1024];
-        snprintf_P(buf, sizeof(buf), INDEX_HTML, MY_ESP.boardType);
-        server->send(200, "text/html", buf);
-    }
+	void makeContent() override {
+		char buf[1024];
+		snprintf_P(buf, sizeof(buf), INDEX_HTML, MY_ESP.boardType);
+		server->send(200, "text/html", buf);
+	}
 
-    std::function<void()> onUpdate = [&]() {
-        HTTPUpload& upload = server->upload();
+	std::function<void()> onUpdate = [&]() {
+		HTTPUpload& upload = server->upload();
 
 		#ifdef ESP32
 			//# TODO
@@ -206,7 +206,7 @@ class Web_OTA: public Web_Base {
 				}
 			}
 		#endif
-    };
+	};
 
 	std::function<void()> onGetJS = [&]() {
 		server->send_P(200, "application/javascript", MAIN_JS);
@@ -220,20 +220,20 @@ class Web_OTA: public Web_Base {
 		AppPrintHeap();
 	};
 
-    public:
-        Web_OTA(): Web_Base("Web_OTA") {}
+	public:
+		Web_OTA(): Web_Base("Web_OTA") {}
 
-        void begin(Serv_Network *network, WebServer *server) {
-            load("/update", network, server);
+		void begin(Serv_Network *network, WebServer *server) {
+			load("/update", network, server);
 
-            // Handling uploading firmware file
-            server->on("/update", HTTP_POST, [&]() {
-                // server->send(200, "text/plain", (Update.hasError()) ? "Update: fail\n" : "Update: OK!\n");
-                delay(500);
-                ESP.restart();
-            }, onUpdate);
-            
-            server->on("/main.js", HTTP_GET, onGetJS);		//! FILE: main.js
-            server->on("/main.css", HTTP_GET, onGetCSS);	//! FILE: main.css
-        }
+			// Handling uploading firmware file
+			server->on("/update", HTTP_POST, [&]() {
+					// server->send(200, "text/plain", (Update.hasError()) ? "Update: fail\n" : "Update: OK!\n");
+					delay(500);
+					ESP.restart();
+			}, onUpdate);
+			
+			server->on("/main.js", HTTP_GET, onGetJS);		//! FILE: main.js
+			server->on("/main.css", HTTP_GET, onGetCSS);	//! FILE: main.css
+		}
 };

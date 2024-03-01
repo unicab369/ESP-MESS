@@ -6,10 +6,14 @@
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
 
-void setup() {
+Mng_Runtime runTime;
 
+void setup() {
+   Serial.begin(115200);
+   runTime.setupRunTime();
 }
 
 void loop() {
-   
+   runTime.runJob1();
+   runTime.runJob2();
 }

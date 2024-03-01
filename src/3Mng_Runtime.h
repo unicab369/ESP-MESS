@@ -15,16 +15,13 @@ class Mng_Runtime: public Loggable {
     std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
         if (runTime->secondsChanged == true) {            
             // //! Reset sensors reading every second
+            Serial.println("IM HERE");
+
+            char output[22];
+            sprintf(output, "+%lu", loopCnt1);
+            device.addDisplayQueues(output, 3);
+            loopCnt1 = 0;
             // device.addStoreQueue();
-        }
-    };
-
-    //! SECONDARY JOB
-    std::function<void(RunTimeModel*)> runtimeCb2 = [&](RunTimeModel* runTime) {
-        if (runTime->secondsChanged == true) {
-            // if (runTime->isSecondInterval(5)) {
-            //     DataContent content;
-
         }
     };
 
@@ -143,7 +140,8 @@ class Mng_Runtime: public Loggable {
                     }
                 }, "core1_TaskB", 4000, &network, 1, NULL, 1);
             #else
-                timer.attach(0.025, Mng_Runtime::timerCallback);
+                pinMode(2, OUTPUT);
+                // timer.attach(0.025, Mng_Runtime::timerCallback);
             #endif
         }
 
@@ -153,8 +151,9 @@ class Mng_Runtime: public Loggable {
             loopCnt1++;
             network.run();
 
-            // //! JOB1
-            // asyncTimer1.run(runtimeCb1);
+            #ifdef ESP8266
+                asyncTimer1.run(runtimeCb1);
+            #endif
         }
 
         void runJob2() {
@@ -163,6 +162,8 @@ class Mng_Runtime: public Loggable {
             if (millis() - timeRef > 100) {
                 #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
                     digitalWrite(22, !digitalRead(22));
+                #else
+                    digitalWrite(2, !digitalRead(2));
                 #endif
                 
                 timeRef = millis();
@@ -170,9 +171,6 @@ class Mng_Runtime: public Loggable {
             }
 
             device.runGroupTasks();
-
-            //! JOB2: LIVE TASKS
-            // asyncTimer2.run(runtimeCb2);
         }
 };
 

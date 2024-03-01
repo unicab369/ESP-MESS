@@ -88,7 +88,6 @@ struct RunTimeModel {
 
 class AsyncTimer {
     uint32_t timeRef = millis();
-    std::function<void(RunTimeModel*)>* callback;
     uint8_t coreId;
     uint16_t lastRead = 2;
 

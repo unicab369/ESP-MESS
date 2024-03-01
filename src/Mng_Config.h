@@ -41,7 +41,7 @@ x
                 btn1 = 6;
                 sda0 = 4; scl0 = 5;
             
-            #elif ESP_MESS_V3
+            #elif ESP_MESS_V3 && defined(ESP32)
                 led1 = 22;
                 btn1 = 16;
                 rotaryA = 13; rotaryB = 15;
@@ -108,7 +108,7 @@ x
                 // xLogSection("DIRECTIVE = ESP8266");
                 
                 // D0: 16, D1: 5, D2: 4, D3: 0, D4: 2, D5: 14, D6: 12, D7: 13, D8: 15
-                sda0 = 5; scl0 = 4;
+                scl0 = 5; sda0 = 4;
                 led1 = 2;
                 btn1 = 0;
                 // relay1 = 14;

@@ -22,7 +22,7 @@ void setup() {
   // Wire.begin(4, 5);
   // disp.setup(&Wire);
   // pinMode(12, OUTPUT);
-
+  
   xTaskCreatePinnedToCore([](void *pvParam) {
     while(1) { 
       runTime.runJob1();

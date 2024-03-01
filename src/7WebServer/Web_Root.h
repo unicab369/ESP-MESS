@@ -156,22 +156,22 @@ class Web_Root: public Web_Base {
             load("/", network, server);
             server->onNotFound(handleBaseContent);
 
-            devConfig.begin(network, server);
-            ctrlConfig.begin(network, server);
-            devFile.begin(network, server);
+            // devConfig.begin(network, server);
+            // ctrlConfig.begin(network, server);
+            // devFile.begin(network, server);
             webOTA.begin(network, server);
             
-            server->on("/uPlot.iife.min.js", HTTP_GET, uPlotJs);
-            server->on("/uPlot.min.css", HTTP_GET, uPlotCss);
-            server->on("/testPlot", HTTP_GET, uPlotHtml);
+            // server->on("/uPlot.iife.min.js", HTTP_GET, uPlotJs);
+            // server->on("/uPlot.min.css", HTTP_GET, uPlotCss);
+            // server->on("/testPlot", HTTP_GET, uPlotHtml);
 
-            server->on("/root.js", HTTP_GET, handleJs);
-            server->on("/button.css", HTTP_GET, pureCssButton);
-            server->on("/forms.css", HTTP_GET, pureCssForm);
+            // server->on("/root.js", HTTP_GET, handleJs);
+            // server->on("/button.css", HTTP_GET, pureCssButton);
+            // server->on("/forms.css", HTTP_GET, pureCssForm);
 
-            server->on("/restart", HTTP_POST, handleRestart);
-            server->on("/toggleIO", HTTP_POST, handleToggle);
-            server->on("/setTime", handleSetTime);
-            server->on("/sendRF", handleSendRF);
+            // server->on("/restart", HTTP_POST, handleRestart);
+            // server->on("/toggleIO", HTTP_POST, handleToggle);
+            // server->on("/setTime", handleSetTime);
+            // server->on("/sendRF", handleSendRF);
         }
 };
