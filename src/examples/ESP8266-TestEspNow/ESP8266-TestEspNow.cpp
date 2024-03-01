@@ -74,38 +74,38 @@ void setup() {
    Serial.begin(115200);
    unsigned long timeRef = millis();
 
-   pinMode(PIN_CTRL1, INPUT);    //! Control Input1
-   pinMode(PIN_CTRL2, INPUT);    //! Control Input2
-   pinMode(PIN_MODE, INPUT_PULLUP);
-   pinMode(PIN_DONE, OUTPUT);
-   pinMode(PIN_LED, OUTPUT);
+   // pinMode(PIN_CTRL1, INPUT);    //! Control Input1
+   // pinMode(PIN_CTRL2, INPUT);    //! Control Input2
+   // pinMode(PIN_MODE, INPUT_PULLUP);
+   // pinMode(PIN_DONE, OUTPUT);
+   // pinMode(PIN_LED, OUTPUT);
 
-   bool read1 = digitalRead(PIN_CTRL1);
-   bool read2 = digitalRead(PIN_CTRL2);
-   configureESPNow();
+   // bool read1 = digitalRead(PIN_CTRL1);
+   // bool read2 = digitalRead(PIN_CTRL2);
+   // configureESPNow();
 
-   if (read1 || read2) {
-      read1 ? tweet.command.sendSingleClick(PIN_CTRL1) : tweet.command.sendSingleClick(PIN_CTRL2);
-      delay(1);
-      digitalWrite(PIN_DRIVE, LOW);             //! Power Release
-      for (;;) {}
+   // if (read1 || read2) {
+   //    read1 ? tweet.command.sendSingleClick(PIN_CTRL1) : tweet.command.sendSingleClick(PIN_CTRL2);
+   //    delay(1);
+   //    digitalWrite(PIN_DRIVE, LOW);             //! Power Release
+   //    for (;;) {}
 
-   } else {
-      // setup i2C
-      Wire.begin(4, 5);
-      sht.setup(&Wire);
-      bh17.setup(&Wire);
+   // } else {
+   //    // setup i2C
+   //    Wire.begin(4, 5);
+   //    sht.setup(&Wire);
+   //    bh17.setup(&Wire);
 
-      // Serial.print("TWEET MODE");
-      if(!ina219.begin()){
-         // Serial.println("INA219 not connected!");
-      }
+   //    // Serial.print("TWEET MODE");
+   //    if(!ina219.begin()){
+   //       // Serial.println("INA219 not connected!");
+   //    }
 
-      // request readings: need to wait at least 20ms before collect reading
-      // start the Wifi to save wait time
-      sht.requestReadings();
-      bh17.requestReadings();
-   }
+   //    // request readings: need to wait at least 20ms before collect reading
+   //    // start the Wifi to save wait time
+   //    sht.requestReadings();
+   //    bh17.requestReadings();
+   // }
 
 
    // if (!digitalRead(PIN_MODE)) {
@@ -120,11 +120,15 @@ void setup() {
 }
 
 void loop() {
-   if (currentMode == MODE_SETUP) {
-      network.run();
-   } else {
-      logSensors();
-      digitalWrite(PIN_DONE, !digitalRead(PIN_DONE));
-      delay(2000);
-   }
+   // if (currentMode == MODE_SETUP) {
+   //    network.run();
+   // } else {
+   //    logSensors();
+   //    digitalWrite(PIN_DONE, !digitalRead(PIN_DONE));
+   //    delay(2000);
+   // }
+
+   Serial.println("IM HERE AAA");
+   ESP.deepSleep(3000000, WAKE_RF_DEFAULT);
+   Serial.println("IM HERE BBBB");
 }
