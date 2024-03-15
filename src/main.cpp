@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <functional>
-#include <Wire.h>
-#include <SPI.h>
+// #include <Wire.h>
+// #include <SPI.h>
 
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
@@ -14,14 +14,16 @@ Mng_Runtime runTime;
 
 void setup() {
   Serial.begin(115200);
-  runTime.setupRunTime();
+  pinMode(2, OUTPUT);
 
-  // // SPI.begin(18, 19, 23, 2);
-  // // epaperz.setup();
-  // bluetooth.setup();
-  // Wire.begin(4, 5);
-  // disp.setup(&Wire);
-  // pinMode(12, OUTPUT);
+  // runTime.setupRunTime();
+
+  // // // SPI.begin(18, 19, 23, 2);
+  // // // epaperz.setup();
+  // // bluetooth.setup();
+  // // Wire.begin(4, 5);
+  // // disp.setup(&Wire);
+  // // pinMode(12, OUTPUT);
   
   xTaskCreatePinnedToCore([](void *pvParam) {
     while(1) { 
