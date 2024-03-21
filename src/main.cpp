@@ -16,7 +16,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(2, OUTPUT);
 
-  // runTime.setupRunTime();
+  runTime.setupRunTime();
 
   // // // SPI.begin(18, 19, 23, 2);
   // // // epaperz.setup();

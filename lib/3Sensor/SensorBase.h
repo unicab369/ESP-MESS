@@ -8,15 +8,16 @@ class SensorBase {
 
         uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen, int delayMs = 20) {
             thisWire = _wire;
-            registerCmd(cmd, cmdLen);
+
             delay(delayMs);
+            writeBuffer(cmd, cmdLen);
             thisWire->requestFrom(address, 1);
             return thisWire->read();
         }
 
-        bool _requestReadings(byte* cmd, byte cmdLen, unsigned long wait, byte _dataLen) {
+        bool _requestReadings(byte* cmd, byte cmdLen, byte _dataLen) {
             if (checkConnection()==false) return false;
-            registerCmd(cmd, cmdLen);
+            writeBuffer(cmd, cmdLen);
             dataLen = _dataLen;
             return true;
         }
@@ -26,19 +27,11 @@ class SensorBase {
     public:
         virtual uint16_t setup(TwoWire *wire) { return 0; }
         virtual bool requestReadings() { return false; }
-        virtual void reset() { }
         
         bool checkConnection() {
             thisWire->beginTransmission(address);
             byte err = thisWire->endTransmission();
             return err == 0;
-        }
-
-        void registerCmd(byte *cmd, byte len) {
-            if (len==0) { return; }
-            thisWire->beginTransmission(address);
-            for (byte i=0; i<len; i++) { thisWire->write(cmd[i]); }
-            thisWire->endTransmission();
         }
 
         bool collectReadings() {
@@ -53,9 +46,52 @@ class SensorBase {
             onReceiveData(buf);
             return true;
         }
+
+        //! Read Write into buffer
+        bool readBuffer(uint8_t* output, byte len) {
+            byte readLen = thisWire->requestFrom(address, len);
+            for (byte i=0; i<len; i++) output[i] = thisWire->read();
+            return readLen == len;
+        }
+
+        bool writeBuffer(byte *cmd, byte len) {
+            if (len==0) return false;
+            thisWire->beginTransmission(address);
+            for (byte i=0; i<len; i++) thisWire->write(cmd[i]);
+            return thisWire->endTransmission() == 0;
+        }
+
+        //! Read Write Value
+        bool readValue(uint8_t cmd, uint8_t &value) {
+            bool check = writeValue(cmd);
+            thisWire->requestFrom(address, 1);
+            value = Wire.read();
+            return check;
+        }
+
+        bool writeValue(byte cmd) {
+            thisWire->beginTransmission(address);
+            thisWire->write(cmd);
+            return thisWire->endTransmission() == 0;
+        }
+
+        //! Read uint16_t
+        bool readUint16(uint8_t* cmd, uint8_t len, uint16_t &value, bool reverted = false) {
+            bool check1 = writeBuffer(cmd, len);
+            uint8_t byte_val[2];
+            bool check2 = readBuffer(byte_val, 2);
+            
+            if (reverted) {
+                value = ((uint16_t)byte_val[1] << 8) | byte_val[0];
+            } else {
+                value = ((uint16_t)byte_val[0] << 8) | byte_val[1];
+            }
+            
+            return check1;
+        }
 };
 
-class TempHum_Interface {
+class Interface_TempHum {
     float temp = -1;
     float hum = -1;
 
@@ -65,17 +101,26 @@ class TempHum_Interface {
 
         float getTemp() { return temp; }
         float getHum()  { return hum; }
+
+        void resetReadings() {
+            temp = -1;
+            hum = -1;
+        }
 };
 
-class Lux_Interface {
+class Interface_Lux {
     float lux = -1;
 
     public:
         void setLux(float _lux) { lux = _lux; }
         float getLux() { return lux; }
+
+        void resetReadings() {
+            lux = -1;
+        }
 };
 
-class Current_Interface {
+class Interface_Current {
     float busVoltage = -1;
     float mA = -1;
 
@@ -86,7 +131,7 @@ class Current_Interface {
         float getBusVoltage() { return busVoltage; }
         float getmA() { return mA; }
 
-        void reset() {
+        void resetReadings() {
             busVoltage = -1;
             mA = -1;
         }

@@ -1,3 +1,9 @@
+void printBinary(uint8_t num) {
+   for (int i = 7; i >= 0; --i) {
+      Serial.print((num >> i) & 1);
+   }
+}
+
 #include "Loggable.h"
 #include "AppPrint.h"
 

@@ -6,7 +6,7 @@ byte SHT_HIGHREP_FREE_CMD[2]    = { 0x24, 0x00 };
 byte SHT_MEDREP_FREE_CMD[2]     = { 0x24, 0x0B };
 byte SHT_LOWREP_FREE_CMD[2]     = { 0x24, 0x16 };
 
-class Mod2_SHT3: public SensorBase, public TempHum_Interface {
+class Mod2_SHT3: public SensorBase, public Interface_TempHum {
     void onReceiveData(uint16_t *buf) override {
         int32_t temp = (int32_t)(((uint32_t)buf[0] << 8) | buf[1]);
         temp = ((4375 * temp) >> 14) - 4500;
@@ -21,19 +21,14 @@ class Mod2_SHT3: public SensorBase, public TempHum_Interface {
 
     public:
         //! addr 0x44
-        Mod2_SHT3(): SensorBase(0x44), TempHum_Interface() {}
+        Mod2_SHT3(): SensorBase(0x44), Interface_TempHum() {}
 
         uint16_t setup(TwoWire *wire) override {
             uint16_t value = _setup(wire, SHT_RESET_CMD, 2, 0);
             return value;
         }
-        
-        void reset() override { 
-            setTemp(-1); 
-            setHum(-1);
-        }
 
         bool requestReadings() override {
-            return _requestReadings(SHT_HIGHREP_FREE_CMD, 2, 15, 6);
+            return _requestReadings(SHT_HIGHREP_FREE_CMD, 2, 6);
         }
 };

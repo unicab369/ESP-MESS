@@ -12,9 +12,10 @@ byte BH17_ONCE_LOW[1]   = { 0x23 };   // 4 lux resolution 16ms
 byte BH17_BEGIN[2]      = { 0x01, 0x23 };
 #define BH17_DEFAULT_MTREG 69
 
-class Mod2_BH17: public SensorBase, public Lux_Interface {
-    
+class Mod2_BH17: public SensorBase, public Interface_Lux {
     void onReceiveData(uint16_t *buf) override {
+        Serial.printf("\nHighByte = %02X, LowByte = %02x", buf[1], buf[0]);
+
         uint32_t value = buf[0];
         value <<= 8;
         value |= buf[1];
@@ -24,19 +25,97 @@ class Mod2_BH17: public SensorBase, public Lux_Interface {
 
     public:
         //! addr 0x23
-        Mod2_BH17(): SensorBase(0x23), Lux_Interface() {}
+        Mod2_BH17(): SensorBase(0x23), Interface_Lux() {}
 
         uint16_t setup(TwoWire *wire) override {
             uint16_t value = _setup(wire, BH17_CONT_LOW, 1, 0);
             return value;
         }
 
-        void reset() override { 
-            setLux(-1); 
+        bool requestReadings() override {
+            return _requestReadings(0, 0, 2);
         }
 
-        bool requestReadings() override {
-            return _requestReadings(0, 0, 10, 2);
+        void getReading() {
+            uint16_t value;
+            readUint16(0, 0, value);
+            Serial.printf("\nHexValue = %04X", value);
+            setLux(value/1.2);
+        }
+};
+
+#define APDS9930_ENABLE 0x00
+#define AUTO_INCREMENT  0xA0
+#define DEFAULT_ATIME 0xED
+/* ALS coefficients */
+
+#define DF      52
+#define GA      0.49
+#define ALS_B   1.862
+#define ALS_C   0.746
+#define ALS_D   1.291
+
+byte APDS9930_START[2] = { APDS9930_ENABLE | AUTO_INCREMENT, 0x03 };
+
+class Mod_APDS9930: public SensorBase, public Interface_Lux {
+
+    public:
+        //! addr
+        Mod_APDS9930(): SensorBase(0x39), Interface_Lux() {}
+
+        uint16_t setup(TwoWire *wire) override {
+            // Enable Register (0x00)
+            // Reserved SAI PIEN AIEN WEN PEN AEN(1) PON(1) - set bit AEN and PON to HIGH
+            uint16_t value = _setup(wire, APDS9930_START, 2, 0);
+
+            uint8_t reg0;
+            readValue(0x00 | 0xA0, reg0);
+            Serial.print("\nEnable_Reg = "); printBinary(reg0);
+
+            // APDS9930_ATIME
+            uint8_t writeVal[2] = { 0x01 | 0xA0, 0xE1 };
+            writeBuffer(writeVal, 2);
+
+            uint8_t reg1;
+            readValue(0x01 | 0xA0, reg1);
+            Serial.printf("\nReg1 = %02X", reg1);
+
+            // APDS9930_WTIME
+            uint8_t writeVal2[2] = { 0x03 | 0xA0, 0xF1 };
+            writeBuffer(writeVal2, 2);
+
+            uint8_t reg2;
+            readValue(0x03 | 0xA0, reg2);
+            Serial.printf("\nReg2 = %02X", reg2);
+
+            // DEFAULT_PPULSE
+            uint8_t writeVal3[2] = { 0x0E | 0xA0, 0x01 };
+            writeBuffer(writeVal3, 2);
+
+            uint8_t reg3;
+            readValue(0x0E | 0xA0, reg3);
+            Serial.printf("\nReg3 = %02X", reg3);
+
+            return value;
+        }
+
+        void getReading() {
+            uint8_t request1[2] = { 0x14 | AUTO_INCREMENT, 
+                                    0x15 | AUTO_INCREMENT };
+            uint8_t request2[2] = { 0x16 | AUTO_INCREMENT, 
+                                    0x17 | AUTO_INCREMENT };
+
+            uint16_t ch0, ch1;
+            readUint16(request1, 2, ch0, true);
+            readUint16(request2, 2, ch1, true);
+
+            uint8_t x[4]={1,8,16,120};
+            float ALSIT = 2.73 * (256 - DEFAULT_ATIME);
+            float iac  = max(ch0 - ALS_B * ch1, ALS_C * ch0 - ALS_D * ch1);
+            if (iac < 0) iac = 0;
+            float lpc  = GA * DF / (ALSIT * x[0]);
+
+            setLux(iac * lpc);
         }
 };
 
