@@ -22,7 +22,7 @@ class SensorBase {
             return true;
         }
 
-        virtual void onReceiveData(uint16_t* buf) {}
+        virtual void onReceiveData(uint8_t* buf) {}
 
     public:
         virtual uint16_t setup(TwoWire *wire) { return 0; }
@@ -37,7 +37,7 @@ class SensorBase {
         bool collectReadings() {
             if (checkConnection()==false) return false;
             thisWire->requestFrom(address, dataLen);
-            uint16_t buf[dataLen] = { 0 };
+            uint8_t buf[dataLen] = { 0 };
 
             for (byte i=0; i<dataLen; i++) {
                 buf[i] = thisWire->read();
@@ -76,17 +76,15 @@ class SensorBase {
         }
 
         //! Read uint16_t
+        uint16_t makeUint16(uint8_t highByte, uint8_t lowByte) {
+            return ((uint16_t)highByte << 8) | lowByte;
+        }
+
         bool readUint16(uint8_t* cmd, uint8_t len, uint16_t &value, bool reverted = false) {
             bool check1 = writeBuffer(cmd, len);
             uint8_t byte_val[2];
             bool check2 = readBuffer(byte_val, 2);
-            
-            if (reverted) {
-                value = ((uint16_t)byte_val[1] << 8) | byte_val[0];
-            } else {
-                value = ((uint16_t)byte_val[0] << 8) | byte_val[1];
-            }
-            
+            value = reverted ? makeUint16(byte_val[1], byte_val[0]) : makeUint16(byte_val[0], byte_val[1]);
             return check1;
         }
 };

@@ -13,7 +13,7 @@ byte BH17_BEGIN[2]      = { 0x01, 0x23 };
 #define BH17_DEFAULT_MTREG 69
 
 class Mod2_BH17: public SensorBase, public Interface_Lux {
-    void onReceiveData(uint16_t *buf) override {
+    void onReceiveData(uint8_t *buf) override {
         Serial.printf("\nHighByte = %02X, LowByte = %02x", buf[1], buf[0]);
 
         uint32_t value = buf[0];
@@ -39,7 +39,6 @@ class Mod2_BH17: public SensorBase, public Interface_Lux {
         void getReading() {
             uint16_t value;
             readUint16(0, 0, value);
-            Serial.printf("\nHexValue = %04X", value);
             setLux(value/1.2);
         }
 };
@@ -73,7 +72,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             Serial.print("\nEnable_Reg = "); printBinary(reg0);
 
             // APDS9930_ATIME
-            uint8_t writeVal[2] = { 0x01 | 0xA0, 0xE1 };
+            uint8_t writeVal[2] = { 0x01 | 0xA0, 0xED };
             writeBuffer(writeVal, 2);
 
             uint8_t reg1;
@@ -81,7 +80,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             Serial.printf("\nReg1 = %02X", reg1);
 
             // APDS9930_WTIME
-            uint8_t writeVal2[2] = { 0x03 | 0xA0, 0xF1 };
+            uint8_t writeVal2[2] = { 0x03 | 0xA0, 0xFF };
             writeBuffer(writeVal2, 2);
 
             uint8_t reg2;
@@ -89,7 +88,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             Serial.printf("\nReg2 = %02X", reg2);
 
             // DEFAULT_PPULSE
-            uint8_t writeVal3[2] = { 0x0E | 0xA0, 0x01 };
+            uint8_t writeVal3[2] = { 0x0E | 0xA0, 0x08 };
             writeBuffer(writeVal3, 2);
 
             uint8_t reg3;

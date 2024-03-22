@@ -1,5 +1,5 @@
 class Mod_INA219: public SensorBase, public Interface_Current {
-   void onReceiveData(uint16_t *buf) override {
+   void onReceiveData(uint8_t *buf) override {
       uint16_t val1 = *buf;
       uint16_t val2 = (val1 >> 3) * 4;
       setBusVoltage(val2/1000);
