@@ -68,7 +68,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             uint16_t value = _setup(wire, APDS9930_START, 2, 0);
 
             uint8_t reg0;
-            readValue(0x00 | 0xA0, reg0);
+            readByte(0x00 | 0xA0, reg0);
             Serial.print("\nEnable_Reg = "); printBinary(reg0);
 
             // APDS9930_ATIME
@@ -76,7 +76,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             writeBuffer(writeVal, 2);
 
             uint8_t reg1;
-            readValue(0x01 | 0xA0, reg1);
+            readByte(0x01 | 0xA0, reg1);
             Serial.printf("\nReg1 = %02X", reg1);
 
             // APDS9930_WTIME
@@ -84,7 +84,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             writeBuffer(writeVal2, 2);
 
             uint8_t reg2;
-            readValue(0x03 | 0xA0, reg2);
+            readByte(0x03 | 0xA0, reg2);
             Serial.printf("\nReg2 = %02X", reg2);
 
             // DEFAULT_PPULSE
@@ -92,7 +92,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             writeBuffer(writeVal3, 2);
 
             uint8_t reg3;
-            readValue(0x0E | 0xA0, reg3);
+            readByte(0x0E | 0xA0, reg3);
             Serial.printf("\nReg3 = %02X", reg3);
 
             return value;

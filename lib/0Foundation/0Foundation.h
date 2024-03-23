@@ -4,6 +4,13 @@ void printBinary(uint8_t num) {
    }
 }
 
+void printBinary(uint16_t num) {
+   for (int i = 15; i >=0; i--) {
+      if (i==7) Serial.print(" ");
+      Serial.print((num >> i) & 1);
+   }
+}
+
 #include "Loggable.h"
 #include "AppPrint.h"
 

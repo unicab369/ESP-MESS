@@ -62,17 +62,33 @@ class SensorBase {
         }
 
         //! Read Write Value
-        bool readValue(uint8_t cmd, uint8_t &value) {
-            bool check = writeValue(cmd);
+        bool readByte(uint8_t cmd, uint8_t &value) {
+            bool check = writeByte(cmd);
             thisWire->requestFrom(address, 1);
             value = Wire.read();
             return check;
         }
 
-        bool writeValue(byte cmd) {
+        bool writeByte(byte cmd) {
             thisWire->beginTransmission(address);
             thisWire->write(cmd);
             return thisWire->endTransmission() == 0;
+        }
+
+        //! zzzzz
+        bool read2Bytes(uint8_t cmd, uint16_t &value) {
+            bool check = writeByte(cmd);
+            uint8_t byte_val[2];
+            bool check2 = readBuffer(byte_val, 2);
+            value = makeUint16(byte_val[0], byte_val[1]);
+            return check;
+        }
+
+        bool write2Bytes(uint8_t cmd, uint16_t value) {
+            uint8_t lVal = value & 0xFF;
+            uint8_t hVal = value >> 8;
+            uint8_t buffer[3] = {cmd, hVal, lVal};
+            return writeBuffer(buffer, sizeof(buffer));
         }
 
         //! Read uint16_t

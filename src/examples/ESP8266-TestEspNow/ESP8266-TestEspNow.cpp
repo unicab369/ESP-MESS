@@ -7,7 +7,10 @@
 
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
-#include <Adafruit_INA219.h>
+// #include <Adafruit_INA219.h>
+#include <INA219_WE.h>
+
+INA219_WE ina219c = INA219_WE(0x40);
 
 #define PIN_CTRL1 12
 #define PIN_CTRL2 14
@@ -27,28 +30,22 @@ Serv_Tweet tweet;
 Serv_EspNow espNow;
 Net_Wifi wifi;
 TimeoutItem testTimer;       //* print time logger
-int BROADCAST_CHANNEL = 10;
+int BROADCAST_CHANNEL = 6;
 
 Serv_Device device;
 Mng_Network network;
 DeviceMode currentMode = MODE_LOWPOWER;
-
-std::function<void(DataPacket2*)> onTweet2 = [](DataPacket2* packet) {
-   Serial.println("IM HERE 3");
-   // espNow.send(packet, sizeof(DataPacket2));
-};
-
 unsigned long timeRef = millis();
-Adafruit_INA219 ina219;
+// Adafruit_INA219 ina219;
 
 Mod_APDS9930 apds99;
+Mod_INA219 ina219b;
 
 void configureESPNow() {
    wifi.setTxPower(0);
    wifi.startAP(true, BROADCAST_CHANNEL);
    tweet.setup(&espNow);
-   espNow.setup(6);
-   // Serial.print("Channel = "); Serial.println(WiFi.channel());
+   espNow.setup(WiFi.channel());
 }
 
 void setup() {
@@ -94,9 +91,9 @@ void setup() {
             timeRef = millis();
          }
 
-         Serial.println("IM HERE AAA");
-         ESP.deepSleep(6000000);
-         Serial.println("IM HERE BBBB");
+         // Serial.println("IM HERE AAA");
+         // ESP.deepSleep(6000000);
+         // Serial.println("IM HERE BBBB");
       }
 
    } else {
@@ -106,10 +103,17 @@ void setup() {
       bh17.setup(&Wire);
       apds99.setup(&Wire);
 
-      // Serial.print("TWEET MODE");
-      if(!ina219.begin()){
+      if(!ina219c.init()){
          Serial.println("INA219 not connected!");
       }
+      
+      uint16_t confRead = ina219c.readRegister(INA219_WE::INA219_CONF_REG);
+      Serial.printf("\nINA29_CONFIG_REG = 0x%04X", confRead);
+
+      uint16 calRead = ina219c.readRegister(INA219_WE::INA219_CAL_REG);
+      Serial.printf("\nINA29_CAL_REG = 0x%04X", calRead);
+
+      ina219b.setup(&Wire);
 
       // request readings: need to wait at least 20ms before collect reading
       // start the Wifi to save wait time
@@ -121,12 +125,14 @@ void logSensors() {
    float temp = 0, hum = 0, lux1 = 0, lux2 = 0;
    float busvoltage = 0, current_mA = 0;
 
-   // collect readings
-   busvoltage = ina219.getBusVoltage_V();
-   current_mA = ina219.getCurrent_mA();
-   if (std::isnan(current_mA)) current_mA = 0.0f;
-   Serial.printf("\n\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
+   // // collect readings
+   // busvoltage = ina219.getBusVoltage_V();
+   // current_mA = ina219.getCurrent_mA();
+   // if (std::isnan(current_mA)) current_mA = 0.0f;
+   // Serial.printf("\n\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
    
+   // ina219b.getReading();
+
    // sht3x.requestReadings(); 
    // sht3x.collectReadings();
    // bh17.requestReadings();
@@ -135,16 +141,24 @@ void logSensors() {
    sht3x.getReading();
    bh17.getReading();
    apds99.getReading();
+   ina219b.getReading();
+
+   busvoltage = ina219c.getBusVoltage_V();
+   current_mA = ina219c.getCurrent_mA();
+   Serial.printf("\n\nbusVoltage = %.2f, mA= %.2f", busvoltage, current_mA);
+
+   busvoltage = ina219b.getBusVoltage();
+   current_mA = ina219b.getmA();
 
    temp = sht3x.getTemp();
    hum = sht3x.getHum();
    lux1 = bh17.getLux();
    lux2 = apds99.getLux();
 
-   Serial.printf("\ntemp = %.2f, hum = %.2f, lux1 = %.2f, lux2 = %.2f", temp, hum, lux1, lux2);
-
    // send readings
-   tweet.record.sendTempHumLux(temp, hum, lux1, busvoltage, current_mA);
+   Serial.printf("\ntemp = %.2f, hum = %.2f, lux1 = %.2f, lux2 = %.2f", temp, hum, lux1, lux2);
+   Serial.printf("\n\n***busVoltage = %.2f, mA= %.2f", busvoltage, current_mA);
+   // tweet.record.sendTempHumLux(temp, hum, lux1, busvoltage, current_mA);
 }
 
 
