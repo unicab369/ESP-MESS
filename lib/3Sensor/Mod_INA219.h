@@ -12,7 +12,7 @@ class Mod_INA219: public SensorBase, public Interface_Current {
 
       uint16_t setup(TwoWire *wire) override {
          uint8_t cmd1[] = { 0x05 };
-         uint16_t value = _setup(wire, cmd1, 1, 0);
+         uint16_t value = _setup(wire, cmd1, 1);
 
          //! Reset
          write2Bytes(0x00, 0x8000);
@@ -55,12 +55,12 @@ class Mod_INA219: public SensorBase, public Interface_Current {
          return 1;
       }
 
-      bool requestReadings() override {
-         uint8_t readCmd[] = { 0x02 };
-         return _requestReadings(readCmd, 2, 2);
-      }
+      // bool requestReadings() override {
+      //    uint8_t readCmd[] = { 0x02 };
+      //    return _requestReadings(readCmd, 2, 2);
+      // }
 
-      void getReading() {
+      bool getReading() override {
          uint16_t busVoltage, mA;
 
          read2Bytes(0x02, busVoltage);
@@ -70,5 +70,6 @@ class Mod_INA219: public SensorBase, public Interface_Current {
          read2Bytes(0x04, mA);
          float maVal = (int16_t)mA/10.0;
          setCurrent(maVal);
+         return true;
       }
 };

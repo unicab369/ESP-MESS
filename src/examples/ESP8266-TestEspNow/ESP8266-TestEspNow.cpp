@@ -68,7 +68,7 @@ void setup() {
    } 
 
    if (read1 && read2) {
-      Serial.print("SETUP MODE");
+      Serial.print("\nSETUP MODE");
       device.configure();
       network.setup(&device);
       currentMode = MODE_SETUP;
@@ -81,6 +81,8 @@ void setup() {
       }
 
    } else if (read1 || read2) {
+      Serial.print("\nMODE 2");
+
       read1 ? tweet.command.sendSingleClick(PIN_CTRL1) : tweet.command.sendSingleClick(PIN_CTRL2);
       delay(1);
       digitalWrite(PIN_DRIVE, LOW);             //! POWER RELEASE
@@ -97,6 +99,8 @@ void setup() {
       }
 
    } else {
+      Serial.print("\nMODE3");
+
       // setup i2C
       Wire.begin(4, 5);
       sht3x.setup(&Wire);
@@ -110,7 +114,7 @@ void setup() {
       uint16_t confRead = ina219c.readRegister(INA219_WE::INA219_CONF_REG);
       Serial.printf("\nINA29_CONFIG_REG = 0x%04X", confRead);
 
-      uint16 calRead = ina219c.readRegister(INA219_WE::INA219_CAL_REG);
+      uint16_t calRead = ina219c.readRegister(INA219_WE::INA219_CAL_REG);
       Serial.printf("\nINA29_CAL_REG = 0x%04X", calRead);
 
       ina219b.setup(&Wire);
@@ -158,7 +162,7 @@ void logSensors() {
    // send readings
    Serial.printf("\ntemp = %.2f, hum = %.2f, lux1 = %.2f, lux2 = %.2f", temp, hum, lux1, lux2);
    Serial.printf("\n\n***busVoltage = %.2f, mA= %.2f", busvoltage, current_mA);
-   // tweet.record.sendTempHumLux(temp, hum, lux1, busvoltage, current_mA);
+   tweet.record.sendTempHumLux(temp, hum, lux2, busvoltage, current_mA);
 }
 
 

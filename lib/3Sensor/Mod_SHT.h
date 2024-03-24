@@ -7,33 +7,21 @@ byte SHT_MEDREP_FREE_CMD[2]     = { 0x24, 0x0B };
 byte SHT_LOWREP_FREE_CMD[2]     = { 0x24, 0x16 };
 
 class Mod2_SHT3: public SensorBase, public Interface_TempHum {
-    void onReceiveData(uint8_t *buf) override {
-        int32_t temp = (int32_t)(((uint32_t)buf[0] << 8) | buf[1]);
-        temp = ((4375 * temp) >> 14) - 4500;
-        setTemp((float)temp / 100.0f);
-
-        uint32_t hum = ((uint32_t)buf[3] << 8) | buf[4];
-        hum = (625 * hum) >> 12;
-        setHum((float)hum / 100.0f);
-    }
-
     public:
         //! addr 0x44
         Mod2_SHT3(): SensorBase(0x44), Interface_TempHum() {}
 
         uint16_t setup(TwoWire *wire) override {
-            uint16_t value = _setup(wire, SHT_RESET_CMD, 2, 0);
+            uint16_t value = _setup(wire, SHT_RESET_CMD, 2);
             return value;
         }
 
         bool requestReadings() override {
-            return _requestReadings(SHT_HIGHREP_FREE_CMD, 2, 6);
+            writeBuffer(SHT_HIGHREP_FREE_CMD, 2);
+            return true;
         }
 
-        void getReading() {
-            bool check = writeBuffer(SHT_HIGHREP_FREE_CMD, 2);
-            if (!check) return;
-            
+        bool getReading() override {
             uint8_t buf[6] = { 0 };
             bool check2 = readBuffer(buf, 6);
 
@@ -43,6 +31,7 @@ class Mod2_SHT3: public SensorBase, public Interface_TempHum {
 
             uint32_t hum = (uint32_t)makeUint16(buf[3], buf[4]);
             hum = (625 * hum) >> 12;
-            setHum((float)hum / 100.0f);   
+            setHum((float)hum / 100.0f);
+            return true;
         }
 };

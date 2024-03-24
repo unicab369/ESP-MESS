@@ -6,45 +6,22 @@ class SensorBase {
         TwoWire *thisWire;
         SensorBase(int _addr): address(_addr) {}
 
-        uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen, int delayMs = 20) {
+        uint16_t _setup(TwoWire* _wire, byte* cmd, byte cmdLen) {
             thisWire = _wire;
-
-            delay(delayMs);
             writeBuffer(cmd, cmdLen);
             thisWire->requestFrom(address, 1);
             return thisWire->read();
         }
 
-        bool _requestReadings(byte* cmd, byte cmdLen, byte _dataLen) {
-            if (checkConnection()==false) return false;
-            writeBuffer(cmd, cmdLen);
-            dataLen = _dataLen;
-            return true;
-        }
-
-        virtual void onReceiveData(uint8_t* buf) {}
-
     public:
         virtual uint16_t setup(TwoWire *wire) { return 0; }
-        virtual bool requestReadings() { return false; }
+        virtual bool requestReadings() { return true; }
+        virtual bool getReading() { return false; }
         
         bool checkConnection() {
             thisWire->beginTransmission(address);
             byte err = thisWire->endTransmission();
             return err == 0;
-        }
-
-        bool collectReadings() {
-            if (checkConnection()==false) return false;
-            thisWire->requestFrom(address, dataLen);
-            uint8_t buf[dataLen] = { 0 };
-
-            for (byte i=0; i<dataLen; i++) {
-                buf[i] = thisWire->read();
-            } 
-
-            onReceiveData(buf);
-            return true;
         }
 
         //! Read Write into buffer

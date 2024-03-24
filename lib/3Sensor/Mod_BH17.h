@@ -13,33 +13,22 @@ byte BH17_BEGIN[2]      = { 0x01, 0x23 };
 #define BH17_DEFAULT_MTREG 69
 
 class Mod2_BH17: public SensorBase, public Interface_Lux {
-    void onReceiveData(uint8_t *buf) override {
-        Serial.printf("\nHighByte = %02X, LowByte = %02x", buf[1], buf[0]);
-
-        uint32_t value = buf[0];
-        value <<= 8;
-        value |= buf[1];
-        if (value>10000000) { value = 0; }
-        setLux(value/1.2);
-    }
-
     public:
         //! addr 0x23
         Mod2_BH17(): SensorBase(0x23), Interface_Lux() {}
 
         uint16_t setup(TwoWire *wire) override {
-            uint16_t value = _setup(wire, BH17_CONT_LOW, 1, 0);
+            uint16_t value = _setup(wire, BH17_CONT_LOW, 1);
             return value;
         }
 
-        bool requestReadings() override {
-            return _requestReadings(0, 0, 2);
-        }
-
-        void getReading() {
+        bool getReading() override {
             uint16_t value;
             readUint16(0, 0, value);
+
+            if (value>10000000) { value = 0; }
             setLux(value/1.2);
+            return true;
         }
 };
 
@@ -65,7 +54,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
         uint16_t setup(TwoWire *wire) override {
             // Enable Register (0x00)
             // Reserved SAI PIEN AIEN WEN PEN AEN(1) PON(1) - set bit AEN and PON to HIGH
-            uint16_t value = _setup(wire, APDS9930_START, 2, 0);
+            uint16_t value = _setup(wire, APDS9930_START, 2);
 
             uint8_t reg0;
             readByte(0x00 | 0xA0, reg0);
@@ -98,7 +87,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             return value;
         }
 
-        void getReading() {
+        bool getReading() override {
             uint8_t request1[2] = { 0x14 | AUTO_INCREMENT, 
                                     0x15 | AUTO_INCREMENT };
             uint8_t request2[2] = { 0x16 | AUTO_INCREMENT, 
@@ -115,6 +104,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             float lpc  = GA * DF / (ALSIT * x[0]);
 
             setLux(iac * lpc);
+            return true;
         }
 };
 
