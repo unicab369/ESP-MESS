@@ -4234,9 +4234,9 @@
     (property "Datasheet" "http://www.aosmd.com/pdfs/datasheet/AO3401A.pdf" (at 92.075 71.12 0)
       (effects (font (size 1.27 1.27)) (justify left) hide)
     )
-    (pin "1" (uuid 1af42c89-0c51-47b1-b77d-e50eb780b1ce))
-    (pin "2" (uuid 20b40451-fe76-4ae8-bfca-410d11bc9fe0))
-    (pin "3" (uuid 7e0df4a4-2101-4852-92b4-fec0001eb4ae))
+    (pin "1" (uuid 4bcdd49a-b5d4-4270-910a-dcfa754419e3))
+    (pin "2" (uuid 9874a743-0bac-4a1f-be7f-5777a33cb225))
+    (pin "3" (uuid 526b99cb-cc4f-4e5a-b4bd-33c9b01bbfff))
     (instances
       (project "sensor_node"
         (path "/af3a10dd-48b4-4881-8409-82af1b899ed6"
