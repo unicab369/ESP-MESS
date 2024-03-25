@@ -171,10 +171,6 @@ class Mng_Network {
             espNow.changeChannel(servWifi.scanChannel);
         }
 
-        void resetWifi() {
-            servWifi.resetWifi();        //! Reset Wifi
-        }
-
         void run() { 
             udp.run();
             espNow.run();

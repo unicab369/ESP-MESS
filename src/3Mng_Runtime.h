@@ -1,34 +1,15 @@
 #include "4Mng_Network.h"
 
-//! timerCallback is static sto asyncTimer1 cannot be an instance of Mng_Runtime
-AsyncTimer asyncTimer1;
-
 uint32_t loopCnt1 = 0, loopCnt2 = 0;
 uint8_t secondCounter = 0;
-uint32_t count = 0;
 uint32_t counter100ms = 0;
 
 class Mng_Runtime: public Loggable {
-    //! MAIN JOB
-    std::function<void(RunTimeModel*)> runtimeCb1 = [&](RunTimeModel* runTime) {
-        if (runTime->secondsChanged == true) {            
-            // //! Reset sensors reading every second
-            Serial.println("IM HERE");
-
-            char output[22];
-            sprintf(output, "+%lu", loopCnt1);
-            device.addDisplayQueues(output, 3);
-            loopCnt1 = 0;
-            // device.addStoreQueue();
-        }
-    };
-
     public:
         Mng_Runtime(): Loggable("Runtime") {}
 
         Serv_Device device;
         Mng_Network network;
-        Mng_Power power;
 
         void setupRunTime() {
             xLogSection(__func__);
@@ -48,7 +29,7 @@ class Mng_Runtime: public Loggable {
             };
 
             device.onHandleResetWifi = [&]() {
-                network.resetWifi();
+                network.servWifi.resetWifi();
             };
 
             device.onHandleStartAP = [&]() {
@@ -66,18 +47,17 @@ class Mng_Runtime: public Loggable {
             loopCnt1++;
             network.run();
 
-            #ifdef ESP8266
-                asyncTimer1.run(runtimeCb1);
-            #endif
-
             if (millis()-c0_timeRef>1000) {
-                uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-
                 char output[22];
-                sprintf(output, "C0 D%lu +%lu", stackUsage, loopCnt1);
-                device.addDisplayQueues(output, 3);
 
-                // Serial.printf("\n\nTimer0 = %lu; stack = %lu", loopCnt1, stackUsage);
+                #if defined(ESP32)
+                    uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
+                    sprintf(output, "C0 D%lu +%lu", stackUsage, loopCnt1);
+                #else
+                    sprintf(output, "+%lu", loopCnt1);
+                #endif
+
+                device.addDisplayQueues(output, 3);
                 loopCnt1 = 0;    
                 c0_timeRef = millis();
             }
@@ -89,15 +69,14 @@ class Mng_Runtime: public Loggable {
 
             //! guard
             if (millis() - timeRef < 100) return;
+            timeRef = millis();
+            device.handleQueues();
 
             #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
                 digitalWrite(22, !digitalRead(22));
             #else
                 digitalWrite(2, !digitalRead(2));
             #endif
-            
-            timeRef = millis();
-            device.handleQueues();
 
             counter100ms++;
             if (counter100ms>9) {
@@ -105,10 +84,13 @@ class Mng_Runtime: public Loggable {
 
                 secondCounter++;
                 if (secondCounter>59) secondCounter = 0;
-                uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-
                 char output[22];
-                sprintf(output, "C1 D%lu +%lu", stackUsage, loopCnt2);
+
+                #if defined(ESP32)
+                    uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
+                    sprintf(output, "C1 D%lu +%lu", stackUsage, loopCnt2);
+                #endif
+
                 device.addDisplayQueues(output, 4);
 
                 //#cmd: iotPlotter
