@@ -5,6 +5,8 @@ AsyncTimer asyncTimer1;
 
 uint32_t loopCnt1 = 0, loopCnt2 = 0;
 uint8_t secondCounter = 0;
+uint32_t count = 0;
+uint32_t counter100ms = 0;
 
 class Mng_Runtime: public Loggable {
     //! MAIN JOB
@@ -24,7 +26,6 @@ class Mng_Runtime: public Loggable {
     public:
         Mng_Runtime(): Loggable("Runtime") {}
 
-        AsyncTimer asyncTimer2;
         Serv_Device device;
         Mng_Network network;
         Mng_Power power;
@@ -55,118 +56,115 @@ class Mng_Runtime: public Loggable {
             };
 
             network.setup(&device);
-
-            #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-                pinMode(22, OUTPUT);
-
-                xTaskCreatePinnedToCore([](void *pvParam){
-                    Mng_Network* network = (Mng_Network*)pvParam;
-                    Serv_Device *dev = network->device;
-
-                    while(1) {
-                        vTaskDelay(pdMS_TO_TICKS(1000));
-                        uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-
-                        char output[22];
-                        sprintf(output, "C0 D%lu +%lu", stackUsage, loopCnt1);
-                        dev->addDisplayQueues(output, 3);
-                        // Serial.printf("\n\nTimer0 = %lu; stack = %lu", loopCnt1, stackUsage);
-                        loopCnt1 = 0;
-                    }
-                }, "core0_TaskB", 4000, &network, 1, NULL, 0);
-
-                xTaskCreatePinnedToCore([](void *pvParam){
-                    Mng_Network* network = (Mng_Network*)pvParam;
-                    Serv_Device *dev = network->device;
-
-                    while(1) {
-                        vTaskDelay(pdMS_TO_TICKS(1000));
-                        uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
-
-                        char output[22];
-                        sprintf(output, "C1 D%lu +%lu", stackUsage, loopCnt2);
-                        dev->addDisplayQueues(output, 4);
-                        // Serial.printf("\n\nTimer1*** = %lu; stack = %lu", loopCnt2, stackUsage);
-                        loopCnt2 = 0;
-                        
-                        secondCounter++;
-                        if (secondCounter>59) secondCounter = 0;
-
-                        //#cmd: settings
-                        uint8_t log_freq = dev->getStorage()->stoSettings.value.espNowLogFreq;
-
-                        if (log_freq>2 && secondCounter%log_freq==0) {
-                            network->handle_PlotterQueue();
-                        }
-
-                        //#cmd: iotPlotter
-                        //#cmd: apiKey
-                        //#cmd: url http://iotplotter.com/api/v2/feed/#
-                        uint8_t send_freq = dev->getStorage()->stoSettings.value.espNowSendFreq;
-
-                        if (send_freq>2 && secondCounter%send_freq == 0) {
-                            float temp, hum, lux, volt = 0, mA = 0;
-                            dev->i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
-                            // network->tweet.record.sendTempHumLux(temp, hum, lux, volt, mA);
-                        }
-
-                        //! update sensor readings
-                        dev->handle_Interval(secondCounter, network->getHostName(), network->getNetworkId());
-                        network->handle_PollNetworkState();
-                    }
-                }, "core1_TaskB", 4000, &network, 1, NULL, 1);
-            #else
-                pinMode(2, OUTPUT);
-            #endif
         }
 
         unsigned long timeRef = millis();
+        unsigned c0_timeRef = millis();
+        unsigned c1_timeRef = millis();
 
-        void runJob1() {
+        void run_core0() {
             loopCnt1++;
             network.run();
 
             #ifdef ESP8266
                 asyncTimer1.run(runtimeCb1);
             #endif
+
+            if (millis()-c0_timeRef>1000) {
+                uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
+
+                char output[22];
+                sprintf(output, "C0 D%lu +%lu", stackUsage, loopCnt1);
+                device.addDisplayQueues(output, 3);
+
+                // Serial.printf("\n\nTimer0 = %lu; stack = %lu", loopCnt1, stackUsage);
+                loopCnt1 = 0;    
+                c0_timeRef = millis();
+            }
         }
 
-        void runJob2() {
+        void run_core1() {
             loopCnt2++;
-
-            if (millis() - timeRef > 100) {
-                #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-                    digitalWrite(22, !digitalRead(22));
-                #else
-                    digitalWrite(2, !digitalRead(2));
-                #endif
-                
-                timeRef = millis();
-                device.handleQueues();
-            }
-
             device.runGroupTasks();
+
+            //! guard
+            if (millis() - timeRef < 100) return;
+
+            #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
+                digitalWrite(22, !digitalRead(22));
+            #else
+                digitalWrite(2, !digitalRead(2));
+            #endif
+            
+            timeRef = millis();
+            device.handleQueues();
+
+            counter100ms++;
+            if (counter100ms>9) {
+                counter100ms = 0;
+
+                secondCounter++;
+                if (secondCounter>59) secondCounter = 0;
+                uint32_t stackUsage = uxTaskGetStackHighWaterMark(NULL);
+
+                char output[22];
+                sprintf(output, "C1 D%lu +%lu", stackUsage, loopCnt2);
+                device.addDisplayQueues(output, 4);
+
+                //#cmd: iotPlotter
+                //#cmd: apiKey
+                //#cmd: url http://iotplotter.com/api/v2/feed/#
+                //#cmd: settings
+                uint8_t log_freq = device.getStorage()->stoSettings.value.espNowLogFreq;
+                if (log_freq>2 && secondCounter%log_freq==0) {
+                    network.handle_PlotterQueue();
+                }
+
+                uint8_t send_freq = device.getStorage()->stoSettings.value.espNowSendFreq;
+                if (send_freq>2 && secondCounter%send_freq == 0) {
+                    float temp, hum, lux, volt = 0, mA = 0;
+                    device.i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
+                    // network->tweet.record.sendTempHumLux(temp, hum, lux, volt, mA);
+                }
+
+                if (device.i2c1.dispMode == DISPLAY_DEFAULT) {
+                    device.addDisplayQueues(device.appClock.getDisplay(), 1);         //* LINE 1  
+
+                    if (secondCounter%2==0) {
+                        //! Request sensor Readings
+                        device.i2c1.sensors.requestReadings();
+                    } 
+                    else if (secondCounter%1==0) {
+                        //! Collect sensor Readings
+                        device.i2c1.sensors.collectReadings(); 
+                        device.addDisplayQueues(device.i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
+                        char strOut[22];
+
+                        if (secondCounter%3==0) {
+                            sprintf(strOut, "sd %luMB", device.storage.sd1.getCardSize());
+                            device.addDisplayQueues(network.getHostName(), 0);         //* LINE 0
+                        } else {
+                            char networkInfo[64];
+                            sprintf(strOut, "a%lu/%lu/%lu", MY_ESP.maxAllocatedHeap(), ESP.getFreeHeap(), MY_ESP.heapSize());
+                            uint64_t resetCount = device.storage.stoStat.resetCnt();
+                            sprintf(networkInfo, "%s ~%u ~%llu", network.getNetworkId(), WiFi.channel(), resetCount);
+
+                            device.addDisplayQueues(networkInfo, 0);      //* LINE 0
+                        }
+
+                        device.addDisplayQueues(strOut, 6);           //* LINE 6
+                    }
+
+                    // epaper.printLn();
+                } 
+                else if (device.i2c1.dispMode == DISPLAY_2ND) {
+
+                }
+
+                network.handle_PollNetworkState();
+
+                loopCnt2 = 0;
+                c1_timeRef = millis();    
+            }
         }
 };
-
-// Lora Bluetooth, mqtt
-// FS update, sd storage
-// device encryption
-
-// ESP12
-// Servo                (2)
-
-// device discovery
-// multi channel
-// - Storing channel
-// - Scan channel
-// - broadcast channel
-
-// PIR Multi            (4)
-// handler:
-// x toggle pin
-// ws2812 output
-// buzzer
-
-//! ESPNow, behavior     (3)
-//! Manage pins

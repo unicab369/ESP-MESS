@@ -69,10 +69,10 @@ struct RecordItem {
 
    void makeJson(char* output, uint8_t* id) {
       strcat(output, "{\"data\":{");
-      appendParam(output, id, "Temp", value1); strcat(output, ",");
-      appendParam(output, id, "Hum", value2); strcat(output, ",");
-      appendParam(output, id, "Lux", value3); strcat(output, ",");
-      appendParam(output, id, "Volt", value4); strcat(output, ",");
+      appendParam(output, id, "T", value1); strcat(output, ",");
+      appendParam(output, id, "H", value2); strcat(output, ",");
+      appendParam(output, id, "L", value3); strcat(output, ",");
+      appendParam(output, id, "V", value4); strcat(output, ",");
       appendParam(output, id, "mA", value5); 
       strcat(output, "}}");
    }

@@ -110,7 +110,8 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
 
         //! Interfaces
         void addDisplayQueues(const char* str, uint8_t line) override {
-            _addDisplayQueues(str, line);
+            addDisplayQueue1(str, line);
+            addDisplayQueue2(str, line);
         }
 
         void updateTimer(time_t time) override {
@@ -141,43 +142,6 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
             // Serial.println(timeStr);
             // i2c1.as5600.run();
             // epaper.printLn();
-
-            if (i2c1.dispMode == DISPLAY_DEFAULT) {
-                _addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1  
-
-                if (interval%2==0) {
-                    //! Request sensor Readings
-                    i2c1.sensors.requestReadings();
-                } 
-                else if (interval%1==0) {
-                    //! Collect sensor Readings
-                    i2c1.sensors.collectReadings(); 
-                    _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
-                    
-                    if (interval%3==0) {
-                        char strOut[22];
-                        sprintf(strOut, "sd %luMB", storage.sd1.getCardSize());
-
-                        _addDisplayQueues(hostName, 0);         //* LINE 0
-                        _addDisplayQueues(strOut, 6);           //* LINE 6
-                    } 
-                    else {
-                        char heapInfo[22];
-                        char networkInfo[64];
-                        sprintf(heapInfo, "a%lu/%lu/%lu", MY_ESP.maxAllocatedHeap(), ESP.getFreeHeap(), MY_ESP.heapSize());
-                        uint64_t resetCount = storage.stoStat.resetCnt();
-                        sprintf(networkInfo, "%s ~%u ~%llu", localIP, WiFi.channel(), resetCount);
-
-                        _addDisplayQueues(networkInfo, 0);      //* LINE 0
-                        _addDisplayQueues(heapInfo, 6);         //* LINE 6
-                    }
-                }
-
-                // epaper.printLn();
-            } 
-            else if (i2c1.dispMode == DISPLAY_2ND) {
-
-            }
         }
 
         //! configure

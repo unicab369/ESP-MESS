@@ -35,7 +35,6 @@ class Web_Server: public Loggable {
 
     int value = 0;
     HTTPClient http;
-    const char* serverUrl = "http://iotplotter.com/api/v2/feed/";
 
     public:
         Web_Server(): Loggable("Web_Server") {}
@@ -58,8 +57,6 @@ class Web_Server: public Loggable {
 
         void sendIotPlotter(const char* apiKey, const char* feed, const char* postData) {
             if (strlen(apiKey) < 32 || strlen(feed) < 10) return;
-            
-            // String url = String(serverUrl) + String(feed);
             String url = String(feed);
 
             #ifdef ESP32

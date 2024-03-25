@@ -66,12 +66,6 @@ class Serv_Serial: public Loggable {
             dispQueue2.sendQueue(&item);            
         }
 
-        //! Add to both DisplayQueue1 and DisplayQueue2
-        void _addDisplayQueues(const char* str, uint8_t line) {
-            addDisplayQueue1(str, line);
-            addDisplayQueue2(str, line);
-        }
-
         void addDataStoreQueue(DataStoreItem *item) {
             if (!storage.isValidPath()) return;
             storage.storeItem(item);
