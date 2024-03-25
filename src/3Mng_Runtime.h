@@ -101,15 +101,16 @@ class Mng_Runtime: public Loggable {
 
                         //#cmd: iotPlotter
                         //#cmd: apiKey
-                        //#cmd: url http://iotplotter.com/api/v2/feed/
+                        //#cmd: url http://iotplotter.com/api/v2/feed/#
                         uint8_t send_freq = dev->getStorage()->stoSettings.value.espNowSendFreq;
 
                         if (send_freq>2 && secondCounter%send_freq == 0) {
                             float temp, hum, lux, volt = 0, mA = 0;
                             dev->i2c1.sensors.getTempHumLux(&temp, &hum, &lux);
-                            network->tweet.record.sendTempHumLux(temp, hum, lux, volt, mA);
+                            // network->tweet.record.sendTempHumLux(temp, hum, lux, volt, mA);
                         }
 
+                        //! update sensor readings
                         dev->handle_Interval(secondCounter, network->getHostName(), network->getNetworkId());
                         network->handle_PollNetworkState();
                     }

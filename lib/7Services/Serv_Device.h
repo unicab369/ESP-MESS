@@ -146,9 +146,11 @@ class Serv_Device: public Serv_Serial, public Mng_Config, public Interface_Devic
                 _addDisplayQueues(appClock.getDisplay(), 1);         //* LINE 1  
 
                 if (interval%2==0) {
+                    //! Request sensor Readings
                     i2c1.sensors.requestReadings();
                 } 
                 else if (interval%1==0) {
+                    //! Collect sensor Readings
                     i2c1.sensors.collectReadings(); 
                     _addDisplayQueues(i2c1.sensors.getTempHumLux(), 5);  //* LINE 5
                     

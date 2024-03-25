@@ -103,14 +103,15 @@ void setup() {
 
       // setup i2C
       Wire.begin(4, 5);
-      sht3x.setup(&Wire);
-      bh17.setup(&Wire);
-      apds99.setup(&Wire);
 
       if(!ina219c.init()){
          Serial.println("INA219 not connected!");
       }
       
+      sht3x.setup(&Wire);
+      bh17.setup(&Wire);
+      apds99.setup(&Wire);
+
       uint16_t confRead = ina219c.readRegister(INA219_WE::INA219_CONF_REG);
       Serial.printf("\nINA29_CONFIG_REG = 0x%04X", confRead);
 
@@ -129,30 +130,20 @@ void logSensors() {
    float temp = 0, hum = 0, lux1 = 0, lux2 = 0;
    float busvoltage = 0, current_mA = 0;
 
-   // // collect readings
-   // busvoltage = ina219.getBusVoltage_V();
-   // current_mA = ina219.getCurrent_mA();
-   // if (std::isnan(current_mA)) current_mA = 0.0f;
-   // Serial.printf("\n\nBusVolt = %.2f, curr(mA) = %.2f", busvoltage, current_mA);
-   
-   // ina219b.getReading();
-
-   // sht3x.requestReadings(); 
-   // sht3x.collectReadings();
-   // bh17.requestReadings();
-   // bh17.collectReadings();
-
-   sht3x.getReading();
-   bh17.getReading();
-   apds99.getReading();
+   // collect readings
+   sht3x.requestReadings();
    ina219b.getReading();
-
-   busvoltage = ina219c.getBusVoltage_V();
-   current_mA = ina219c.getCurrent_mA();
-   Serial.printf("\n\nbusVoltage = %.2f, mA= %.2f", busvoltage, current_mA);
+   // busvoltage = ina219c.getBusVoltage_V();
+   // current_mA = ina219c.getCurrent_mA();
+   // Serial.printf("\n\nbusVoltage = %.2f, mA= %.2f", busvoltage, current_mA);
 
    busvoltage = ina219b.getBusVoltage();
    current_mA = ina219b.getmA();
+
+   delay(15);
+   bh17.getReading();
+   sht3x.getReading();
+   apds99.getReading();
 
    temp = sht3x.getTemp();
    hum = sht3x.getHum();
@@ -163,6 +154,7 @@ void logSensors() {
    Serial.printf("\ntemp = %.2f, hum = %.2f, lux1 = %.2f, lux2 = %.2f", temp, hum, lux1, lux2);
    Serial.printf("\n\n***busVoltage = %.2f, mA= %.2f", busvoltage, current_mA);
    tweet.record.sendTempHumLux(temp, hum, lux2, busvoltage, current_mA);
+   delay(1);
 }
 
 

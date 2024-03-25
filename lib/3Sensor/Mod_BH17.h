@@ -61,7 +61,7 @@ class Mod_APDS9930: public SensorBase, public Interface_Lux {
             Serial.print("\nEnable_Reg = "); printBinary(reg0);
 
             // APDS9930_ATIME
-            uint8_t writeVal[2] = { 0x01 | 0xA0, 0xED };
+            uint8_t writeVal[2] = { 0x01 | 0xA0, 0xFF };
             writeBuffer(writeVal, 2);
 
             uint8_t reg1;

@@ -1,11 +1,4 @@
 class Mod_INA219: public SensorBase, public Interface_Current {
-   void onReceiveData(uint8_t *buf) override {
-      uint16_t val1 = *buf;
-      uint16_t val2 = (val1 >> 3) * 4;
-      setBusVoltage(val2/1000);
-      Serial.printf("Volt Reading = %lu", val2);
-   }
-
    public:
       //! addr 0x40
       Mod_INA219(): SensorBase(0x40), Interface_Current() {}

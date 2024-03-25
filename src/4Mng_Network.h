@@ -120,11 +120,13 @@ class Mng_Network {
                         char output[256];
                         //! Make Json
                         record.makeJson(output, packet.sourceB);
-
+                        Serial.println("Attempt Log Data");
+                        Serial.println(output);
+                        
                         Mng_Storage *storage = servWifi.interface->getStorage();
                         Data_Settings settings = storage->stoSettings.value;
                         Data_IotPlotter plotter = storage->stoPlotter.value;
-
+                        
                         wServer.sendIotPlotter(plotter.apiKey, plotter.url, output);           
                         break;
                 }
