@@ -42,9 +42,9 @@ class Mod_AS5600: private Loggable {
         }
 };
 
-class Serv_I2C: public Loggable {
+class Serv_I2C {
     public:
-        Serv_I2C(): Loggable("I2C") {}
+        Serv_I2C() {}
 
         Disp_SSD13062 disp;
         DisplayMode dispMode = DISPLAY_DEFAULT;
@@ -59,7 +59,7 @@ class Serv_I2C: public Loggable {
     
         void setup(int scl, int sda, TwoWire *wire = &Wire) {
             bool error = scl == 255 || sda == 255;
-            xLogStatus(__func__, !error);
+            // xLogStatus(__func__, !error);
             if (error) return;
 
             thisWire = wire;
@@ -85,18 +85,18 @@ class Serv_I2C: public Loggable {
                 error = thisWire->endTransmission();
 
                 if (error == 0) {
-                    xLogf("Device found. Addr = 0x%02X", addr);
+                    // xLogf("Device found. Addr = 0x%02X", addr);
                 } else if (error == 4) {
-                    xLogf("Unknown Error. Addr = 0x%02X", addr);
+                    // xLogf("Unknown Error. Addr = 0x%02X", addr);
                 }
             }
 
             unsigned long dif = millis() - ref;
-            xLogf("Scan Time = %lu", dif);
+            // xLogf("Scan Time = %lu", dif);
         }
         
         void switchDisplayMode() {
-            xLog(__func__);
+            // xLog(__func__);
             dispMode = (dispMode == DISPLAY_DEFAULT) ? DISPLAY_2ND : DISPLAY_DEFAULT;
             disp.clear();
         }

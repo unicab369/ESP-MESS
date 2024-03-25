@@ -71,12 +71,7 @@ class Mng_Runtime: public Loggable {
             if (millis() - timeRef < 100) return;
             timeRef = millis();
             device.handleQueues();
-
-            #if defined(ESP32) && !defined(CONFIG_IDF_TARGET_ESP32C3)
-                digitalWrite(22, !digitalRead(22));
-            #else
-                digitalWrite(2, !digitalRead(2));
-            #endif
+            device.led.toggle();
 
             counter100ms++;
             if (counter100ms>9) {
