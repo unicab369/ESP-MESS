@@ -88,7 +88,11 @@ void setup() {
       digitalWrite(PIN_DRIVE, LOW);             //! POWER RELEASE
 
       for (;;) {
-         if (millis() - timeRef > 500) {
+         if (read1 && millis() - timeRef > 500) {
+            digitalWrite(PIN_LED, !digitalRead(PIN_LED));
+            timeRef = millis();
+
+         } else if (read2 && millis() - timeRef > 1000) {
             digitalWrite(PIN_LED, !digitalRead(PIN_LED));
             timeRef = millis();
          }

@@ -3,6 +3,7 @@
 
 #include <0Foundation.h>
 #include "3Mng_Runtime.h"
+#include <Mess-i2c.h>
 
 Mng_Runtime runTime;
 // Net_Bluetooth bluetooth;
