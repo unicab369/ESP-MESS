@@ -1,4 +1,4 @@
-22026999794085569
+22030423354790989
 2n7002
 SOT363
 
@@ -2575,6 +2575,13 @@ speaker CUI
 0
 2
 2
+CR2032
+BAT_BAT-HLD-001-TR
+
+
+0
+3
+3
 Calibration_Scale
 Gauge_10mm_Type1_CopperTop
 Gauge, Massstab, 10mm, CopperTop, Type 1,
@@ -90348,6 +90355,13 @@ igbt diode module
 0
 25
 25
+UJC-USB-C
+CUI_UJC-HP-3-SMT-TR
+
+
+0
+10
+10
 Valve
 Valve_ECC-83-1
 Valve ECC-83-1 round pins

@@ -38,9 +38,18 @@ x
             #elif CONFIG_IDF_TARGET_ESP32C3
                 Serial.println("IM HERE zzz 333");
                 led1 = 12;
-                btn1 = 6;
-                sda0 = 4; scl0 = 5;
+                // btn1 = 6;
+                // sda0 = 4; scl0 = 5;
             
+                // conf->cs0, conf->ao0, conf->rst0, conf->mosi0, conf->sck0
+                //! SPI Pins
+                sck0 = 4; mosi0 = 3; miso0 = 10;
+                
+                //! large display: CS low enable
+                rst0 = 5;
+                ao0 = 6;       // display AO
+                cs0 = 7;       // display CS
+
             #elif ESP_MESS_V3 && defined(ESP32)
                 led1 = 22;
                 btn1 = 16;
