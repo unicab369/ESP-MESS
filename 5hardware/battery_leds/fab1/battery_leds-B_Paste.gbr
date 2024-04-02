@@ -1,0 +1,21 @@
+%TF.GenerationSoftware,KiCad,Pcbnew,7.0.7*%
+%TF.CreationDate,2024-04-02T17:30:46-04:00*%
+%TF.ProjectId,battery_leds,62617474-6572-4795-9f6c-6564732e6b69,rev?*%
+%TF.SameCoordinates,Original*%
+%TF.FileFunction,Paste,Bot*%
+%TF.FilePolarity,Positive*%
+%FSLAX46Y46*%
+G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
+G04 Created by KiCad (PCBNEW 7.0.7) date 2024-04-02 17:30:46*
+%MOMM*%
+%LPD*%
+G01*
+G04 APERTURE LIST*
+%ADD10R,2.500000X5.100000*%
+G04 APERTURE END LIST*
+D10*
+%TO.C,BT2*%
+X136000001Y-96437501D03*
+X158900001Y-96437501D03*
+%TD*%
+M02*
